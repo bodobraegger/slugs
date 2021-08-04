@@ -1,0 +1,129 @@
+%%% Tim's Stuff %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\def\x{{\vect{x}}}
+\def\y{{\vect{y}}}
+\def\z{{\vect{z}}}
+\def\c{{\vect{c}}}
+\def\s{{\vect{s}}}
+\def\p{{\vect{p}}}
+\def\q{{\vect{q}}}
+\def\r{{\vect{r}}}
+\def\u{{\vect{u}}}
+\def\v{{\vect{v}}}
+\def\w{{\vect{w}}}
+\def\n{{\vect{n}}}
+\def\m{{\vect{m}}}
+\def\O{{\vect{o}}}
+
+\def\scrpax{{\vect{p}^*\!}}
+
+\def\e{{\mbox{e}}}
+
+\newcommand{\B}[1]{\mathbf{#1}}   % switch to bold math font
+
+\def\bAlpha{\B{\alpha}}
+\def\bBeta{\B{\beta}}
+
+\def\zeroset{{0\!\!\!/}}
+
+%\newcommand{\IR}{\mbox{$\mathds{R}$}}
+\newcommand{\IR}{\mbox{I$\!$R}}
+\newcommand{\IN}{\mbox{$\mathds{N}$}}
+\newcommand{\IZ}{\mbox{$\mathds{Z}$}}
+\newcommand{\IC}{\mbox{$\mathds{C}$}}
+
+% for EG style:
+\newlength{\maxfigwidth}
+\setlength{\maxfigwidth}{\columnwidth}
+
+% \setlength{\parskip}{0pt}  % usually a good idea, but not for EG style :-(
+
+% Three possible type settings for transposed matrices:
+%
+\def\tsuper{^{\top\!}}
+%\def\tsuper{^{T\!}}
+%\def\tsuper{^{\rm T\!}}
+
+% Tiny transpose version for large matrices:
+\def\ttsuper{^{\!\mbox{\tiny$\top$}\!}}
+
+% Choose, what matrix type you like (brackets or
+% parantheses)
+%
+%\def\bmatrix#1{\left[\matrix{#1}\right]}
+\def\bmatrix#1{\pmatrix{#1}}
+
+\def\tm{\mbox{$^{\!\mbox{\tiny TM}}$}}
+
+
+% The adobe fonts lead to some spacing errors. So, I defined the
+% following corrected expressions:
+\def\pj{{\p\!_j}}         % instead of \p_j
+
+
+\newcommand*{\nopicture}[2][0.9\linewidth]{%
+  \framebox{\parbox[b][0.6\linewidth][c]{#1}{
+      \begin{center}#2\end{center}
+      }}
+  }
+
+\newcommand*{\nopicturehalf}[2][0.42\linewidth]{%
+  \framebox{\parbox[b][0.4\linewidth][c]{#1}{
+      \begin{center}#2\end{center}
+      }}
+  }
+
+\newcommand*{\nopicturethird}[2][0.3\linewidth]{%
+  \framebox{\parbox[b][0.33\linewidth][c]{#1}{
+      \begin{center}#2\end{center}
+      }}
+  }
+
+\newcommand*{\nopicturedoubleheight}[2][0.9\linewidth]{%
+  \framebox{\parbox[b][1.2\linewidth][c]{#1}{
+      \begin{center}#2\end{center}
+      }}
+  }
+
+\newcommand*{\nopicturehalfdoubleheight}[2][0.45\linewidth]{%
+  \framebox{\parbox[b][0.8\linewidth][c]{#1}{
+      \begin{center}#2\end{center}
+      }}
+  }
+
+\newcommand*{\nopicturethirddoubleheight}[2][0.3\linewidth]{%
+  \framebox{\parbox[b][0.67\linewidth][c]{#1}{
+      \begin{center}#2\end{center}
+      }}
+  }
+
+% remarks:
+%\def\rem#1{{[\textbf{\textit{#1}}]}}
+\def\rem#1{}
+% section wording tasks:
+%\def\scttask#1{\break{\small\textit{[#1]}}}
+\def\scttask#1{}
+
+%\def\new{\bf}
+\def\new{}
+
+\def\myindent{\noindent\rule{0pt}{1pt}\hskip\parindent}
+
+%
+%   % enumerate-Stil
+%
+%   %% Kursiv-romans
+%   %\def\theenumi{({\it\roman{enumi}}\/)}
+%
+%   % aufrechte Kursiv-romans (muesste {u} statt {it} sein) -- krieg
+%   % ich nicht hin
+%   %\def\theenumi{({\usefont{OT1}{cmr}{m}{it}\roman{enumi}}\/)}
+%
+%   \def\theenumi{({\roman{enumi}})}
+%
+%   \def\labelenumi{\theenumi}
+%
+
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+

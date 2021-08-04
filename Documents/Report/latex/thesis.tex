@@ -1,0 +1,212 @@
+\documentclass[a4paper,twoside,12pt,chapterprefix=false]{scrbook}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{longtable} % tables over several pages
+\usepackage[font={small,sl},hang,labelfont=bf]{caption} % configure captions
+%\usepackage{captcont} % continue sufigures over several pages
+\usepackage{booktabs} % publication quality tables for LaTeX
+%\usepackage{showkeys} % shows the labels above the references for easier development
+
+\usepackage{acronym}
+\usepackage{subfig}
+
+\ifpdfoutput{%
+	\usepackage[pdftex]{graphicx}
+	\usepackage[]{pdfpages} %for including full pdf pages
+}{%
+	\usepackage{graphicx}
+}
+\usepackage{rotating} % rotate figures
+
+\usepackage{scrpage2}
+\KOMAoptions{headinclude}
+
+% Font packages:
+\usepackage{times}
+\usepackage{helvet}   % sets sans serif font
+\usepackage[utf8]{inputenc}
+
+% Listings:
+\usepackage{listings}
+
+%PDF hyperref config
+\ifpdfoutput{%
+	\usepackage[pdftex,
+		bookmarks,
+		bookmarksopen=true,
+		bookmarksnumbered=true,
+		pdfauthor={My Name},
+		pdftitle={Thesis Title},
+		colorlinks,
+		linkcolor=black,
+		citecolor=black,
+		filecolor=black,
+		urlcolor=black,
+		anchorcolor=black,
+		menucolor=black,
+		breaklinks=true,
+		pageanchor=true,
+		plainpages=false,
+		pdfpagelabels=true]{hyperref}
+}{}
+
+\ifpdfoutput{%
+	\pdfcompresslevel=9
+	\pdfoutput=1
+	\DeclareGraphicsExtensions{.pdf,.png,.eps}
+}{}
+
+\bibliographystyle{apalike}
+
+% Uncomment the chapter / section you are working on.
+%
+%\includeonly{figures}
+%\includeonly{tables}
+%\includeonly{data-analysis}
+%\includeonly{conclusion}
+%\includeonly{apx-sample-appendix}
+
+%\pagestyle{useheadings}
+
+% A4
+%
+\topmargin -0.5in
+\textheight 9.3in
+\textwidth 6.3in
+\oddsidemargin 0.18in
+\evensidemargin -0.22in
+\parskip 0.1in
+\parindent 0in
+
+\renewcommand{\arraystretch}{1.5}
+\renewcommand{\baselinestretch}{1}
+
+
+\begin{document}
+
+\input{commands}
+
+%% Define leading chapter pages
+%
+\input{studchapter}
+\newpagestyle{mychapterpagestyle}{{\protect\mychpstyleintl}{\protect\mychpstyleintl}}{}
+\newpagestyle{myappendixpagestyle}{{\protect\mychpstyleintl}{\protect\mychpstyleintl}}{}
+%%
+
+
+\hypersetup{pageanchor=false} % disabling anchors for title page to avoid warning
+
+%% Replace this by your own design of a title page
+%
+%\title{Thesis Title}
+%\author{My Name}
+%\date{September 2042}
+%\maketitle
+%\clearemptydoublepage
+% --- selfmade version ----
+\begin{titlepage}
+	\topmargin 1.0cm
+	\oddsidemargin 0.0cm
+	\evensidemargin 0.0cm
+	%\textwidth 6.5in
+	\centering
+	\Huge
+	\vspace{3.0cm}
+	\textbf{\textsf{Thesis Title}} \\[2.0cm]
+
+
+	\todo{Put nice teaser image here}
+
+
+	%\includegraphics*[width=0.4\textwidth]{figures/titlefigure} \\[4.0cm]
+	\vspace{5.0cm}
+	\sffamily
+	\Large
+	My Name
+	\\[0.8cm]
+	\large
+	Master Thesis
+	\\
+	September 2042
+	\\[1.3cm]
+	Dr. Stéphane Magnenat, Dr. Fabio Zünd\\
+	Prof. Dr. Robert W. Sumner
+	\vfill
+	\includegraphics*[width=0.3\textwidth]{figures/eth_logo_lang_pos} \hfill
+	\includegraphics*[width=0.3\textwidth]{figures/GTC_ColorBlack}
+	\vspace{3.4cm}
+\end{titlepage}
+\clearemptydoublepage
+%%
+
+\hypersetup{pageanchor=true}
+\pagenumbering{roman}
+\setcounter{page}{1}
+
+\chapter*{Abstract}
+\input{tex/abstract}
+
+%include acknowledgment here:
+\chapter*{Acknowledgements}
+\input{tex/acknowledgments}
+
+\tableofcontents
+\cleardoublepage
+
+\addcontentsline{toc}{chapter}{List of Figures}
+\listoffigures
+\cleardoublepage
+
+\addcontentsline{toc}{chapter}{List of Tables}
+\listoftables
+\cleardoublepage
+
+\pagenumbering{arabic}
+\renewcommand*{\chapterpagestyle}{mychapterpagestyle}
+\renewcommand*{\chapterformat}{} % show chapter titles only (no numbers)
+% \setchapterpreamble[o]{...}  unfortunately does not move the \chapter output downwards
+
+% ---- MAIN PART ----
+
+\input{tex/introduction}
+\input{tex/related-work}
+\input{tex/more-chapters}
+\input{tex/results}
+\input{tex/conclusion}
+
+
+% ---- END MAIN PART ----
+
+
+\appendix
+\clearpage
+\renewcommand*{\chapterpagestyle}{myappendixpagestyle}
+
+\input{tex/apx-sample-appendix}
+
+\clearpage
+\renewcommand*{\chapterpagestyle}{empty}
+
+%\nocite{*}
+\addcontentsline{toc}{chapter}{Bibliography}
+\bibliography{graphics}
+
+
+%include task description here:
+\cleardoublepage
+\todo{put project description here}
+%\includegraphics[viewport=3cm 0cm 20cm 27.5cm]{task_description} %better use includepdf below!
+%\includepdf{task_description}
+\cleardoublepage
+
+%include eigenstaendigkeitserklaerung
+\cleardoublepage
+\todo{put eigenstaendigkeitserklaerung here}
+%\includepdf{asdasdasd}
+\cleardoublepage
+
+
+
+
+
+\end{document}
