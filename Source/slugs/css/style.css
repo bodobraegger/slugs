@@ -1,0 +1,7 @@
+body {
+    width: 100%;
+    height: 100vh;
+    background-image: 
+      radial-gradient(circle at top right, rgb(255, 255, 255), transparent), 
+      radial-gradient(circle at 20%   80%, rgb(181, 210, 255), transparent);
+  }

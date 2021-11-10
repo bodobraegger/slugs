@@ -1,0 +1,45 @@
+.terminal {
+    font-family: 'Inconsolata', monospace;
+    background-color:rgba(255, 152, 238, 0.3);
+}
+
+#terminal_container {
+    position:relative; /* IMPORTANT */
+    /*border-style: solid;
+    border-color: rgba(237, 165, 255, 0.9);
+    border-radius: 10px;
+    padding: 12px; */
+    height: 600px;
+    width: 300px;
+}
+
+#terminal_input{
+    font-family: 'Inconsolata', monospace;
+    border: 0; /* HAS TO BE SIMILAR TO #autocomplete */
+    font-size:14px; /* HAS TO BE SIMILAR TO #autocomplete */
+    padding:10px; /* IMPORTANT */
+    background-color: transparent;
+    
+    /* FOR DESIGN PURPOSE */
+    outline:0;
+    width: 100%;
+    border-bottom:1px solid rgba(255,255,255,0.3);
+    /* ================== */
+}
+
+#terminal_input::placeholder {
+    color: #1a1a1a; /* FOR DESIGN PURPOSE */
+}
+
+#autocomplete {
+    position: absolute; /* IMPORTANT */
+    z-index: -1; /* IMPORTANT */
+    border:0; /* HAS TO BE SIMILAR TO #search_ */
+    font-size:14px; /* HAS TO BE SIMILAR TO #search_ */
+    left: 10px; /* ACCORDING TO THE LEFT-PADDING OF #search_ */
+    top:10px; /* ACCORDING TO THE TOP-PADDING OF #search_ */
+    
+    color: rgba(204, 0, 255, 0.9);
+    width: 100%;
+    /* ================== */
+}

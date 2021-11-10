@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <meta charset="UTF8">
+    <link rel="icon" href="data:,">
+    <head>
+        <!-- phaser3 and plugins -->
+        <script src="node_modules/phaser/dist/phaser.min.js"></script>
+        <script src="node_modules/phaser3-rex-plugins/dist/rexuiplugin.min.js"></script>
+        <script src="js/lib/randomColor.min.js"></script>
+        <!-- terminal emulation 
+        <link rel="stylesheet" href="node_modules/xterm/css/xterm.css" />
+      <script src="node_modules/xterm/lib/xterm.js"></script>
+    -->
+    <link rel="stylesheet" href="css/terminal.css" />
+    <!-- our implementation -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="js/Scene1.js"></script>
+    <script src="js/Scene2.js"></script>
+    <script src="js/game.js"></script>
+    
+</head>
+<body>
+    
+    <div id="phaser_container"></div>
+    
+    <div class='terminal' id="terminal_container">
+        <div id="autocomplete"></div>
+        <input id="terminal_input" type="text" placeholder="Awaiting your input :)" />
+        <div id="terminal_log">
+        </div>
+        
+        
+        <script src = "js/terminal.js"></script>
+        
+    </div>
+
+    </body>
+</html>
