@@ -4,16 +4,14 @@ class Scene2 extends Phaser.Scene {
     }
 
     create() {
-        let width = this.scale.gameSize.width;
-        let height = this.scale.gameSize.height;
         this.add.text(20, 20, "playing...", {
             font: '25px Mono',
             fill: 'red'
         })
         this.matter.world.setBounds();
         this.matter.add.mouseSpring();
-        this.cameras.main.setZoom(0.5);
-        this.cameras.main.centerOn(document.getElementById("phaser_container").clientWidth/2, document.getElementById("phaser_container").clientHeight/2);
+        // this.cameras.main.setZoom(0.5);
+        // this.cameras.main.centerOn(document.getElementById("phaser_container").clientWidth/2, document.getElementById("phaser_container").clientHeight/2);
     
 
         let circle = this.add.circle(1, 1, 10, 0xFFF000);
@@ -34,8 +32,8 @@ class Scene2 extends Phaser.Scene {
         let matterArc = this.matter.add.trapezoid(1, 1, 10, 20, 0.5);
 
         let slug_r = 20;
-        let slug_x = width/2;
-        let slug_y = height/2;
+        let slug_x = document.getElementById("phaser_container").clientWidth/2;
+        let slug_y = document.getElementById("phaser_container").clientHeight/2;
 
         this.yourSlug = new Slug(this, slug_x, slug_y, slug_r);
         let s1 = new Slug(this, slug_x-80, slug_y-5, 15);
@@ -52,27 +50,13 @@ class Scene2 extends Phaser.Scene {
         
         // RENDER TERMINAL ON TOP OF PHASER
         const terminal_container = document.getElementById('terminal_container');
-        const ph_terminal_container = this.add.dom(0.8*width, 0.9*height, terminal_container)
+        // const ph_terminal_container = this.add.dom(0.8*document.getElementById("phaser_container").clientWidth, 0.9*document.getElementById("phaser_container").clientHeight/2, terminal_container)
         const terminal_input = document.getElementById('terminal_input');
 
         terminal_input.addEventListener('cmd', (e) => {
             // WE HAVE A HOOK INTO THE TERMINAL
             this.processCommand(e.detail.value);
         });
-
-
-        /*
-        const text = this.add.text(400, 300, 'Hello World', { fixedWidth: 150, fixedHeight: 36 })
-        text.setOrigin(0.5, 0.5)
-    
-        text.setInteractive().on('pointerdown', () => {
-            const editor = this.rexUI.edit(text);
-            const elem = editor.inputText.node;
-            elem.style.backgroundColor='white';
-            elem.style.color='pink';
-
-        })*/
-
 
     }
     update() {
@@ -142,19 +126,19 @@ class Slug extends Phaser.GameObjects.Group {
         
         this.headjoint  = this.scene.matter.add.joint(
             this.head, this.body, 
-            (this.head.radius+this.body.radius)/2, 0.6, 
+            4+(this.head.radius+this.body.radius)/2, 0.6, 
             { pointA: {x: this.head.radius/2, y: 0}, 
               pointB: {x: this.body.radius/2, y: 0} }
         ); // , {pointA: {x: this.body.radius/2, y: 0}}
         this.bodyjoint  = this.scene.matter.add.joint(
             this.body, this.tail_0, 
-            (this.body.radius+this.tail_0.radius)/2, 0.6,
+            4+(this.body.radius+this.tail_0.radius)/2, 0.6,
             { pointA: {x: -this.body.radius/2, y: 0}, 
               pointB: {x: -this.tail_0.radius/2, y: 0} }
         );
         this.tailjoint  = this.scene.matter.add.joint(
             this.tail_0, this.tail_1, 
-            (this.tail_0.radius+this.tail_1.radius)/2, 0.6,
+            4+(this.tail_0.radius+this.tail_1.radius)/2, 0.6,
             { pointA: {x: this.tail_0.radius/2, y: 0}, 
               pointB: {x: this.tail_1.radius/2, y: 0} }
         );
@@ -207,11 +191,11 @@ class Slug extends Phaser.GameObjects.Group {
 
         this.antennaeJoints = [
             // this.scene.matter.add.joint(a1, a2, antennaLength/2, 0.5, {pointA: {x: antennaLength/2, y: 0}, pointB: {x: antennaLength/2, y: 0}}),
-            this.scene.matter.add.joint(this.head, a1, 3, 0.5, {damping:0.5, pointA: {x: -this.head.radius, y: -this.head.radius/4}, pointB: {x: antennaLength/2, y: 0}}),
-            this.scene.matter.add.joint(this.head, a2, 3, 0.5, {damping:0.5,pointA: {x: -this.head.radius, y: this.head.radius/4}, pointB: {x: antennaLength/2, y: 0}}),
-            this.scene.matter.add.joint(a1, a2, antennaLength, 0.5, {damping:0.5,pointA: {x: -antennaLength/2, y: 0}, pointB: {x: -antennaLength/2, y: 0}}),
-            this.scene.matter.add.joint(a1, a2, antennaLength*1.5, 0.5, {damping:0.5,pointA: {x: -antennaLength/2, y: 0}, pointB: {x: antennaLength/2, y: 0}}),
-            this.scene.matter.add.joint(a2, a1, antennaLength*1.5, 0.5, {damping:0.5,pointA: {x: -antennaLength/2, y: 0}, pointB: {x: antennaLength/2, y: 0}}),
+            this.scene.matter.add.joint(this.head, a1, 5, 0.5, {damping:0.5, pointA: {x: -this.head.radius, y: -this.head.radius/4}, pointB: {x: antennaLength/2, y: 0}}),
+            this.scene.matter.add.joint(this.head, a2, 5, 0.5, {damping:0.5,pointA: {x: -this.head.radius, y: this.head.radius/4}, pointB: {x: antennaLength/2, y: 0}}),
+            this.scene.matter.add.joint(a1, a2, 4+antennaLength, 0.5, {damping:0.5,pointA: {x: -antennaLength/2, y: 0}, pointB: {x: -antennaLength/2, y: 0}}),
+            this.scene.matter.add.joint(a1, a2, 4+antennaLength*1.5, 0.5, {damping:0.5,pointA: {x: -antennaLength/2, y: 0}, pointB: {x: antennaLength/2, y: 0}}),
+            this.scene.matter.add.joint(a2, a1, 4+antennaLength*1.5, 0.5, {damping:0.5,pointA: {x: -antennaLength/2, y: 0}, pointB: {x: antennaLength/2, y: 0}}),
             
         ]
 
@@ -228,6 +212,9 @@ class Slug extends Phaser.GameObjects.Group {
         
 
         let antennae = [a1, a2]
+        antennae.forEach(e => {
+            e.setCollisionCategory(null);
+        });
 
         this.antennae = this.scene.add.group(antennae)
         this.a1 = a1;
@@ -237,7 +224,12 @@ class Slug extends Phaser.GameObjects.Group {
         this.a1.body.allowRotation=false;
         this.a2.body.allowRotation=false;
         this.bodyparts = [this.a1, this.a2, this.head, this.body, this.tail_0, this.tail_1];
+        this.bodyparts.forEach((e, i) => {
+            // e.setCollisionGroup(i*this.scene.GameObjects.length);
+            // e.setCollidesWith(0);
+        })
         this.addMultiple(this.bodyparts);
+
     }
 
     moveRandomly() {
