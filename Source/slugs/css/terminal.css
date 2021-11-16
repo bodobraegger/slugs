@@ -4,7 +4,7 @@
 }
 
 #terminal_container {
-    position:relative; /* IMPORTANT */
+    position:absolute; /* IMPORTANT */
     /*border-style: solid;
     border-color: rgba(237, 165, 255, 0.9);
     border-radius: 10px;
