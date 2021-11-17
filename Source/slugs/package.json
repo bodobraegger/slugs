@@ -1,8 +1,6 @@
 {
   "dependencies": {
     "phaser": "^3.55.2",
-    "phaser3-rex-plugins": "^1.1.63",
-    "randomcolor": "^0.6.2",
-    "xterm": "^4.15.0"
+    "phaser3-rex-plugins": "^1.1.63"
   }
 }

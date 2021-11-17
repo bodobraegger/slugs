@@ -85,7 +85,14 @@ const config = {
       default: 'matter',
       matter: {
         debug: false,
-        gravity: { y: 0 }
+        gravity: { y: 0 },
+        positionIterations: 1.5,
+        velocityIterations: 1,
+        constraintIterations: 0.5,
+        enableSleeping: true,
+        plugins: {
+          attractors: true,
+        }
       }
     },
     parent: 'phaser_container',
