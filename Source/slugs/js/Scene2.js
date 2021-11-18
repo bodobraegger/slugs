@@ -1,3 +1,24 @@
+let red = Phaser.Display.Color.HexStringToColor("0xff0000")
+let blue = Phaser.Display.Color.HexStringToColor("0x0000ff")
+let green = Phaser.Display.Color.HexStringToColor("0x00FF00")
+let yellow = Phaser.Display.Color.HexStringToColor("0xffff00")
+let magenta = Phaser.Display.Color.HexStringToColor("0xff00ff")
+let cyan = Phaser.Display.Color.HexStringToColor("0x00ffff")
+
+let COLORS = [
+  red,
+  blue,
+  green,
+  yellow,
+  magenta,
+  cyan,
+]
+
+let COLORCATS = [ 0 ];
+for(let i = 0; i < 8; i++) {
+  COLORCATS[i] = i*1/8;
+}
+
 class Scene2 extends Phaser.Scene {
   constructor() {
     super("playGame")
@@ -10,6 +31,7 @@ class Scene2 extends Phaser.Scene {
     })
     this.matter.world.setBounds();
     this.matter.add.mouseSpring();
+    
     // this.cameras.main.setZoom(0.5);
     // this.cameras.main.centerOn(document.getElementById("phaser_container").clientWidth/2, document.getElementById("phaser_container").clientHeight/2);
   
@@ -40,13 +62,19 @@ class Scene2 extends Phaser.Scene {
     this.slugs = [this.yourSlug, s1];
     s1.setAlpha(0.9); 
     
-    
-    for(let i=0; i<5; i++) {
+    let poison = [ ];
+
+    for(var i = 0; i < 10; i++) {
+      var c =  new Phaser.Display.Color().random();
+      poison.push(this.addGameSpriteCircle(100, 100, 20, c.color, 'circle_spiky'));
+      poison[i].color = c;
+
       let rand = (Math.random()+0.2)*10
       let s = new Slug(this, slug_x+i*10*rand, slug_y+i*10*rand, (slug_r+20)*rand/10)
       this.slugs.push(s);
     }
     
+
     
     // RENDER TERMINAL ON TOP OF PHASER
     const terminal_container = document.getElementById('terminal_container');
@@ -57,6 +85,20 @@ class Scene2 extends Phaser.Scene {
       // WE HAVE A HOOK INTO THE TERMINAL
       this.processCommand(e.detail.value);
     });
+
+    poison.forEach(x => {
+      this.slugs.forEach(s => {
+        x.setOnCollideWith(s.head, pair => {
+          // TODO: REWORK THIS TO USE BODY COLOR OR SO FOR X
+          if(this.sameColorClass(x.color, s.color)) {
+            s.setAlpha(1);
+          } else {
+            s.setAlpha(0.5);
+            s.setTint(s.color.clone().darken(10).color)
+          }
+        })
+      })
+    }); 
 
   }
   update() {
@@ -74,7 +116,11 @@ class Scene2 extends Phaser.Scene {
       url: "node_modules/phaser3-rex-plugins/dist/rexuiplugin.min.js",
       sceneKey: 'rexUI'
     });
-  }
+    this.load.image('circle', 'assets/circle.png');
+    this.load.image('circle_spiky', 'assets/circle_spiky.png');
+    this.load.image('flower', 'assets/flower.png');
+    this.load.image('square_rounded', 'assets/square_rounded.png');
+}
   processCommand(input) {
     let cmd = input.trim().split(/\s+/);
     console.log('processing command: ', cmd);
@@ -101,30 +147,53 @@ class Scene2 extends Phaser.Scene {
       matterCircle
     )
   }
+  addGameSpriteCircle(x, y, radius, color = new Phaser.Display.Color().random().color, source = 'circle') {
+    let img = this.add.sprite(x, y, source);
+    img.displayWidth = radius*2;
+    img.displayHeight = radius*2;
+    img.setTint(color);
 
+    let matterCircle = this.matter.add.circle(x, y, radius);
+    let o = this.matter.add.gameObject(
+           img,
+      matterCircle
+    ) 
+    o.radius = radius;
+    return o;
+  }
+
+  sameColorClass(color1, color2) {
+    let cat1, cat2 = 0;
+    COLORCATS.forEach( (e, i) => {
+      if(e - color1.h > 0) {
+        cat1 = i;
+      }
+      if(e - color2.h > 0) {
+        cat2 = i;
+      }
+      
+    })
+    if(cat1 == cat2) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
 }
 
-class Slug extends Phaser.GameObjects.Group {
+class Slug extends Phaser.GameObjects.GameObject {
   constructor(scene, x, y, radius) {
-    super(scene, []);
-    this.classType = Phaser.GameObjects.Arc;
-    let color = new Phaser.Display.Color().random();
-    let headColor = new Phaser.Display.Color().setFromRGB(color).lighten((Math.max(0.2+Math.random(), 0.8))*50);
-    let tailColor = new Phaser.Display.Color().setFromRGB(color).lighten((Math.max(0.2+Math.random(), 0.8))*30);
+    super(scene, x, y);
+    this.color = new Phaser.Display.Color().random();
+    let headColor = this.color.clone().lighten((Math.min(0.2+Math.random(), 0.8))*50);
+    let tailColor = this.color.clone().lighten((Math.min(0.1+Math.random(), 0.8))*30);
 
-    this.head = this.scene.addGameCircle(x, y, radius/1.5, headColor.color);
-    this.body = this.scene.matter.add.gameObject(
-           this.scene.add.circle(x-radius+radius/1.5, y, radius, color.color), 
-      this.scene.matter.add.circle(x-radius+radius/1.5, y, radius)
-    );
-    this.tail_0 = this.scene.matter.add.gameObject(
-           this.scene.add.circle(x-radius+radius/1.5-(radius+radius/1.3), y, radius/1.3, tailColor.color), 
-      this.scene.matter.add.circle(x-radius+radius/1.5-(radius+radius/1.3), y, radius/1.3)
-    );
-    this.tail_1 = this.scene.matter.add.gameObject(
-           this.scene.add.circle(x-radius+radius/1.5-((radius+radius/1.3)+(radius/1.3+radius/2)), y, radius/2, tailColor.color), 
-           this.scene.matter.add.circle(x-radius+radius/1.5-((radius+radius/1.3)+(radius/1.3+radius/2)), y, radius/2)
-    );
+    this.head   = this.scene.addGameCircle(x, y, radius/1.5, headColor.color);
+    this.body   = this.scene.addGameSpriteCircle(x-radius+radius/1.5, y, radius, this.color.color);
+    this.tail_0 = this.scene.addGameCircle(x-radius+radius/1.5-(radius+radius/1.3), y, radius/1.3, tailColor.color);
+    this.tail_1 = this.scene.addGameCircle(x-radius+radius/1.5-((radius+radius/1.3)+(radius/1.3+radius/2)), y, radius/2, tailColor.color);
+
     
     this.headjoint  = this.scene.matter.add.joint(
       this.head, this.body, 
@@ -147,40 +216,7 @@ class Slug extends Phaser.GameObjects.Group {
     );
     this.headjoint.angularStiffness = 0.8;
     let antennaeColor = this.head.fillColor;
-    /*
-    let antennaVertices = `0 0 0 ${radius} ${radius} ${0.75*radius} ${radius} ${0.25*radius}`;
-    // let antenna_vertices = [0,0, 0,2*radius, 2*radius,1.5*radius, 2*radius,.5*radius]
-
-    let a0 = this.scene.matter.add.gameObject(
-      this.scene.add.polygon(x+radius, y+radius/1.5, antennaVertices, antennaeColor), 
-      { shape: { type: 'fromVerts', verts: antennaVertices, flagInternal: true } }
-    );
-
-    let a1 = this.scene.matter.add.gameObject(
-      this.scene.add.polygon(x+radius, y-radius/1.5, antennaVertices, antennaeColor), 
-      { shape: { type: 'fromVerts', verts: antennaVertices, flagInternal: true } }
-    );
-    this.antennae = this.scene.add.group([a0, a1])
-    
-    this.scene.matter.add.joint(this.antennae.getChildren().at(-1), this.head, 2*radius/1.5, 0.6);
-    this.scene.matter.add.joint(this.antennae.getChildren().at(-2), this.head, 2*radius/1.5, 0.6);
-    this.scene.matter.add.joint(this.antennae.getChildren().at(-1), this.antennae.getChildren().at(-2), 2*radius/1.5, 0.6);
-    let a1 = new Antenna(scene, x+radius/1.5+radius/5, y, radius/5, headColor);
-    let a2 = new Antenna(scene, x+radius/1.5+radius/5, y, radius/5, headColor);
-    let antennae = [a1, a2]
-    this.scene.matter.add.joint(this.head, a1.getChildren().at(0), radius/1.5+radius/5, 0.9);
-    this.scene.matter.add.joint(this.head, a2.getChildren().at(0), radius/1.5+radius/5, 0.9);
-    
  
-    a1.getChildren().forEach((element, i) => {
-      this.scene.matter.add.joint(element, a2.getChildren().at(i), radius, 0.6)
-    });
-    this.scene.matter.add.joint(a1.getChildren().at(0), a2.getChildren().at(-1), a1.radius * 2, 0.5)
-    this.scene.matter.add.joint(a2.getChildren().at(0), a1.getChildren().at(-1), a1.radius * 2, 0.5)
-    
-    */
-    
-
      
      let antennaLength = this.head.radius;
     let a1 = this.scene.matter.add.gameObject(
@@ -210,9 +246,7 @@ class Slug extends Phaser.GameObjects.Group {
     this.antennaeJoints.forEach(e=> {
       this.joints.push(e);
     });
-    this.joints.forEach(e => {
-    })
-    
+
 
     let antennae = [a1, a2]
     antennae.forEach(e => {
@@ -230,12 +264,26 @@ class Slug extends Phaser.GameObjects.Group {
       // e.setCollisionGroup(i*this.scene.GameObjects.length);
       // e.setCollidesWith(0);
     })
-    this.addMultiple(this.bodyparts);
-
+    this.children = this.bodyparts + this.joints;
   }
 
   moveRandomly() {
     this.scene.matter.applyForce(this.head, {x: getRandomInclusive(-0.2, 0.2), y: getRandomInclusive(-0.2, 0.2)})
+  }
+
+  setAlpha(a) {
+    this.bodyparts.forEach(element => {
+      element.setAlpha(a);
+    });
+  }
+
+  setTint(t) {
+    this.bodyparts.forEach(element => {
+      try { element.setTint(t); }
+      catch {
+        element.fillColor = t;
+      }
+    });
   }
 }
 
@@ -261,4 +309,11 @@ class Antenna extends Phaser.GameObjects.Group {
 function getRandomInclusive(min, max) {
   return Math.random() * (max - min) + min; //The maximum is inclusive and the minimum is inclusive
   }
-  
+
+
+
+class Food extends Phaser.GameObjects.Polygon {
+    constructor(scene, x, y, radius, color) {
+        super(scene, x, y, )
+    }
+}
