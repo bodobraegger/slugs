@@ -13,10 +13,10 @@ let COLORS = [
   magenta,
   cyan,
 ]
-
+// 6 categories of hues
 let COLORCATS = [ 0 ];
-for(let i = 0; i < 8; i++) {
-  COLORCATS[i] = i*1/8;
+for(let i = 1; i < 5; i++) {
+  COLORCATS[i] = i*1/5;
 }
 
 class Scene2 extends Phaser.Scene {
@@ -58,14 +58,13 @@ class Scene2 extends Phaser.Scene {
     let slug_y = document.getElementById("phaser_container").clientHeight/2;
 
     this.yourSlug = new Slug(this, slug_x, slug_y, slug_r);
-    let s1 = new Slug(this, slug_x-80, slug_y-5, 15);
+    let s1 = new Slug(this, slug_x-80, slug_y-5, 100);
     this.slugs = [this.yourSlug, s1];
-    s1.setAlpha(0.9); 
     
     let poison = [ ];
 
     for(var i = 0; i < 10; i++) {
-      var c =  new Phaser.Display.Color().random();
+      var c =  new Phaser.Display.Color().random().saturate(50);
       poison.push(this.addGameSpriteCircle(100, 100, 20, c.color, 'circle_spiky'));
       poison[i].color = c;
 
@@ -94,7 +93,6 @@ class Scene2 extends Phaser.Scene {
             s.setAlpha(1);
           } else {
             s.setAlpha(0.5);
-            s.setTint(s.color.clone().darken(10).color)
           }
         })
       })
@@ -102,6 +100,13 @@ class Scene2 extends Phaser.Scene {
 
   }
   update() {
+    let constraints = [ ]
+      this.slugs.forEach(e => {
+        // SHOW THE SKELETONS OF THE SLUGS
+        constraints = constraints.concat(e.jointsBody);
+      })
+      this.renderConstraint(constraints, 0xF9F6EE, 1, 1, 1, 0xF9F6EE, 1);
+
     /*
     if(this.follow = true) {
       this.cameras.main.scrollX = this.yourSlug.body.x - document.getElementById("phaser_container").clientWidth/2;
@@ -116,23 +121,30 @@ class Scene2 extends Phaser.Scene {
       url: "node_modules/phaser3-rex-plugins/dist/rexuiplugin.min.js",
       sceneKey: 'rexUI'
     });
+    this.load.setBaseURL(''); 
     this.load.image('circle', 'assets/circle.png');
     this.load.image('circle_spiky', 'assets/circle_spiky.png');
     this.load.image('flower', 'assets/flower.png');
     this.load.image('square_rounded', 'assets/square_rounded.png');
+    this.load.image('circle_leopard', 'assets/circle_leopard.png');
 }
   processCommand(input) {
     let cmd = input.trim().split(/\s+/);
     console.log('processing command: ', cmd);
+    let output = `<span class='cmd'>${cmd.join(' ')}</span>: `
     if(cmd.length < 1 || cmd[0] == '') { return; }
     if(cmd[0] == 'abracadabra') {
       this.yourSlug.moveRandomly();
       this.yourSlug.joints.forEach(e=>{
         this.matter.world.removeConstraint(e);
       }); 
+      output += `oh no! that was a bad magic trick.`
+      addToOutput(output)
     }
     if(cmd[0] == 'move') {
       this.yourSlug.moveRandomly();
+      output += `moving your being around :).`
+      addToOutput(output)
     }
     if(cmd[0] == 'follow') [
       this.follow = true
@@ -147,7 +159,7 @@ class Scene2 extends Phaser.Scene {
       matterCircle
     )
   }
-  addGameSpriteCircle(x, y, radius, color = new Phaser.Display.Color().random().color, source = 'circle') {
+  addGameSpriteCircle(x, y, radius, color = new Phaser.Display.Color().random().saturate(50).color, source = 'circle') {
     let img = this.add.sprite(x, y, source);
     img.displayWidth = radius*2;
     img.displayHeight = radius*2;
@@ -162,17 +174,58 @@ class Scene2 extends Phaser.Scene {
     return o;
   }
 
+  addGameCircleTextured(x, y, radius, color = new Phaser.Display.Color().random().saturate(50).color, texture = 'circle_leopard') {
+    
+    let g = this.add.graphics()
+
+    let crcl= this.add.circle(0, 0, radius, color)
+    crcl.fillColor=color;
+    crcl.removeFromDisplayList()
+    
+    let txtr = new Phaser.GameObjects.Sprite(this, 0, 0, texture);
+    // txtr.displayWidth = 2*radius;
+    // txtr.displayHeight = 2*radius;
+    
+    let mask = new Phaser.Display.Masks.GeometryMask(this, crcl);
+    // txtr.setMask(mask);
+    
+    let rt = this.add.renderTexture(x, y, radius*2, radius*2);
+    rt.draw(crcl, radius, radius);
+    rt.draw(txtr, radius, radius);
+    rt.setMask(mask);
+    // let c = this.add.container(x, y, [crcl, txtr, ]);
+    
+    let matterCircle = this.matter.add.circle(x, y, radius);
+
+
+    let o = this.matter.add.gameObject(
+           rt,
+      matterCircle
+    ) 
+    o.radius = radius;
+  
+    // SHOW THE SKELETONS OF THE SLUGS
+    // TO ENSURE CIRCULAR MASKS ON THE TEXTURE FILES, IF PERFORAMCE HOG JUST CUT OUT THE TEXTURES BY HAND
+    this.events.on('postupdate', function() {
+      crcl.copyPosition(rt)
+    }, this);
+
+    return [o, crcl];
+  }
+
   sameColorClass(color1, color2) {
-    let cat1, cat2 = 0;
-    COLORCATS.forEach( (e, i) => {
-      if(e - color1.h > 0) {
+    let cat1=-1, cat2 = -1;
+    let i = 0;
+    for(i = 0; i < COLORCATS.length; i++) {
+      if(color1.h - COLORCATS[i] > 0) {
         cat1 = i;
-      }
-      if(e - color2.h > 0) {
+      } 
+      if(color2.h - COLORCATS[i] > 0) {
         cat2 = i;
       }
-      
-    })
+    }
+    console.log('color.h:', color1.h, color2.h)
+    console.log('cat:', cat1, cat2)
     if(cat1 == cat2) {
       return true;
     }
@@ -180,17 +233,30 @@ class Scene2 extends Phaser.Scene {
       return false;
     }
   }
+
+  renderConstraint(constraints, lineColor, lineOpacity, lineThickness, pinSize, anchorColor, anchorSize) {
+    if (!this.graphics) {
+      this.graphics = this.add.graphics();
+    }
+  
+    this.graphics.clear();
+    for(var i=0, n=constraints.length; i<n; i++) {
+      this.matter.world.renderConstraint(constraints[i], this.graphics, lineColor, lineOpacity, lineThickness, pinSize, anchorColor, anchorSize);
+    }
+  }
+  
 }
 
 class Slug extends Phaser.GameObjects.GameObject {
   constructor(scene, x, y, radius) {
     super(scene, x, y);
-    this.color = new Phaser.Display.Color().random();
+    this.color = new Phaser.Display.Color().random().saturate(50);
     let headColor = this.color.clone().lighten((Math.min(0.2+Math.random(), 0.8))*50);
     let tailColor = this.color.clone().lighten((Math.min(0.1+Math.random(), 0.8))*30);
 
     this.head   = this.scene.addGameCircle(x, y, radius/1.5, headColor.color);
-    this.body   = this.scene.addGameSpriteCircle(x-radius+radius/1.5, y, radius, this.color.color);
+    let v = this.scene.addGameCircleTextured(x-radius+radius/1.5, y, radius, this.color.color);
+    this.body = v[0]; this.bodymask   = v[1];
     this.tail_0 = this.scene.addGameCircle(x-radius+radius/1.5-(radius+radius/1.3), y, radius/1.3, tailColor.color);
     this.tail_1 = this.scene.addGameCircle(x-radius+radius/1.5-((radius+radius/1.3)+(radius/1.3+radius/2)), y, radius/2, tailColor.color);
 
@@ -238,14 +304,16 @@ class Slug extends Phaser.GameObjects.GameObject {
       
     ]
 
-    this.joints = [
+    this.jointsBody = [
       this.headjoint,
       this.bodyjoint,
       this.tailjoint
     ]
+    this.joints = [...this.jointsBody]
     this.antennaeJoints.forEach(e=> {
       this.joints.push(e);
     });
+
 
 
     let antennae = [a1, a2]

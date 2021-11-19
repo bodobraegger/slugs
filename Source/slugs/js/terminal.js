@@ -1,4 +1,4 @@
-let words = ['move', 'if', 'for', 'help', 'abracadabra']
+let words = ['move', 'if', 'for', 'help', 'abracadabra', 'clear']
 
 var logCount = 0;
 var logMax = 5;
@@ -105,18 +105,33 @@ terminal_input.addEventListener('keydown', (e) => {
         clearLog();
         clear();
         return;
+      } else if(cmd=='help') {
+        addToOutput(`hello! the commands that are available are <span class='cmd'>${words}</span>.`)
+      } else if(!words.includes(cmd)) {
+        addToOutput(`error: '<span class='cmd'>${cmd}</span>' is not a known command. try a different one, or try typing '<span class='cmd'>help</span>'!.`)
       }
+
       let CmdEvent = new CustomEvent('cmd', { 
         detail: { value: cmd }
       });
       terminal_input.dispatchEvent(CmdEvent);
-      addToLog(cmd);
+      // addToLog(cmd);
       clear()
     }
 })
 
 
 function addToLog(cmd) {
+  logCount++;
+  if(logCount > logMax) {
+    terminal_log.firstChild.remove();
+  }
+  let p = document.createElement('p');
+  p.innerHTML = cmd;
+  terminal_log.appendChild(p);
+}
+
+function addToOutput(cmd) {
   logCount++;
   if(logCount > logMax) {
     terminal_log.firstChild.remove();
