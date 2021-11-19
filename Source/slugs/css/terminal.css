@@ -14,7 +14,17 @@
     width: 20%;
 }
 
-#terminal_input{
+#autocomplete_parent {
+    display: grid;
+    grid-template-columns: 1fr;
+}
+#autocomplete_parent div, #autocomplete_parent input { 
+    grid-row-start: 1;
+    grid-column-start: 1;
+}
+
+
+#terminal_input, #autocomplete {
     font-family: 'Inconsolata', monospace;
     border: 0; /* HAS TO BE SIMILAR TO #autocomplete */
     font-size:14px; /* HAS TO BE SIMILAR TO #autocomplete */
@@ -24,6 +34,7 @@
     /* FOR DESIGN PURPOSE */
     outline:0;
     width: 100%;
+    border-top: 1px dotted rgba(255,255,255,0.3);
     border-bottom:1px solid rgba(255,255,255,0.3);
     /* ================== */
 }
@@ -33,16 +44,8 @@
 }
 
 #autocomplete {
-    position: absolute; /* IMPORTANT */
     z-index: -1; /* IMPORTANT */
-    border:0; /* HAS TO BE SIMILAR TO #search_ */
-    font-size:14px; /* HAS TO BE SIMILAR TO #search_ */
-    left: 10px; /* ACCORDING TO THE LEFT-PADDING OF #search_ */
-    top:10px; /* ACCORDING TO THE TOP-PADDING OF #search_ */
-    
     color: rgba(204, 0, 255, 0.9);
-    width: 100%;
-    /* ================== */
 }
 
 .cmd {
