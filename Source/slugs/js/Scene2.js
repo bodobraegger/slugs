@@ -129,26 +129,55 @@ class Scene2 extends Phaser.Scene {
     this.load.image('circle_leopard', 'assets/circle_leopard.png');
 }
   processCommand(input) {
-    let cmd = input.trim().split(/\s+/);
-    console.log('processing command: ', cmd);
-    let output = `<span class='cmd'>${cmd.join(' ')}</span>: `
+    let cmd = []
+    cmd = input.trim().split(/\s+/);
+    let output = `${wrapCmd(cmd.join(' '))}: `
+
     if(cmd.length < 1 || cmd[0] == '') { return; }
-    if(cmd[0] == 'abracadabra') {
-      this.yourSlug.moveRandomly();
-      this.yourSlug.joints.forEach(e=>{
-        this.matter.world.removeConstraint(e);
-      }); 
-      output += `oh no! that was a bad magic trick.`
-      addToOutput(output)
+    
+    let cmd0 = cmd[0];
+
+    switch (cmd0) {
+      case 'if':
+        let exception_if = `uh oh, an if rule needs to be of the form ${wrapCmd('if (X) {Y}')}!`;
+        if(cmd.length < 3 || cmd[1] == '' || cmd[1][0] != '(' || cmd[2] == '') { 
+          addToOutput(exception_if);
+          return;
+        }
+        let condition = parseEncased('()', cmd);
+        console.log(condition);
+        let action = parseEncased('{}', cmd);
+        console.log(action)
+
+        switch (condition) {
+          case '':
+            break;
+        
+          default:
+            break;
+        }
+        break;
+      case 'abracadabra':
+        this.yourSlug.moveRandomly();
+        this.yourSlug.joints.forEach(e=>{
+          this.matter.world.removeConstraint(e);
+        }); 
+        output += `oh no! that was a bad magic trick.`
+        addToOutput(output)
+        break;
+      case 'move':
+        this.yourSlug.moveRandomly();
+        output += `moving your being around :).`
+        addToOutput(output)
+        break;
+    
+      default:
+          addToOutput(colorize(`
+            ${wrapCmd(cmd0)} is not a known command.<br> 
+            try a different one, or try typing ${wrapCmd('help')}!.
+          `, 'rgba(196, 77, 86, 0.2)' )); // new Phaser.Display.Color().random().rgba
+        break;
     }
-    if(cmd[0] == 'move') {
-      this.yourSlug.moveRandomly();
-      output += `moving your being around :).`
-      addToOutput(output)
-    }
-    if(cmd[0] == 'follow') [
-      this.follow = true
-    ]
   }
 
   addGameCircle(x, y, radius, color) {

@@ -1,6 +1,7 @@
 .terminal {
     font-family: 'Inconsolata', monospace;
     background-color:rgba(255, 152, 238, 0.3);
+    border-radius: 15px;
 }
 
 #terminal_container {
@@ -50,4 +51,11 @@
 
 .cmd {
    font-weight: bold;
+}
+
+.output {
+    background-color:rgba(93, 255, 206, 0.1);
+    border-radius: 15px;
+    padding: 10px; 
+    margin: 5px 3px;
 }

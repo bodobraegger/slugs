@@ -1,4 +1,4 @@
-let words = ['move', 'if', 'for', 'help', 'abracadabra', 'clear']
+let wordsFirst = ['move', 'if (', 'for (', 'help', 'abracadabra', 'clear']
 
 var logCount = 0;
 var logMax = 5;
@@ -7,7 +7,7 @@ let autocomplete = document.getElementById('autocomplete');
 let terminal_input = document.getElementById('terminal_input');
 
 
-function clear() {
+function clearInput() {
   terminal_input.value = '';
   autocomplete.innerHTML = '';
 }
@@ -57,11 +57,11 @@ terminal_input.addEventListener('keyup', (e) => {
 		let input = terminal_input.value;
     autocomplete.innerHTML = input;
     
-    let regex = new RegExp('^' + input + '.*', 'i');
+    let regex = new RegExp(`^${escapeRegExp(input)}.*`, 'igm');
     
-    for(let i = 0; i < words.length; i++){
-    	if(words[i].match(regex)){
-      	autocomplete.innerHTML += words[i].slice(input.length, words[i].length);
+    for(let i = 0; i < wordsFirst.length; i++){
+    	if(wordsFirst[i].match(regex)){
+      	autocomplete.innerHTML += wordsFirst[i].slice(input.length, wordsFirst[i].length);
         break;
       }
     }
@@ -93,7 +93,7 @@ terminal_input.addEventListener('keydown', (e) => {
             terminal_input.value = next;
         }
         else {
-          clear();
+          clearInput();
         }
         return;
     }
@@ -101,47 +101,81 @@ terminal_input.addEventListener('keydown', (e) => {
       let cmd = terminal_input.value
       while(buffer.next() !== undefined) {};
       buffer.push(cmd)
-      if(cmd=='clear') {
-        clearLog();
-        clear();
-        return;
-      } else if(cmd=='help') {
-        addToOutput(`hello! the commands that are available are <span class='cmd'>${words}</span>.`)
-      } else if(!words.includes(cmd)) {
-        addToOutput(`error: '<span class='cmd'>${cmd}</span>' is not a known command. try a different one, or try typing '<span class='cmd'>help</span>'!.`)
-      }
-
-      let CmdEvent = new CustomEvent('cmd', { 
-        detail: { value: cmd }
-      });
-      terminal_input.dispatchEvent(CmdEvent);
-      // addToLog(cmd);
-      clear()
+      switch (cmd) {
+        case 'clear':
+          clearLog();
+          break;
+        
+        case 'help':
+          addToOutput(`hello! the commands that are available are ${wrapCmd(wordsFirst.join(', '))}.`)
+          break;
+        
+        default:
+          let CmdEvent = new CustomEvent('cmd', { 
+            detail: { value: cmd }
+          });
+          terminal_input.dispatchEvent(CmdEvent);
+          // addToLog(cmd);
+        }
+        clearInput();
     }
 })
 
-
-function addToLog(cmd) {
+// TERMINAL IO FUNCTIONS
+function addToOutput(output) {
   logCount++;
   if(logCount > logMax) {
     terminal_log.firstChild.remove();
   }
-  let p = document.createElement('p');
-  p.innerHTML = cmd;
-  terminal_log.appendChild(p);
-}
-
-function addToOutput(cmd) {
-  logCount++;
-  if(logCount > logMax) {
-    terminal_log.firstChild.remove();
+  let div = document.createElement('div');
+  // if output is already a div, don't create a nested one.
+  if(output.slice(0,4) == '<div') {
+    div.innerHTML = `${output}`;
+    div = div.firstElementChild;
+  } else {
+    div.innerHTML = `${output}`;
   }
-  let p = document.createElement('p');
-  p.innerHTML = cmd;
-  terminal_log.appendChild(p);
+  div.classList += ` output`;
+  terminal_log.appendChild(div);
 }
 
 function clearLog() {
   terminal_log.innerHTML = '';
   logCount = 0;
+}
+
+function colorize(output, color) {
+  return `<div class='colorized' style="background-color: ${color}">${output}</div>`
+}
+
+function wrapCmd(cmd) {
+  return `<span class='cmd'>${cmd}</span>`
+}
+
+// STRING HELPERS
+function escapeRegExp(str) {
+  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+}
+
+
+// INPUT PARSING
+function parseEncased(parentheses, input_arr) {
+  let exception_if = `uh oh, an if rule needs to be of the form ${wrapCmd('if (X) {Y}')}!`;
+  let encased = '';
+  let i = 0;
+  word = input_arr[i];
+  while(word.at(0) != parentheses[0]) {
+    i++;
+    word = input_arr[i];
+  } word = input_arr[i].slice(1);
+  while(word.at(-1) != parentheses[1]) {
+    if(i >= input_arr.length) {
+      addToOutput(exception_if);
+      return;
+    }
+    encased += ` ${word}`;
+    word = input_arr[i];
+    i++; 
+  } encased += ` ${word.slice(0, -1)}`;
+  return encased
 }
