@@ -13,11 +13,12 @@ let COLORS = [
   magenta,
   cyan,
 ]
-// 6 categories of hues
-let COLORCATS = [ 0 ];
-for(let i = 1; i < 5; i++) {
-  COLORCATS[i] = i*1/5;
+// 6 categories of hues, hue of 0 and 1 both correspond to red, so cats need to be shifted by half a value
+let COLORCATS = [ 0, 1/6/2 ];
+for(let i = 1; i < 6; i++) {
+  COLORCATS.push(1/6/2 + i*1/6);
 }
+console.log(COLORCATS)
 
 class Scene2 extends Phaser.Scene {
   constructor() {
@@ -57,14 +58,14 @@ class Scene2 extends Phaser.Scene {
     let slug_x = document.getElementById("phaser_container").clientWidth/2;
     let slug_y = document.getElementById("phaser_container").clientHeight/2;
 
-    this.yourSlug = new Slug(this, slug_x, slug_y, slug_r);
+    this.yourSlug = new Slug(this, slug_x, slug_y, slug_r, new Phaser.Display.Color().setFromHSV(0, 1, 1));
     let s1 = new Slug(this, slug_x-80, slug_y-5, 100);
     this.slugs = [this.yourSlug, s1];
     
     let poison = [ ];
 
     for(var i = 0; i < 10; i++) {
-      var c =  new Phaser.Display.Color().random().saturate(50);
+      var c =  new Phaser.Display.Color().random().saturate(75);
       poison.push(this.addGameSpriteCircle(100, 100, 20, c.color, 'circle_spiky'));
       poison[i].color = c;
 
@@ -188,7 +189,7 @@ class Scene2 extends Phaser.Scene {
       matterCircle
     )
   }
-  addGameSpriteCircle(x, y, radius, color = new Phaser.Display.Color().random().saturate(50).color, source = 'circle') {
+  addGameSpriteCircle(x, y, radius, color = new Phaser.Display.Color().random().saturate(75).color, source = 'circle') {
     let img = this.add.sprite(x, y, source);
     img.displayWidth = radius*2;
     img.displayHeight = radius*2;
@@ -203,7 +204,7 @@ class Scene2 extends Phaser.Scene {
     return o;
   }
 
-  addGameCircleTextured(x, y, radius, color = new Phaser.Display.Color().random().saturate(50).color, texture = 'circle_leopard') {
+  addGameCircleTextured(x, y, radius, color = new Phaser.Display.Color().random().saturate(75).color, texture = 'circle_leopard') {
     
     let g = this.add.graphics()
 
@@ -246,11 +247,11 @@ class Scene2 extends Phaser.Scene {
     let cat1=-1, cat2 = -1;
     let i = 0;
     for(i = 0; i < COLORCATS.length; i++) {
-      if(color1.h - COLORCATS[i] > 0) {
-        cat1 = i;
+      if(color1.h - COLORCATS[i] >= 0) {
+        cat1 = i % (COLORCATS.length-1);
       } 
-      if(color2.h - COLORCATS[i] > 0) {
-        cat2 = i;
+      if(color2.h - COLORCATS[i] >= 0) {
+        cat2 = i % (COLORCATS.length-1);
       }
     }
     console.log('color.h:', color1.h, color2.h)
@@ -277,9 +278,9 @@ class Scene2 extends Phaser.Scene {
 }
 
 class Slug extends Phaser.GameObjects.GameObject {
-  constructor(scene, x, y, radius) {
+  constructor(scene=Scene2, x=0, y=0, radius=20, color=new Phaser.Display.Color().random().saturate(75)) {
     super(scene, x, y);
-    this.color = new Phaser.Display.Color().random().saturate(50);
+    this.color = color;
     let headColor = this.color.clone().lighten((Math.min(0.2+Math.random(), 0.8))*50);
     let tailColor = this.color.clone().lighten((Math.min(0.1+Math.random(), 0.8))*30);
 
