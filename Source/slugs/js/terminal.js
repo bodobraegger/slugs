@@ -1,4 +1,9 @@
-let wordsFirst = ['move', 'if (', 'for (', 'help', 'abracadabra', 'clear']
+let ifWord = 'if (',
+    forWord = 'for (';
+let wordsFirst = [ifWord, forWord, 'move', 'help', 'abracadabra', 'clear']
+let wordsForCmdString = [].concat(wordsFirst.slice(0, 2));
+let wordsIfCondition = [].concat(COLORCATS_HR);
+
 
 var logCount = 0;
 var logMax = 5;
@@ -54,14 +59,25 @@ let buffer = createRingBuffer(50);
 
 terminal_input.addEventListener('keyup', (e) => {
 	if(terminal_input.value.length > 0 ) {
-		let input = terminal_input.value;
+    let input = terminal_input.value;
+    let checkAgainst = input;
+
+    let wordsToCompare = wordsFirst;
+    
+    if(input.slice(0, ifWord.length) == ifWord) {
+      wordsToCompare = wordsIfCondition;
+      checkAgainst = input.slice(ifWord.length);
+    }
     autocomplete.innerHTML = input;
+
+    // console.log(wordsToCompare, checkAgainst)
     
-    let regex = new RegExp(`^${escapeRegExp(input)}.*`, 'igm');
     
-    for(let i = 0; i < wordsFirst.length; i++){
-    	if(wordsFirst[i].match(regex)){
-      	autocomplete.innerHTML += wordsFirst[i].slice(input.length, wordsFirst[i].length);
+    
+    let regex = new RegExp(`^${escapeRegExp(checkAgainst)}.*`, 'igm');
+    for(let i = 0; i < wordsToCompare.length; i++){
+    	if(wordsToCompare[i].match(regex)){
+      	autocomplete.innerHTML += wordsToCompare[i].slice(checkAgainst.length, wordsToCompare[i].length);
         break;
       }
     }
@@ -107,7 +123,7 @@ terminal_input.addEventListener('keydown', (e) => {
           break;
         
         case 'help':
-          addToOutput(`hello! the commands that are available are ${wrapCmd(wordsFirst.join(', '))}.`)
+          addToOutput(`hello! the commands that are available are ${wrapCmd(wordsFirst.join(', ').replaceAll('(', '...'))}.`)
           break;
         
         default:
