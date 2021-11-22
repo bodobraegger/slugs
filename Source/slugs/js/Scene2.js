@@ -46,12 +46,9 @@ class Scene2 extends Phaser.Scene {
   }
 
   create() {
-    this.add.text(20, 20, "playing...", {
-      font: '25px Mono',
-      fill: 'red'
-    })
     this.matter.world.setBounds();
     this.matter.add.mouseSpring();
+    //this.matter.enableAttractorPlugin();
     
     // this.cameras.main.setZoom(0.5);
     // this.cameras.main.centerOn(document.getElementById("phaser_container").clientWidth/2, document.getElementById("phaser_container").clientHeight/2);
@@ -82,12 +79,12 @@ class Scene2 extends Phaser.Scene {
     let s1 = new Slug(this, slug_x-80, slug_y-5, 100);
     this.slugs = [this.yourSlug, s1];
     
-    let poison = [ ];
+    this.food = [ ];
 
     for(var i = 0; i < 10; i++) {
       var c =  new Phaser.Display.Color().random().saturate(75);
-      poison.push(this.addGameSpriteCircle(100, 100, 20, c.color, 'circle_spiky'));
-      poison[i].color = c;
+      this.food.push(this.addGameSpriteCircle(100, 100, 20, c.color, 'circle_spiky'));
+      this.food[i].color = c;
 
       let rand = (Math.random()+0.2)*10
       let s = new Slug(this, slug_x+i*10*rand, slug_y+i*10*rand, (slug_r+20)*rand/10)
@@ -106,7 +103,7 @@ class Scene2 extends Phaser.Scene {
       this.processCommand(e.detail.value);
     });
 
-    poison.forEach(x => {
+    this.food.forEach(x => {
       this.slugs.forEach(s => {
         x.setOnCollideWith(s.head, pair => {
           // TODO: REWORK THIS TO USE BODY COLOR OR SO FOR X
@@ -178,26 +175,31 @@ class Scene2 extends Phaser.Scene {
             break;
         }
         break;
-      case 'abracadabra':
-        this.yourSlug.moveRandomly();
-        this.yourSlug.joints.forEach(e=>{
-          this.matter.world.removeConstraint(e);
-        }); 
-        output += `oh no! that was a bad magic trick.`
-        addToOutput(output)
-        break;
-      case 'move':
-        this.yourSlug.moveRandomly();
-        output += `moving your being around :).`
-        addToOutput(output)
-        break;
-    
-      default:
-          addToOutput(colorize(`
-            ${wrapCmd(cmd0)} is not a known command.<br> 
-            try a different one, or try typing ${wrapCmd('help')}!.
-          `, 'rgba(196, 77, 86, 0.2)' )); // new Phaser.Display.Color().random().rgba
-        break;
+        case 'abracadabra':
+          this.yourSlug.moveRandomly();
+          this.yourSlug.joints.forEach(e=>{
+            this.matter.world.removeConstraint(e);
+          }); 
+          output += `oh no! that was a bad magic trick.`
+          addToOutput(output)
+          break;
+        case 'move':
+          this.yourSlug.moveRandomly();
+          output += `moving your being around :).`
+          addToOutput(output)
+          break;
+        case 'eat':
+          this.yourSlug.eat();
+          output += `your being will try to eat!`
+          addToOutput(output)
+          break;
+
+        default:
+            addToOutput(colorize(`
+              ${wrapCmd(cmd0)} is not a known command.<br> 
+              try a different one, or try typing ${wrapCmd('help')}!.
+            `, 'rgba(196, 77, 86, 0.2)' )); // new Phaser.Display.Color().random().rgba
+          break;
     }
   }
 
@@ -384,11 +386,7 @@ class Slug extends Phaser.GameObjects.GameObject {
     })
     this.children = this.bodyparts + this.joints;
   }
-
-  moveRandomly() {
-    this.scene.matter.applyForce(this.head, {x: getRandomInclusive(-0.2, 0.2), y: getRandomInclusive(-0.2, 0.2)})
-  }
-
+  
   setAlpha(a) {
     this.bodyparts.forEach(element => {
       element.setAlpha(a);
@@ -403,6 +401,19 @@ class Slug extends Phaser.GameObjects.GameObject {
       }
     });
   }
+
+  moveRandomly() {
+    this.scene.matter.applyForce(this.head, {x: getRandomInclusive(-0.2, 0.2), y: getRandomInclusive(-0.2, 0.2)})
+  }
+
+  eat(foodType='any') {
+    if(foodType == 'any') {
+      for(var i = 0; i < this.scene.food.length; i++) {
+        let f = this.scene.food.length[i];
+      }
+    }
+  }
+
 }
 
 class Antenna extends Phaser.GameObjects.Group {
