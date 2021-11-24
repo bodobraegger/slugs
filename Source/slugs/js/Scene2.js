@@ -1,7 +1,7 @@
 
 // 6 categories of hues, hue of 0 and 1 both correspond to red, so cats need to be shifted by half a value
 let COLORCATS_HR  = ['red', 'yellow/orange', 'green', 'blue', 'purple', 'pink']
-let COLORCATS_360 = [15, 75, 150, 240, 285, 330]
+let COLORCATS_360 = [15, 75, 165, 240, 285, 330]
 let COLORCATS     = [ 0 ];
 for(let i = 0; i < COLORCATS_360.length; i++) {
   COLORCATS.push(COLORCATS_360[i]/360);
@@ -265,8 +265,8 @@ class Scene2 extends Phaser.Scene {
     return [o, crcl];
   }
 
-  sameColorClass(color1, color2) {
-    let cat1=-1, cat2 = -1;
+  sameColorClass(color1, color2) { // color blindness: https://colororacle.org/?
+    let cat1=-1; let cat2 = -1;
     let i = 0;
     for(i = 0; i < COLORCATS.length; i++) {
       if(color1.h - COLORCATS[i] >= 0) {
@@ -276,9 +276,12 @@ class Scene2 extends Phaser.Scene {
         cat2 = i % (COLORCATS.length-1);
       }
     }
-    console.log('color.h:', color1.h, color2.h)
+    let colorDiff = Math.min(Math.abs(color1.h - color2.h), Math.abs(COLORCATS[cat1] - color2.h), Math.abs(COLORCATS[cat2] - color1.h));
+    let similarityBound = 0.2 * (color1.h + color2.h)/2
+    console.log('color.h:', color1.h, color2.h,'| dff:', colorDiff, 'similarityBound:', similarityBound)
     console.log('cat:', COLORCATS_HR[cat1], COLORCATS_HR[cat2])
-    if(cat1 == cat2) {
+
+    if(cat1 == cat2 || colorDiff <= similarityBound) {
       return true;
     }
     else {
