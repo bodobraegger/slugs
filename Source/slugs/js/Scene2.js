@@ -76,12 +76,12 @@ class Scene2 extends Phaser.Scene {
     let slug_y = document.getElementById("phaser_container").clientHeight/2;
 
     this.yourSlug = new Slug(this, slug_x, slug_y, slug_r, new Phaser.Display.Color().setFromHSV(0, 1, 1));
-    let s1 = new Slug(this, slug_x-80, slug_y-5, 100);
+    let s1 = new Slug(this, slug_x-80, slug_y-5, 10);
     this.slugs = [this.yourSlug, s1];
     
-    this.food = [ ];
+    this.food = [ this.addGameSpriteCircle(100, 100, 20, new Phaser.Display.Color().random().color, 'circle_spiky') ];
 
-    for(var i = 0; i < 10; i++) {
+    for(var i = 0; i < 5; i++) {
       var c =  new Phaser.Display.Color().random().saturate(75);
       this.food.push(this.addGameSpriteCircle(100, 100, 20, c.color, 'circle_spiky'));
       this.food[i].color = c;
@@ -103,15 +103,17 @@ class Scene2 extends Phaser.Scene {
       this.processCommand(e.detail.value);
     });
 
-    this.food.forEach(x => {
+    this.food.forEach((f, f_index) => {
       this.slugs.forEach(s => {
-        x.setOnCollideWith(s.head, pair => {
-          // TODO: REWORK THIS TO USE BODY COLOR OR SO FOR X
-          if(this.sameColorClass(x.color, s.color)) {
+        f.setOnCollideWith(s.head, pair => {
+          // TODO: REWORK THIS TO USE BODY COLOR OR SO FOR f
+          if(this.sameColorClass(f.color, s.color)) {
             s.setAlpha(1);
           } else {
             s.setAlpha(0.5);
           }
+          f.destroy();
+          this.food.splice(f_index, 1);
         })
       })
     }); 
@@ -223,6 +225,7 @@ class Scene2 extends Phaser.Scene {
       matterCircle
     ) 
     o.radius = radius;
+    o.color = Phaser.Display.Color.IntegerToColor(color);
     return o;
   }
 
@@ -411,8 +414,12 @@ class Slug extends Phaser.GameObjects.GameObject {
 
   eat(foodType='any') {
     if(foodType == 'any') {
-      for(var i = 0; i < this.scene.food.length; i++) {
-        let f = this.scene.food.length[i];
+      for(var i = 0; i < 1; i++) {
+        let f = this.scene.food[i];
+        console.log(f);
+        let vels = velocityToTarget(this.head, f, 10);
+        console.log(vels)
+        this.head.setVelocity(vels.velX, vels.velY);
       }
     }
   }
@@ -449,3 +456,11 @@ class Food extends Phaser.GameObjects.Polygon {
         super(scene, x, y, )
     }
 }
+
+const velocityToTarget = (from, to, speed = 1) => {
+  console.log(from.x, from.y, to.x, to.y)
+  const direction = Math.atan((to.x - from.x) / (to.y - from.y));
+  const speed2 = to.y >= from.y ? speed : -speed;
+ 
+  return { velX: speed2 * Math.sin(direction), velY: speed2 * Math.cos(direction) };
+ };
