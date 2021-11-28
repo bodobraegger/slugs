@@ -77,42 +77,41 @@ terminal_input.addEventListener('keyup', (e) => {
     let wordsInput = input.match(/\w+/g);
     let wordsOfInterest = wordsInput;
     let current_word = wordsInput.at(-1);
-    let last_word = wordsInput.at(-1);
-    console.log(input, wordsOfInterest, current_word);
+    let last_word = (' ' + current_word).slice(1);
     
     if(wordsOfInterest[0] == ifWord) {
       wordsToCompare = wordsIfConditionLeft;
       checkAgainst = wordsOfInterest.at(-1);
-      if(wordsAll.includes(current_word) == false) {
-        console.log('word not recognized')
-        wordsOfInterest = wordsOfInterest.slice(0, wordsOfInterest.length-1)
-        for(let i = 1; i < wordsOfInterest.length; i++) {
-          if(!wordsAll.includes(wordsOfInterest[i])) {
-            console.log(wordsOfInterest[i], 'not in list of all words!')
-            return;
-          }
+      let i = 1
+      for( ; i < wordsOfInterest.length; i++) {
+        if(!wordsAll.includes(wordsOfInterest[i])) {
+          console.log(wordsOfInterest[i], 'not in list of all words!')
+          wordsOfInterest = wordsOfInterest.slice(0, i);
+          current_word = wordsOfInterest[i-1];
+          break
         }
       }
-      else {
+      if(i == wordsInput.length) {
         checkAgainst = '';
       }
       // parse condition
       if(wordsOfInterest.length > 1) {
+        // TODO: FIX AUTOCOMPLETE RENDER WITH WHITESPACE IN MIDDLE
         // IF even number of words, then we have...
         if(wordsOfInterest.length % 2 == 0) {
           // if xx is yy then zz ... 
           if(wordsAction.includes(current_word)) {
-            // console.log('// if xx is yy then zz')
+            console.log('// if xx is yy then zz')
             return;
           }
           // if XX is YY..., 
           else if(wordsOfInterest.at(-2) == equalWord) {
-            // console.log('// if XX is YY...,')
+            console.log('// if XX is YY...,')
             wordsToCompare = wordsBoolean;
           }
           // OR if XX ..., OR if XX is YY and ZZ ... 
           else if(wordsOfInterest.at(-2) == ifWord || wordsBoolean.includes(wordsOfInterest.at(-2))) {
-            // console.log('// OR if XX ..., OR if XX is YY and ZZ ...')
+            console.log('// OR if XX ..., OR if XX is YY and ZZ ...')
             wordsToCompare = [equalWord]; 
           }
           else if(wordsOfInterest.at(-1) == thenWord) {
@@ -123,30 +122,31 @@ terminal_input.addEventListener('keyup', (e) => {
         else if(wordsBoolean.concat(equalWord).includes(current_word)) {
           // if XX is YY then ...,
           if(current_word == thenWord) {
-            // console.log('// if XX is YY then ...,')
+            console.log('// if XX is YY then ...,')
             wordsToCompare = wordsAction;
           }
           // if XX is ..., 
           else if(current_word == equalWord) {
-            // console.log('// if XX is ...,')
+            console.log('// if XX is ...,')
             wordsToCompare = wordsIfConditionRight;
-            // console.log('juhui')
           }
           // OR if XX is YY and ... 
           else if(wordsBoolean.includes(wordsOfInterest.at(-2))) {
-            // console.log('// OR if XX is YY and ...')
+            console.log('// OR if XX is YY and ...')
             wordsToCompare = wordsIfConditionLeft;
+            console.log('juhui')
           }
         }
       }
     }
+    console.log(input, wordsOfInterest, current_word);
     console.log(checkAgainst, wordsToCompare);
     
     
     autocomplete.innerHTML = input;
     let regex = new RegExp(`^${escapeRegExp(checkAgainst)}.*`, 'igm');
     for(let i = 0; i < wordsToCompare.length; i++){
-    	if(wordsToCompare[i].match(regex)){
+      if(wordsToCompare[i].match(regex)){
         if(wordsAll.includes(last_word)) {
           autocomplete.innerHTML += ' ';
         }
