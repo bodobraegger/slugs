@@ -1,4 +1,3 @@
-
 // 6 categories of hues, hue of 0 and 1 both correspond to red, so cats need to be shifted by half a value
 let COLORCATS_HR  = ['red', 'yellow/orange', 'green', 'blue', 'purple', 'pink']
 let COLORCATS_360 = [15, 75, 165, 240, 285, 330]
@@ -7,38 +6,6 @@ for(let i = 0; i < COLORCATS_360.length; i++) {
   COLORCATS.push(COLORCATS_360[i]/360);
 }
 console.log(COLORCATS)
-
-/* hue help
-#ff0040	    rgb(255, 0, 64)	    hsl(345, 100%, 50%)
-#ff0000	    rgb(255, 0, 0)	    hsl(0, 100%, 50%)
-#ff4000	    rgb(255, 64, 0)	    hsl(15, 100%, 50%)
-
-#ff8000	    rgb(255, 128, 0)	  hsl(30, 100%, 50%)
-#ffbf00	    rgb(255, 191, 0)	  hsl(45, 100%, 50%)
-#ffff00	    rgb(255, 255, 0)	  hsl(60, 100%, 50%)
-#bfff00	    rgb(191, 255, 0)	  hsl(75, 100%, 50%)
-
-#80ff00	    rgb(128, 255, 0)	  hsl(90, 100%, 50%)
-#40ff00	    rgb(64, 255, 0)	    hsl(105, 100%, 50%)
-#00ff00	    rgb(0, 255, 0)	    hsl(120, 100%, 50%)
-#00ff40	    rgb(0, 255, 64)	    hsl(135, 100%, 50%)
-#00ff80	    rgb(0, 255, 128)	  hsl(150, 100%, 50%)
-
-#00ffbf	    rgb(0, 255, 191)	  hsl(165, 100%, 50%)
-#00ffff	    rgb(0, 255, 255)	  hsl(180, 100%, 50%)
-#00bfff	    rgb(0, 191, 255)	  hsl(195, 100%, 50%)
-#0080ff	    rgb(0, 128, 255)	  hsl(210, 100%, 50%)
-#0040ff	    rgb(0, 64, 255)	    hsl(225, 100%, 50%)
-#0000ff	    rgb(0, 0, 255)	    hsl(240, 100%, 50%)
-
-#4000ff	    rgb(64, 0, 255)	    hsl(255, 100%, 50%)
-#8000ff	    rgb(128, 0, 255)	  hsl(270, 100%, 50%)
-#bf00ff	    rgb(191, 0, 255)	  hsl(285, 100%, 50%)
-
-#ff00ff	    rgb(255, 0, 255)	  hsl(300, 100%, 50%)
-#ff00bf	    rgb(255, 0, 191)	  hsl(315, 100%, 50%)
-#ff0080	    rgb(255, 0, 128)	  hsl(330, 100%, 50%)
-*/
 
 class Scene2 extends Phaser.Scene {
   constructor() {
@@ -149,8 +116,7 @@ class Scene2 extends Phaser.Scene {
     this.load.image('circle_leopard', 'assets/circle_leopard.png');
 }
   processCommand(input) {
-    let cmd = []
-    cmd = input.trim().split(/\s+/);
+    let cmd = [].concat(input);
     let output = `${wrapCmd(cmd.join(' '))}: `
 
     if(cmd.length < 1 || cmd[0] == '') { return; }
@@ -159,14 +125,16 @@ class Scene2 extends Phaser.Scene {
 
     switch (cmd0) {
       case 'if':
-        let exception_if = `uh oh, an if rule needs to be of the form ${wrapCmd('if (X) {Y}')}!`;
-        if(cmd.length < 3 || cmd[1] == '' || cmd[1][0] != '(' || cmd[2] == '') { 
+        let thenIndex = cmd.indexOf(thenWord); 
+        let condition = cmd.slice(1, thenIndex);
+        let action = cmd.slice(thenIndex+1);
+
+        let exception_if = `uh oh, an if rule needs to be of the form ${wrapCmd('if condition then action')}, for example: ${wrapCmd('if color is red then eat')}!`;
+        if(cmd.length < 6) { 
           addToOutput(exception_if);
           return;
         }
-        let condition = parseEncased('()', cmd);
         console.log(condition);
-        let action = parseEncased('{}', cmd);
         console.log(action)
 
         switch (condition) {
@@ -447,7 +415,7 @@ class Antenna extends Phaser.GameObjects.Group {
 
 function getRandomInclusive(min, max) {
   return Math.random() * (max - min) + min; //The maximum is inclusive and the minimum is inclusive
-  }
+}
 
 
 

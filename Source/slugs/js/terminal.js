@@ -1,16 +1,27 @@
-let ifWord = 'if (',
-    forWord = 'for (';
-let wordsFirst = [ifWord, forWord, 'move', 'help', 'abracadabra', 'clear']
-let wordsForCmdString = [].concat(wordsFirst.slice(0, 2));
-let wordsIfCondition = [].concat(COLORCATS_HR);
+const ifWord = 'if',
+    forWord = 'for',
+    equalWord = 'is',
+    thenWord = 'then',
+    andWord = 'and',
+    orWord = 'or';
+
+const wordsFirst = [ifWord, forWord, 'move', 'help', 'abracadabra', 'clear']
+const wordsForCmdString = [].concat(wordsFirst.slice(0, 2));
+let wordsIfConditionLeft = ['color', 'shape', 'size'];
+let wordsIfConditionRight = [].concat(COLORCATS_HR);
+const wordsBoolean = [thenWord, andWord, orWord];
+
+let wordsAction = ['eat']
+
+let wordsAll = wordsFirst.concat(wordsIfConditionLeft).concat(wordsIfConditionRight).concat(equalWord).concat(wordsBoolean).concat(wordsAction);
+console.log(wordsAll)
 
 
-var logCount = 0;
-var logMax = 5;
-let terminal_log = document.getElementById('terminal_log');
-let autocomplete = document.getElementById('autocomplete');
-let terminal_input = document.getElementById('terminal_input');
-
+const logCount = 0;
+const logMax = 5;
+const terminal_log = document.getElementById('terminal_log');
+const autocomplete = document.getElementById('autocomplete');
+const terminal_input = document.getElementById('terminal_input');
 
 function clearInput() {
   terminal_input.value = '';
@@ -64,19 +75,70 @@ terminal_input.addEventListener('keyup', (e) => {
 
     let wordsToCompare = wordsFirst;
     
-    if(input.slice(0, ifWord.length) == ifWord) {
-      wordsToCompare = wordsIfCondition;
-      checkAgainst = input.slice(ifWord.length);
+    let input_words = input.match(/\w+/g);
+    let current_word = input_words.at(-1);
+    let last_word = current_word;
+    console.log(input, input_words, current_word);
+    
+    if(input_words[0] == ifWord) {
+      wordsToCompare = wordsIfConditionLeft;
+      checkAgainst = input_words.at(-1);
+      if(wordsAll.includes(current_word) == false) {
+        console.log('word not recognized')
+        input_words = input_words.slice(0, input_words.length-1)
+        last_word = input_words.at(-1);
+      }
+      else {
+        checkAgainst = '';
+      }
+      // parse condition
+      if(input_words.length > 1) {
+        // IF even number of words, then we have...
+        if(input_words.length % 2 == 0) {
+          // if xx is yy then zz ... 
+          if(wordsAction.includes(current_word)) {
+            console.log('// OR if xx is yy then zz')
+            return;
+          }
+          // if XX is YY..., 
+          else if(input_words.at(-2) == equalWord) {
+            console.log('// if XX is YY...,')
+            wordsToCompare = wordsBoolean;
+          }
+          // OR if XX ..., OR if XX is YY and ZZ ... 
+          else if(input_words.at(-2) == ifWord || wordsBoolean.includes(input_words.at(-2))) {
+            console.log('// OR if XX ..., OR if XX is YY and ZZ ...')
+            wordsToCompare = [equalWord]; 
+          }
+        }
+        // ELSE we have ...
+        else if(wordsBoolean.concat(equalWord).includes(current_word)) {
+          // if XX is YY then ...,
+          if(current_word == thenWord) {
+            console.log('// if XX is YY then ...,')
+            wordsToCompare = wordsAction;
+          }
+          // if XX is ..., 
+          else if(current_word == equalWord) {
+            console.log('// if XX is ...,')
+            wordsToCompare = wordsIfConditionRight;
+            console.log('juhui')
+          }
+          // OR if XX is YY and ... 
+          else if(wordsBoolean.includes(input_words.at(-2))) {
+            console.log('// OR if XX is YY and ...')
+            wordsToCompare = wordsIfConditionLeft;
+          }
+        }
+      }
     }
+    console.log(checkAgainst, wordsToCompare);
     autocomplete.innerHTML = input;
-
-    // console.log(wordsToCompare, checkAgainst)
-    
-    
     
     let regex = new RegExp(`^${escapeRegExp(checkAgainst)}.*`, 'igm');
     for(let i = 0; i < wordsToCompare.length; i++){
     	if(wordsToCompare[i].match(regex)){
+        // if(wordsAll.includes(autocomplete.innerHTML.slice(last_word)) {autocomplete.innerHTML += ' '};
       	autocomplete.innerHTML += wordsToCompare[i].slice(checkAgainst.length, wordsToCompare[i].length);
         break;
       }
@@ -92,13 +154,14 @@ terminal_input.addEventListener('keydown', (e) => {
     if(e.key == 'Tab') {
       e.preventDefault();
       terminal_input.value = autocomplete.innerHTML;
+      if(terminal_input.value.at(-1) != ' ') { terminal_input.value += ' ' }
       return;
     }
     if(e.key == 'ArrowUp') {
       e.preventDefault();
       let prev = buffer.prev();
       if(prev!==undefined){
-          terminal_input.value = prev;
+          terminal_input.value = prev.join(' ');
       }
       return;
     }
@@ -114,7 +177,7 @@ terminal_input.addEventListener('keydown', (e) => {
         return;
     }
     if(e.key == 'Enter') {
-      let cmd = terminal_input.value
+      let cmd = terminal_input.value.match(/\w+/g)
       while(buffer.next() !== undefined) {};
       buffer.push(cmd)
       switch (cmd) {
