@@ -135,7 +135,7 @@ class Scene2 extends Phaser.Scene {
           return;
         }
         console.log(condition);
-        console.log(action)
+        console.log(action);
 
         switch (condition) {
           case '':

@@ -14,11 +14,10 @@ const wordsBoolean = [thenWord, andWord, orWord];
 let wordsAction = ['eat']
 
 let wordsAll = wordsFirst.concat(wordsIfConditionLeft).concat(wordsIfConditionRight).concat(equalWord).concat(wordsBoolean).concat(wordsAction);
-console.log(wordsAll)
 
 
-const logCount = 0;
-const logMax = 5;
+let logCount = 0;
+let logMax = 5;
 const terminal_log = document.getElementById('terminal_log');
 const autocomplete = document.getElementById('autocomplete');
 const terminal_input = document.getElementById('terminal_input');
@@ -75,70 +74,85 @@ terminal_input.addEventListener('keyup', (e) => {
 
     let wordsToCompare = wordsFirst;
     
-    let input_words = input.match(/\w+/g);
-    let current_word = input_words.at(-1);
-    let last_word = current_word;
-    console.log(input, input_words, current_word);
+    let wordsInput = input.match(/\w+/g);
+    let wordsOfInterest = wordsInput;
+    let current_word = wordsInput.at(-1);
+    let last_word = wordsInput.at(-1);
+    console.log(input, wordsOfInterest, current_word);
     
-    if(input_words[0] == ifWord) {
+    if(wordsOfInterest[0] == ifWord) {
       wordsToCompare = wordsIfConditionLeft;
-      checkAgainst = input_words.at(-1);
+      checkAgainst = wordsOfInterest.at(-1);
       if(wordsAll.includes(current_word) == false) {
         console.log('word not recognized')
-        input_words = input_words.slice(0, input_words.length-1)
-        last_word = input_words.at(-1);
+        wordsOfInterest = wordsOfInterest.slice(0, wordsOfInterest.length-1)
+        for(let i = 1; i < wordsOfInterest.length; i++) {
+          if(!wordsAll.includes(wordsOfInterest[i])) {
+            console.log(wordsOfInterest[i], 'not in list of all words!')
+            return;
+          }
+        }
       }
       else {
         checkAgainst = '';
       }
       // parse condition
-      if(input_words.length > 1) {
+      if(wordsOfInterest.length > 1) {
         // IF even number of words, then we have...
-        if(input_words.length % 2 == 0) {
+        if(wordsOfInterest.length % 2 == 0) {
           // if xx is yy then zz ... 
           if(wordsAction.includes(current_word)) {
-            console.log('// OR if xx is yy then zz')
+            // console.log('// if xx is yy then zz')
             return;
           }
           // if XX is YY..., 
-          else if(input_words.at(-2) == equalWord) {
-            console.log('// if XX is YY...,')
+          else if(wordsOfInterest.at(-2) == equalWord) {
+            // console.log('// if XX is YY...,')
             wordsToCompare = wordsBoolean;
           }
           // OR if XX ..., OR if XX is YY and ZZ ... 
-          else if(input_words.at(-2) == ifWord || wordsBoolean.includes(input_words.at(-2))) {
-            console.log('// OR if XX ..., OR if XX is YY and ZZ ...')
+          else if(wordsOfInterest.at(-2) == ifWord || wordsBoolean.includes(wordsOfInterest.at(-2))) {
+            // console.log('// OR if XX ..., OR if XX is YY and ZZ ...')
             wordsToCompare = [equalWord]; 
           }
+          else if(wordsOfInterest.at(-1) == thenWord) {
+            wordsToCompare = wordsAction;
+          } 
         }
         // ELSE we have ...
         else if(wordsBoolean.concat(equalWord).includes(current_word)) {
           // if XX is YY then ...,
           if(current_word == thenWord) {
-            console.log('// if XX is YY then ...,')
+            // console.log('// if XX is YY then ...,')
             wordsToCompare = wordsAction;
           }
           // if XX is ..., 
           else if(current_word == equalWord) {
-            console.log('// if XX is ...,')
+            // console.log('// if XX is ...,')
             wordsToCompare = wordsIfConditionRight;
-            console.log('juhui')
+            // console.log('juhui')
           }
           // OR if XX is YY and ... 
-          else if(wordsBoolean.includes(input_words.at(-2))) {
-            console.log('// OR if XX is YY and ...')
+          else if(wordsBoolean.includes(wordsOfInterest.at(-2))) {
+            // console.log('// OR if XX is YY and ...')
             wordsToCompare = wordsIfConditionLeft;
           }
         }
       }
     }
     console.log(checkAgainst, wordsToCompare);
-    autocomplete.innerHTML = input;
     
+    
+    autocomplete.innerHTML = input;
     let regex = new RegExp(`^${escapeRegExp(checkAgainst)}.*`, 'igm');
     for(let i = 0; i < wordsToCompare.length; i++){
     	if(wordsToCompare[i].match(regex)){
-        // if(wordsAll.includes(autocomplete.innerHTML.slice(last_word)) {autocomplete.innerHTML += ' '};
+        if(wordsAll.includes(last_word)) {
+          autocomplete.innerHTML += ' ';
+        }
+        else {
+          autocomplete.innerHTML = autocomplete.innerHTML.trimEnd();
+        }
       	autocomplete.innerHTML += wordsToCompare[i].slice(checkAgainst.length, wordsToCompare[i].length);
         break;
       }
@@ -153,8 +167,7 @@ terminal_input.addEventListener('keydown', (e) => {
     }
     if(e.key == 'Tab') {
       e.preventDefault();
-      terminal_input.value = autocomplete.innerHTML;
-      if(terminal_input.value.at(-1) != ' ') { terminal_input.value += ' ' }
+      terminal_input.value = autocomplete.innerText;
       return;
     }
     if(e.key == 'ArrowUp') {
