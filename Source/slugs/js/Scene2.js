@@ -5,7 +5,15 @@ let COLORCATS     = [ 0 ];
 for(let i = 0; i < COLORCATS_360.length; i++) {
   COLORCATS.push(COLORCATS_360[i]/360);
 }
-console.log(COLORCATS)
+
+let ENTITY_TYPES = ['food', 'others']
+
+let TEXTURES = ['smooth', 'spiky']
+
+let SIZES = ['bigger', 'smaller']
+
+RULES = [ ];
+
 
 class Scene2 extends Phaser.Scene {
   constructor() {
@@ -42,18 +50,23 @@ class Scene2 extends Phaser.Scene {
     let slug_x = document.getElementById("phaser_container").clientWidth/2;
     let slug_y = document.getElementById("phaser_container").clientHeight/2;
 
-    this.yourSlug = new Slug(this, slug_x, slug_y, slug_r, new Phaser.Display.Color().setFromHSV(0, 1, 1));
+    let red = new Phaser.Display.Color().setFromHSV(0, 1, 1);
+    this.yourSlug = new Slug(this, slug_x, slug_y, slug_r, red);
     let s1 = new Slug(this, slug_x-80, slug_y-5, 10);
     this.slugs = [this.yourSlug, s1];
     
-    this.food = [ this.addGameSpriteCircle(100, 100, 20, new Phaser.Display.Color().random().color, 'circle_spiky') ];
+    this.food = [ 
+      this.addGameSpriteCircle(100, 100, 20, red.color, 'flower'),
+      this.addGameSpriteCircle(100, 100, 20, red.color, 'flower'),
+      this.addGameSpriteCircle(100, 100, 20, red.color, 'flower'),
+    ];
 
     for(var i = 0; i < 5; i++) {
-      var c =  new Phaser.Display.Color().random().saturate(75);
-      this.food.push(this.addGameSpriteCircle(100, 100, 20, c.color, 'circle_spiky'));
-      this.food[i].color = c;
-
       let rand = (Math.random()+0.2)*10
+      let c =  new Phaser.Display.Color().random().saturate(75);
+
+      this.food.push(this.addGameSpriteCircle(c.color%(rand*10), c.color%(rand*10), 20, c.color, 'flower'));
+
       let s = new Slug(this, slug_x+i*10*rand, slug_y+i*10*rand, (slug_r+20)*rand/10)
       this.slugs.push(s);
     }
@@ -70,17 +83,24 @@ class Scene2 extends Phaser.Scene {
       this.processCommand(e.detail.value);
     });
 
+    // EATING THE FOOD
     this.food.forEach((f, f_index) => {
       this.slugs.forEach(s => {
         f.setOnCollideWith(s.head, pair => {
-          // TODO: REWORK THIS TO USE BODY COLOR OR SO FOR f
-          if(this.sameColorClass(f.color, s.color)) {
-            s.setAlpha(1);
+          // new CustomEvent('CollisionSlugFood', { 
+          //   detail: { a: f, b: s }
+          // })
+          if(sameColorClass(f.color, s.color)) {
+            if(s.alpha < 1) {
+              s.setAlpha(1);
+            } else {
+              s.setScale(1.2*s.scale);
+            }
           } else {
             s.setAlpha(0.5);
           }
           f.destroy();
-          this.food.splice(f_index, 1);
+          // this.food.splice(f_index);
         })
       })
     }); 
@@ -125,25 +145,21 @@ class Scene2 extends Phaser.Scene {
 
     switch (cmd0) {
       case 'if':
-        let thenIndex = cmd.indexOf(thenWord); 
-        let condition = cmd.slice(1, thenIndex);
-        let action = cmd.slice(thenIndex+1);
-
-        let exception_if = `uh oh, an if rule needs to be of the form ${wrapCmd('if condition then action')}, for example: ${wrapCmd('if color is red then eat')}!`;
-        if(cmd.length < 6) { 
+        
+        let exception_if = `uh oh, an if rule needs to be of the form ${wrapCmd('if <i>condition</i> then <i>action</i>')}, for example: ${wrapCmd('if color is red then eat')}!`;
+        if(cmd.length < 6 || !cmd.at(-2) == thenWord || !wordsAction.includes(cmd.at(-1))) { 
           addToOutput(exception_if);
           return;
         }
-        console.log(condition);
-        console.log(action);
+        let thenIndex = cmd.indexOf(thenWord); 
+        let condition = cmd.slice(1, thenIndex);
+        let action = cmd.slice(thenIndex+1);
+        // console.log(condition);
+        // console.log(action);
+        RULES.push(cmd.join(' '));
 
-        switch (condition) {
-          case '':
-            break;
-        
-          default:
-            break;
-        }
+        addToOutput(`${wrapCmd(cmd.join(' '))}: your being learned the rule you gave it!`)
+
         break;
         case 'abracadabra':
           this.yourSlug.moveRandomly();
@@ -159,10 +175,11 @@ class Scene2 extends Phaser.Scene {
           addToOutput(output)
           break;
         case 'eat':
-          this.yourSlug.eat();
-          output += `your being will try to eat!`
+          output += `you tell your being to eat.`
           addToOutput(output)
+          this.yourSlug.eat();
           break;
+        
 
         default:
             addToOutput(colorize(`
@@ -226,6 +243,8 @@ class Scene2 extends Phaser.Scene {
       matterCircle
     ) 
     o.radius = radius;
+    o.arc=crcl;
+    o.textureType= texture.includes('spiky') ? 'spiky':'smooth';
   
     // SHOW THE SKELETONS OF THE SLUGS
     // TO ENSURE CIRCULAR MASKS ON THE TEXTURE FILES, IF PERFORAMCE HOG JUST CUT OUT THE TEXTURES BY HAND
@@ -233,32 +252,10 @@ class Scene2 extends Phaser.Scene {
       crcl.copyPosition(rt)
     }, this);
 
-    return [o, crcl];
+    return o;
   }
 
-  sameColorClass(color1, color2) { // color blindness: https://colororacle.org/?
-    let cat1=-1; let cat2 = -1;
-    let i = 0;
-    for(i = 0; i < COLORCATS.length; i++) {
-      if(color1.h - COLORCATS[i] >= 0) {
-        cat1 = i % (COLORCATS.length-1);
-      } 
-      if(color2.h - COLORCATS[i] >= 0) {
-        cat2 = i % (COLORCATS.length-1);
-      }
-    }
-    let colorDiff = Math.min(Math.abs(color1.h - color2.h), Math.abs(COLORCATS[cat1] - color2.h), Math.abs(COLORCATS[cat2] - color1.h));
-    let similarityBound = 0.2 * (color1.h + color2.h)/2
-    console.log('color.h:', color1.h, color2.h,'| dff:', colorDiff, 'similarityBound:', similarityBound)
-    console.log('cat:', COLORCATS_HR[cat1], COLORCATS_HR[cat2])
 
-    if(cat1 == cat2 || colorDiff <= similarityBound) {
-      return true;
-    }
-    else {
-      return false;
-    }
-  }
 
   renderConstraint(constraints, lineColor, lineOpacity, lineThickness, pinSize, anchorColor, anchorSize) {
     if (!this.graphics) {
@@ -273,16 +270,17 @@ class Scene2 extends Phaser.Scene {
   
 }
 
-class Slug extends Phaser.GameObjects.GameObject {
+class Slug extends Phaser.GameObjects.Container {
   constructor(scene=Scene2, x=0, y=0, radius=20, color=new Phaser.Display.Color().random().saturate(75)) {
     super(scene, x, y);
-    this.color = color;
+    this.setDataEnabled();
+    this.data.values.color = color;
+    this.color = color
     let headColor = this.color.clone().lighten((Math.min(0.2+Math.random(), 0.8))*50);
     let tailColor = this.color.clone().lighten((Math.min(0.1+Math.random(), 0.8))*30);
 
     this.head   = this.scene.addGameCircle(x, y, radius/1.5, headColor.color);
-    let v = this.scene.addGameCircleTextured(x-radius+radius/1.5, y, radius, this.color.color);
-    this.body = v[0]; this.bodymask   = v[1];
+    this.body   = this.scene.addGameCircleTextured(x-radius+radius/1.5, y, radius, this.color.color);
     this.tail_0 = this.scene.addGameCircle(x-radius+radius/1.5-(radius+radius/1.3), y, radius/1.3, tailColor.color);
     this.tail_1 = this.scene.addGameCircle(x-radius+radius/1.5-((radius+radius/1.3)+(radius/1.3+radius/2)), y, radius/2, tailColor.color);
 
@@ -337,8 +335,12 @@ class Slug extends Phaser.GameObjects.GameObject {
     ]
     this.joints = [...this.jointsBody]
     this.antennaeJoints.forEach(e=> {
-      this.joints.push(e);
+      this.joints.push(e)
     });
+
+    this.joints.forEach(e => {
+      e.originalLength = e.length;
+    })
 
 
 
@@ -357,23 +359,56 @@ class Slug extends Phaser.GameObjects.GameObject {
     this.bodyparts.forEach((e, i) => {
       // e.setCollisionGroup(i*this.scene.GameObjects.length);
       // e.setCollidesWith(0);
+      // this.add(e);
     })
-    this.children = this.bodyparts + this.joints;
+    this.list = this.bodyparts // + this.joints;
+    this.alpha = 1;
+    this.tint = color.color;
+    this.scaleX = 1;
+    this.scaleY = 1;
   }
   
   setAlpha(a) {
-    this.bodyparts.forEach(element => {
+    this.list.forEach(element => {
       element.setAlpha(a);
     });
+    this.alpha = a;
   }
-
+  
   setTint(t) {
-    this.bodyparts.forEach(element => {
+    this.list.forEach(element => {
       try { element.setTint(t); }
       catch {
         element.fillColor = t;
       }
     });
+    this.tint = t;
+  }
+
+  setScale(sX, sY=undefined) {
+    this.scaleX = sX;
+    (sY) ? this.scaleY = sY : this.scaleY = sX;
+    this.list.forEach(element => {
+      element.setScale(sX, sY);
+      if(element.type == 'RenderTexture' ) {
+        let rt = element;
+        let crcl = rt.arc;
+        
+        rt.clearMask(true);
+        crcl.setScale(sX, sY);
+        let mask = new Phaser.Display.Masks.GeometryMask(this, crcl);
+        // rt.draw(crcl, radius, radius);
+        // rt.draw(txtr, radius, radius);
+        rt.setMask(mask);
+      }
+    });
+
+    for(let i = 0; i < this.jointsBody.length; i++) {
+      let j = this.jointsBody[i];
+      let diff = sX-1;
+      j.length = j.originalLength+diff*j.length;
+    }
+
   }
 
   moveRandomly() {
@@ -381,14 +416,86 @@ class Slug extends Phaser.GameObjects.GameObject {
   }
 
   eat(foodType='any') {
-    if(foodType == 'any') {
-      for(var i = 0; i < 1; i++) {
+    let ifColor = false;
+    let ifTexture = false;
+    let ifSize = false;
+    let avoid = false;
+
+    if(RULES.length) {
+      addToOutput(`first, the being thinks of the rules you gave it.`)
+    }
+
+    let rulesFood = [];
+
+
+    for(let i = 0; i < RULES.length; i++) {
+      let r = RULES[i].split(" ");
+      let type = r.at(1);
+      avoid = (r.at(-1) == 'avoid');
+      if(type == 'food') {
+        let boolean = r.slice(1,r.length-2);
+        
+        boolean.forEach((e, i) => {
+          if(wordsIfConditionRight.includes(e)) {
+            boolean[i] = `'${e}'`
+          }
+          if(COLORCATS_HR.includes(e)) {
+            ifColor = true;
+          }
+          if(TEXTURES.includes(e)) {
+            ifTexture = true;
+          }
+          if(SIZES.includes(e)) {
+            isSize = true;
+          }
+        });
+        rulesFood.push(boolean);
+      }
+    }
+    if(rulesFood.length) {
+      addToOutput(`it remembers the following food rules:`)
+      for(let i = 0; i < rulesFood.length; i++) { 
+        let boolean = rulesFood[i];
+        let booleanString = boolean.join(' '); // .splice(1, 0, '(').push(')')
+        addToOutput(`${booleanString.replaceAll("'", "")}`)
+        booleanString = booleanString.replaceAll(equalWord, '==').replaceAll(andWord, '&&').replaceAll(` ${orWord}`, ` ||`);
+        for(let i = 0; i < this.scene.food.length; i++) {
+          let f = this.scene.food[i];
+          // NEEDS TO BE SAME AS INPUT!!
+          let food = '';
+          if(ifColor) {
+            food = COLORCATS_HR[getColorClass(f.color)];
+          }
+          if(ifSize) {
+            food = (f.radius*f.scaleX < this.radius*this.scaleX ? 'smaller':'bigger' )
+          }
+          if(ifTexture) {
+            food = f.textureType;
+          }
+          console.log(booleanString, food);
+          let evaluation = eval(booleanString);
+          console.log(evaluation);
+          if(evaluation) {
+            console.log(f);
+            let vels = velocityToTarget(this.head, f, 10);
+            // console.log(vels)
+            this.head.setVelocity(vels.velX, vels.velY);
+            break;
+          }
+        }
+      }
+
+    } 
+    else {
+      addToOutput('none of the rules tell your being what to eat, so it will try to eat anything!')
+      for(let i = 0; i < 1; i++) { // this.scene.food.length
         let f = this.scene.food[i];
         console.log(f);
         let vels = velocityToTarget(this.head, f, 10);
-        console.log(vels)
+        // console.log(vels)
         this.head.setVelocity(vels.velX, vels.velY);
       }
+      
     }
   }
 
@@ -431,4 +538,46 @@ const velocityToTarget = (from, to, speed = 1) => {
   const speed2 = to.y >= from.y ? speed : -speed;
  
   return { velX: speed2 * Math.sin(direction), velY: speed2 * Math.cos(direction) };
- };
+};
+
+function sameColorClass(color1, color2) { // color blindness: https://colororacle.org/?
+  let cat1=-1; let cat2 = -1;
+  let i = 0;
+  for(i = 0; i < COLORCATS.length; i++) {
+    if(color1.h - COLORCATS[i] >= 0) {
+      cat1 = i % (COLORCATS.length-1);
+    } 
+    if(color2.h - COLORCATS[i] >= 0) {
+      cat2 = i % (COLORCATS.length-1);
+    }
+  }
+  let colorDiff = Math.min(Math.abs(color1.h - color2.h), Math.abs(COLORCATS[cat1] - color2.h), Math.abs(COLORCATS[cat2] - color1.h));
+  let similarityBound = 0.2 * (color1.h + color2.h)/2
+  console.log('color.h:', color1.h, color2.h,'| dff:', colorDiff, 'similarityBound:', similarityBound)
+  console.log('cat:', COLORCATS_HR[cat1], COLORCATS_HR[cat2])
+
+  if(cat1 == cat2 || colorDiff <= similarityBound) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+function getColorClass(color) {
+  let cat1 = -1;
+  let i = 0;
+  for(i = 0; i < COLORCATS.length; i++) {
+    if(color.h - COLORCATS[i] >= 0) {
+      cat1 = i % (COLORCATS.length-1);
+    } 
+  }
+  return cat1;
+}
+
+class Rule {
+  constructor(condition = [], action = []) {
+    this.condition = condition;
+    this.action = action;
+  }
+}

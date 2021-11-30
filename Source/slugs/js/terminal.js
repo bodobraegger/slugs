@@ -7,11 +7,11 @@ const ifWord = 'if',
 
 const wordsFirst = [ifWord, forWord, 'move', 'help', 'abracadabra', 'clear']
 const wordsForCmdString = [].concat(wordsFirst.slice(0, 2));
-let wordsIfConditionLeft = ['color', 'shape', 'size'];
-let wordsIfConditionRight = [].concat(COLORCATS_HR);
+let wordsIfConditionLeft = [].concat(ENTITY_TYPES);
+let wordsIfConditionRight = [].concat(COLORCATS_HR, TEXTURES);
 const wordsBoolean = [thenWord, andWord, orWord];
 
-let wordsAction = ['eat']
+let wordsAction = ['eat', 'avoid']
 
 let wordsAll = wordsFirst.concat(wordsIfConditionLeft).concat(wordsIfConditionRight).concat(equalWord).concat(wordsBoolean).concat(wordsAction);
 
@@ -101,17 +101,17 @@ terminal_input.addEventListener('keyup', (e) => {
         if(wordsOfInterest.length % 2 == 0) {
           // if xx is yy then zz ... 
           if(wordsAction.includes(current_word)) {
-            console.log('// if xx is yy then zz')
+            // console.log('// if xx is yy then zz')
             return;
           }
           // if XX is YY..., 
           else if(wordsOfInterest.at(-2) == equalWord) {
-            console.log('// if XX is YY...,')
+            // console.log('// if XX is YY...,')
             wordsToCompare = wordsBoolean;
           }
           // OR if XX ..., OR if XX is YY and ZZ ... 
           else if(wordsOfInterest.at(-2) == ifWord || wordsBoolean.includes(wordsOfInterest.at(-2))) {
-            console.log('// OR if XX ..., OR if XX is YY and ZZ ...')
+            // console.log('// OR if XX ..., OR if XX is YY and ZZ ...')
             wordsToCompare = [equalWord]; 
           }
           else if(wordsOfInterest.at(-1) == thenWord) {
@@ -122,25 +122,25 @@ terminal_input.addEventListener('keyup', (e) => {
         else if(wordsBoolean.concat(equalWord).includes(current_word)) {
           // if XX is YY then ...,
           if(current_word == thenWord) {
-            console.log('// if XX is YY then ...,')
+            // console.log('// if XX is YY then ...,')
             wordsToCompare = wordsAction;
           }
           // if XX is ..., 
           else if(current_word == equalWord) {
-            console.log('// if XX is ...,')
+            // console.log('// if XX is ...,')
             wordsToCompare = wordsIfConditionRight;
           }
           // OR if XX is YY and ... 
           else if(wordsBoolean.includes(wordsOfInterest.at(-2))) {
-            console.log('// OR if XX is YY and ...')
+            // console.log('// OR if XX is YY and ...')
             wordsToCompare = wordsIfConditionLeft;
-            console.log('juhui')
+            // console.log('juhui')
           }
         }
       }
     }
-    console.log(input, wordsOfInterest, current_word);
-    console.log(checkAgainst, wordsToCompare);
+    // console.log(input, wordsOfInterest, current_word);
+    // console.log(checkAgainst, wordsToCompare);
     
     
     autocomplete.innerHTML = input;
