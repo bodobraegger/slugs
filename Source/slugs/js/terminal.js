@@ -193,7 +193,7 @@ terminal_input.addEventListener('keydown', (e) => {
       let cmd = terminal_input.value.match(/\w+/g)
       while(buffer.next() !== undefined) {};
       buffer.push(cmd)
-      switch (cmd) {
+      switch (cmd[0]) {
         case 'clear':
           clearLog();
           break;
