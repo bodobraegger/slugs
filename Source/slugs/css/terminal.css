@@ -19,7 +19,7 @@
     display: grid;
     grid-template-columns: 1fr;
 }
-#autocomplete_parent div, #autocomplete_parent input { 
+#autocomplete_parent div, #autocomplete_parent textarea { 
     grid-row-start: 1;
     grid-column-start: 1;
 }
@@ -38,6 +38,9 @@
     border-top: 1px dotted rgba(255,255,255,0.3);
     border-bottom:1px solid rgba(255,255,255,0.3);
     /* ================== */
+}
+#terminal_input {
+    padding-top: 9px;
 }
 
 #terminal_input::placeholder {

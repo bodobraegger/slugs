@@ -190,6 +190,7 @@ terminal_input.addEventListener('keydown', (e) => {
         return;
     }
     if(e.key == 'Enter') {
+      e.preventDefault()
       let cmd = terminal_input.value.match(/\w+/g)
       while(buffer.next() !== undefined) {};
       buffer.push(cmd)
@@ -210,6 +211,7 @@ terminal_input.addEventListener('keydown', (e) => {
           // addToLog(cmd);
         }
         clearInput();
+        return;
     }
 })
 
