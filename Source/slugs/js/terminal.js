@@ -8,7 +8,7 @@ const ifWord = 'if',
 const wordsFirst = [ifWord, forWord, 'move', 'help', 'abracadabra', 'clear']
 const wordsForCmdString = [].concat(wordsFirst.slice(0, 2));
 let wordsIfConditionLeft = [].concat(ENTITY_TYPES);
-let wordsIfConditionRight = [].concat(COLORCATS_HR, TEXTURES);
+let wordsIfConditionRight = [].concat(COLORCATS_HR, TEXTURES, SIZES);
 const wordsBoolean = [thenWord, andWord, orWord];
 
 let wordsAction = ['eat', 'avoid']
@@ -193,7 +193,7 @@ terminal_input.addEventListener('keydown', (e) => {
     }
     if(e.key == 'Enter') {
       e.preventDefault()
-      let cmd = terminal_input.value.match(/\w+/g)
+      let cmd = terminal_input.value.toLowerCase().match(/\w+/g)
       if(!cmd) { return; }
       while(buffer.next() !== undefined) {};
       buffer.push(cmd)
@@ -220,8 +220,7 @@ terminal_input.addEventListener('keydown', (e) => {
 
 // TERMINAL IO FUNCTIONS
 function addToOutput(output) {
-  logCount++;
-  if(logCount > logMax) {
+  if(logCount > logMax&&terminal_log.children.length) {
     terminal_log.firstChild.remove();
     return;
   }
@@ -235,11 +234,13 @@ function addToOutput(output) {
   }
   div.classList += ` output`;
   terminal_log.appendChild(div);
+  logCount++;
   
-  console.log(getTotalChildrenHeights(terminal_container));
-  while(getTotalChildrenHeights(terminal_container) > document.getElementsByTagName('canvas')[0].height) {
+  // console.log(getTotalChildrenHeights(terminal_container), 'vs', document.getElementById("phaser_container").clientHeight);
+  // TODO: FIX TERMINAL CLEARING ON TOO LARGE
+  if(getTotalChildrenHeights(terminal_container) > getCanvasHeight() && logCount > 0) {
     terminal_log.firstChild.remove();
-    console.log('trimming log to make room! bigger than canvas currently')
+    // console.log('trimming log to make room! bigger than canvas currently')
     logCount--;
   }
 }
@@ -247,6 +248,14 @@ function addToOutput(output) {
 function clearLog() {
   terminal_log.innerHTML = '';
   logCount = 0;
+}
+
+function getTotalChildrenHeights(element) {
+  let totalHeight = 0;
+  for(let i = 0; i < element.children.length; i++) {
+    totalHeight += element.children[i].clientHeight; // true = include margins
+  }
+  return totalHeight;
 }
 
 function colorize(output, color) {
@@ -283,12 +292,4 @@ function parseEncased(parentheses, input_arr) {
     i++; 
   } encased += ` ${word.slice(0, -1)}`;
   return encased
-}
-
-function getTotalChildrenHeights(element) {
-  let totalHeight = 0;
-  for(let i = 0; i < element.children.length; i++) {
-    totalHeight += element.children[i].clientHeight; // true = include margins
-  }
-  return totalHeight;
 }
