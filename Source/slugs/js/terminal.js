@@ -18,6 +18,8 @@ let wordsAll = wordsFirst.concat(wordsIfConditionLeft).concat(wordsIfConditionRi
 
 let logCount = 0;
 let logMax = 5;
+
+const terminal_container = document.getElementById('terminal_container');
 const terminal_log = document.getElementById('terminal_log');
 const autocomplete = document.getElementById('autocomplete');
 const terminal_input = document.getElementById('terminal_input');
@@ -192,6 +194,7 @@ terminal_input.addEventListener('keydown', (e) => {
     if(e.key == 'Enter') {
       e.preventDefault()
       let cmd = terminal_input.value.match(/\w+/g)
+      if(!cmd) { return; }
       while(buffer.next() !== undefined) {};
       buffer.push(cmd)
       switch (cmd[0]) {
@@ -220,6 +223,7 @@ function addToOutput(output) {
   logCount++;
   if(logCount > logMax) {
     terminal_log.firstChild.remove();
+    return;
   }
   let div = document.createElement('div');
   // if output is already a div, don't create a nested one.
@@ -231,6 +235,13 @@ function addToOutput(output) {
   }
   div.classList += ` output`;
   terminal_log.appendChild(div);
+  
+  console.log(getTotalChildrenHeights(terminal_container));
+  while(getTotalChildrenHeights(terminal_container) > document.getElementsByTagName('canvas')[0].height) {
+    terminal_log.firstChild.remove();
+    console.log('trimming log to make room! bigger than canvas currently')
+    logCount--;
+  }
 }
 
 function clearLog() {
@@ -272,4 +283,12 @@ function parseEncased(parentheses, input_arr) {
     i++; 
   } encased += ` ${word.slice(0, -1)}`;
   return encased
+}
+
+function getTotalChildrenHeights(element) {
+  let totalHeight = 0;
+  for(let i = 0; i < element.children.length; i++) {
+    totalHeight += element.children[i].clientHeight; // true = include margins
+  }
+  return totalHeight;
 }
