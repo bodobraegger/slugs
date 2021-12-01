@@ -1,3 +1,7 @@
+/* 
+** GLOBALS **
+*/
+
 // 6 categories of hues, hue of 0 and 1 both correspond to red, so cats need to be shifted by half a value
 let COLORCATS_HR  = ['red', 'yellow/orange', 'green', 'blue', 'purple', 'pink']
 let COLORCATS_360 = [15, 75, 165, 240, 285, 330]
@@ -13,6 +17,8 @@ let TEXTURES = ['smooth', 'spiky']
 let SIZES = ['bigger', 'smaller']
 
 RULES = [ ];
+
+let foodIndicesValid = []
 
 
 class Scene2 extends Phaser.Scene {
@@ -33,13 +39,14 @@ class Scene2 extends Phaser.Scene {
     let arc = this.add.arc(100, 100, 50, 1, 180, false, 0xFFF000)
     let rectangle = this.matter.add.gameObject(this.add.rectangle(400, 200, 20, 10, 0x9966ff), this.matter.add.rectangle(400, 200, 20, 10))
 
-    let radius = 100
+    let radius = 20
 
     let antenna_vertices = `0 0 0 ${2*radius} ${2*radius} ${1.5*radius} ${2*radius} ${0.5*radius}`;
     // let antenna_vertices = [0,0, 0,2*radius, 2*radius,1.5*radius, 2*radius,.5*radius]
 
     let polygon = this.matter.add.gameObject(this.add.polygon(200, 400, antenna_vertices, 0xFF22FF),  { shape: { type: 'fromVerts', verts: antenna_vertices, flagInternal: true } });
-    //polygon = this.matter.add.gameObject(polygon, m_polygon);
+    // polygon = this.matter.add.gameObject(polygon, m_polygon);
+    // polygon.setScale(0.2, 0.2);
 
     let group = this.add.group([circle, arc, rectangle, polygon]);
     group.setAlpha(0.5)
@@ -47,8 +54,8 @@ class Scene2 extends Phaser.Scene {
     let matterArc = this.matter.add.trapezoid(1, 1, 10, 20, 0.5);
 
     let slug_r = 20;
-    let slug_x = document.getElementById("phaser_container").clientWidth/2;
-    let slug_y = document.getElementById("phaser_container").clientHeight/2;
+    let slug_x = getCanvasWidth()/2;
+    let slug_y = getCanvasHeight()/2;
 
     let red = new Phaser.Display.Color().setFromHSV(0, 1, 1);
     this.yourSlug = new Slug(this, slug_x, slug_y, slug_r, red);
@@ -56,27 +63,29 @@ class Scene2 extends Phaser.Scene {
     this.slugs = [this.yourSlug, s1];
     
     this.food = [ 
-      this.addGameSpriteCircle(100, 100, 20, red.color, 'flower'),
-      this.addGameSpriteCircle(100, 100, 20, red.color, 'flower'),
-      this.addGameSpriteCircle(100, 100, 20, red.color, 'flower'),
+      this.addGameSpriteCircle(0, 0, 10, red.color, 'flower'),
+      this.addGameSpriteCircle(getCanvasWidth(), 0, 15, red.color, 'flower'),
+      this.addGameSpriteCircle(getCanvasWidth(), getCanvasHeight(), 20, red.color, 'flower'),
+      this.addGameSpriteCircle(0, getCanvasHeight(), 25, red.color, 'flower'),
     ];
-
+    
     for(var i = 0; i < 5; i++) {
       let rand = (Math.random()+0.2)*10
-      let c =  new Phaser.Display.Color().random().saturate(75);
-
-      this.food.push(this.addGameSpriteCircle(c.color%(rand*10), c.color%(rand*10), 20, c.color, 'flower'));
-
-      let s = new Slug(this, slug_x+i*10*rand, slug_y+i*10*rand, (slug_r+20)*rand/10)
-      this.slugs.push(s);
+      let c =  new Phaser.Display.Color().random().saturate(100);
+      
+      this.food.push(this.addGameSpriteCircle(c.color%(rand*10), c.color%(rand*10), 5*rand, c.color, 'flower'));
+      
+      // let s = new Slug(this, slug_x+i*10*rand, slug_y+i*10*rand, (slug_r+20)*rand/10)
+      // this.slugs.push(s);
     }
+    foodIndicesValid = [...this.food.keys()]
+    console.log(foodIndicesValid);
     
 
     
     // RENDER TERMINAL ON TOP OF PHASER
-    const terminal_container = document.getElementById('terminal_container');
     // const ph_terminal_container = this.add.dom(0.8*document.getElementById("phaser_container").clientWidth, 0.9*document.getElementById("phaser_container").clientHeight/2, terminal_container)
-    const terminal_input = document.getElementById('terminal_input');
+    // const terminal_input = document.getElementById('terminal_input');
 
     terminal_input.addEventListener('cmd', (e) => {
       // WE HAVE A HOOK INTO THE TERMINAL
@@ -85,34 +94,44 @@ class Scene2 extends Phaser.Scene {
 
     // EATING THE FOOD
     this.food.forEach((f, f_index) => {
-      this.slugs.forEach(s => {
+      // this.slugs.forEach
+      [this.yourSlug].forEach(s => { 
         f.setOnCollideWith(s.head, pair => {
           // new CustomEvent('CollisionSlugFood', { 
           //   detail: { a: f, b: s }
           // })
-          if(sameColorClass(f.color, s.color)) {
-            if(s.alpha < 1) {
-              s.setAlpha(1);
+          if(f.radius <= s.head.radius*s.scaleX) {
+            if(sameColorClass(f.color, s.color)) {
+              if(s.alpha < 1) {
+                s.setAlpha(1);
+              } else {
+                s.setScale(0.3+s.scaleX);
+              }
             } else {
-              s.setScale(1.2*s.scale);
+              s.setAlpha(0.5);
             }
+            f.destroy();
+            foodIndicesValid.splice(foodIndicesValid.indexOf(f_index), 1);
+            // this.food.splice(f_index);
           } else {
-            s.setAlpha(0.5);
+            addToOutput(`the being can't eat anything bigger than it's head :0`)
           }
-          f.destroy();
-          // this.food.splice(f_index);
+          
         })
       })
     }); 
+    console.log(foodIndicesValid)
 
   }
   update() {
     let constraints = [ ]
-      this.slugs.forEach(e => {
-        // SHOW THE SKELETONS OF THE SLUGS
-        constraints = constraints.concat(e.jointsBody);
-      })
-      this.renderConstraint(constraints, 0xF9F6EE, 1, 1, 1, 0xF9F6EE, 1);
+    this.slugs.forEach(e => {
+      // SHOW THE SKELETONS OF THE SLUGS
+      constraints = constraints.concat(e.jointsBody);
+    })
+    this.renderConstraint(constraints, 0xF9F6EE, 1, 1, 1, 0xF9F6EE, 1);
+    
+
 
     /*
     if(this.follow = true) {
@@ -135,14 +154,14 @@ class Scene2 extends Phaser.Scene {
     this.load.image('square_rounded', 'assets/square_rounded.png');
     this.load.image('circle_leopard', 'assets/circle_leopard.png');
 }
-  processCommand(input) {
-    let cmd = [].concat(input);
+  processCommand(input = []) {
+    let cmd = input;
     let output = `${wrapCmd(cmd.join(' '))}: `
 
     if(cmd.length < 1 || cmd[0] == '') { return; }
     
     let cmd0 = cmd[0];
-
+    
     switch (cmd0) {
       case 'if':
         
@@ -157,9 +176,9 @@ class Scene2 extends Phaser.Scene {
         // console.log(condition);
         // console.log(action);
         RULES.push(cmd.join(' '));
-
+        
         addToOutput(`${wrapCmd(cmd.join(' '))}: your being learned the rule you gave it!`)
-
+        
         break;
         case 'abracadabra':
           this.yourSlug.moveRandomly();
@@ -169,20 +188,20 @@ class Scene2 extends Phaser.Scene {
           output += `oh no! that was a bad magic trick.`
           addToOutput(output)
           break;
-        case 'move':
-          this.yourSlug.moveRandomly();
-          output += `moving your being around :).`
-          addToOutput(output)
-          break;
-        case 'eat':
-          output += `you tell your being to eat.`
-          addToOutput(output)
-          this.yourSlug.eat();
-          break;
+          case 'move':
+            this.yourSlug.moveRandomly();
+            output += `moving your being around :).`
+            addToOutput(output)
+            break;
+            case 'eat':
+              output += `you tell your being to eat.`
+              addToOutput(output)
+              this.yourSlug.eat();
+              break;
         
-
-        default:
-            addToOutput(colorize(`
+              
+              default:
+                addToOutput(colorize(`
               ${wrapCmd(cmd0)} is not a known command.<br> 
               try a different one, or try typing ${wrapCmd('help')}!.
             `, 'rgba(196, 77, 86, 0.2)' )); // new Phaser.Display.Color().random().rgba
@@ -406,7 +425,7 @@ class Slug extends Phaser.GameObjects.Container {
     for(let i = 0; i < this.jointsBody.length; i++) {
       let j = this.jointsBody[i];
       let diff = sX-1;
-      j.length = j.originalLength+diff*j.length;
+      j.length = j.originalLength+diff*j.originalLength;
     }
 
   }
@@ -416,28 +435,29 @@ class Slug extends Phaser.GameObjects.Container {
   }
 
   eat(foodType='any') {
-    let ifColor = false;
-    let ifTexture = false;
-    let ifSize = false;
-    let avoid = false;
-
+    
     if(RULES.length) {
       addToOutput(`first, the being thinks of the rules you gave it.`)
     }
-
+    
     let rulesFood = [];
-
-
+    
+    let foodMatching = [ ];
+    
     for(let i = 0; i < RULES.length; i++) {
+      let ifColor = false;
+      let ifTexture = false;
+      let ifSize = false;
+      let avoid = false;
       let r = RULES[i].split(" ");
       let type = r.at(1);
       avoid = (r.at(-1) == 'avoid');
       if(type == 'food') {
-        let boolean = r.slice(1,r.length-2);
+        let booleanExpr = r.slice(1,r.length-2);
         
-        boolean.forEach((e, i) => {
+        booleanExpr.forEach((e, i) => {
           if(wordsIfConditionRight.includes(e)) {
-            boolean[i] = `'${e}'`
+            booleanExpr[i] = `'${e}'`
           }
           if(COLORCATS_HR.includes(e)) {
             ifColor = true;
@@ -446,57 +466,62 @@ class Slug extends Phaser.GameObjects.Container {
             ifTexture = true;
           }
           if(SIZES.includes(e)) {
-            isSize = true;
+            ifSize = true;
           }
         });
-        rulesFood.push(boolean);
+        rulesFood.push({
+          booleanExpr: booleanExpr,
+          ifColor: ifColor,
+          ifTexture: ifTexture,
+          ifSize: ifSize,
+          avoid: avoid,
+        });
       }
     }
+
     if(rulesFood.length) {
       addToOutput(`it remembers the following food rules:`)
-      for(let i = 0; i < rulesFood.length; i++) { 
-        let boolean = rulesFood[i];
-        let booleanString = boolean.join(' '); // .splice(1, 0, '(').push(')')
+      for(let i = 0; i < rulesFood.length; i++) {
+        let r = rulesFood[i]; 
+        let booleanExpr = r.booleanExpr;
+        let booleanString = booleanExpr.join(' '); // .splice(1, 0, '(').push(')')
         addToOutput(`${booleanString.replaceAll("'", "")}`)
         booleanString = booleanString.replaceAll(equalWord, '==').replaceAll(andWord, '&&').replaceAll(` ${orWord}`, ` ||`);
-        for(let i = 0; i < this.scene.food.length; i++) {
-          let f = this.scene.food[i];
-          // NEEDS TO BE SAME AS INPUT!!
+
+
+        for(let i = 0; i < foodIndicesValid.length; i++) {
+          let f = this.scene.food[ foodIndicesValid[i] ];
+          // VARIABLE NAME NEEDS TO BE SAME AS INPUT!!
           let food = '';
-          if(ifColor) {
+          if(r.ifColor) {
             food = COLORCATS_HR[getColorClass(f.color)];
           }
-          if(ifSize) {
-            food = (f.radius*f.scaleX < this.radius*this.scaleX ? 'smaller':'bigger' )
+          if(r.ifSize) {
+            food = (this.radius*this.scaleX < f.radius ? 'smaller':'bigger' )
           }
-          if(ifTexture) {
+          if(r.ifTexture) {
             food = f.textureType;
           }
           console.log(booleanString, food);
           let evaluation = eval(booleanString);
           console.log(evaluation);
           if(evaluation) {
-            console.log(f);
-            let vels = velocityToTarget(this.head, f, 10);
-            // console.log(vels)
-            this.head.setVelocity(vels.velX, vels.velY);
-            break;
-          }
+            foodMatching.push(f);
+          }          
         }
       }
-
-    } 
+    }
     else {
       addToOutput('none of the rules tell your being what to eat, so it will try to eat anything!')
-      for(let i = 0; i < 1; i++) { // this.scene.food.length
-        let f = this.scene.food[i];
-        console.log(f);
-        let vels = velocityToTarget(this.head, f, 10);
-        // console.log(vels)
-        this.head.setVelocity(vels.velX, vels.velY);
+      for(let i=0;i<foodIndicesValid.length;i++) {
+        foodMatching.push(this.scene.food[ foodIndicesValid[i] ]);
       }
-      
     }
+    let closestMatch = findClosest(this.head, foodMatching);
+    console.log(closestMatch);
+    let vels = velocityToTarget(this.head, closestMatch, 10);
+    // console.log(vels)
+    this.head.setVelocity(vels.velX, vels.velY);
   }
 
 }
@@ -580,4 +605,26 @@ class Rule {
     this.condition = condition;
     this.action = action;
   }
+}
+
+function getCanvasHeight() {
+  return document.getElementById("phaser_container").clientHeight;
+}
+
+function getCanvasWidth() {
+  return document.getElementById("phaser_container").clientWidth;
+}
+
+function findClosest(A, B=[new Phaser.GameObjects.GameObject()]) {
+  let distance = Infinity;
+  let closest;
+  B.forEach(e=> {
+    // distance squared is faster
+    currentDistance = Phaser.Math.Distance.BetweenPointsSquared({x: A.x, y: A.y}, {x: e.x, y: e.y});
+    if(currentDistance < distance) {
+      distance = currentDistance;
+      closest = e;
+    }
+  })
+  return closest;
 }
