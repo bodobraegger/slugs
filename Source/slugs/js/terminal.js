@@ -5,15 +5,18 @@ const ifWord = 'if',
     andWord = 'and',
     orWord = 'or';
 
-const wordsFirst = [ifWord, forWord, 'move', 'help', 'abracadabra', 'clear']
-const wordsForCmdString = [].concat(wordsFirst.slice(0, 2));
-let wordsIfConditionLeft = [].concat(ENTITY_TYPES);
-let wordsIfConditionRight = [].concat(COLORCATS_HR, TEXTURES, SIZES);
-const wordsBoolean = [thenWord, andWord, orWord];
-
 let wordsAction = ['eat', 'avoid']
 
+const wordsFirst = wordsAction.concat([ifWord, forWord, 'move', 'help', 'abracadabra', 'clear'])
+const wordsForCmdString = [].concat(wordsFirst.slice(0, 2));
+let wordsIfConditionLeft = [].concat(ENTITY_TYPES);
+let wordsIfConditionRight = [].concat(SIZES, COLORCATS_HR, TEXTURES);
+const wordsBoolean = [thenWord, andWord, orWord];
+
+
 let wordsAll = wordsFirst.concat(wordsIfConditionLeft).concat(wordsIfConditionRight).concat(equalWord).concat(wordsBoolean).concat(wordsAction);
+
+let wordsFilter = ['the', 'a']
 
 
 let logCount = 0;
@@ -59,10 +62,10 @@ var createRingBuffer = function(length){
         }
     },
     next : function(){
-        if (buffer[pointer]){
-            pointer = (pointer + 1) % length;
-            return buffer[pointer];
-        }
+      if (buffer[pointer]){
+        pointer = (pointer + 1) % length;
+        return buffer[pointer];
+      }
     }
   };
 };
@@ -70,7 +73,12 @@ var createRingBuffer = function(length){
 let buffer = createRingBuffer(50);
 
 terminal_input.addEventListener('keyup', (e) => {
-	if(terminal_input.value.length > 0 ) {
+  if(terminal_input.value.length > 0 ) {
+    // clean up input
+    if(e.key==' ' && (terminal_input.value.at(e.target.Selectionstart-1) == ' ' )) {
+      terminal_input.value = terminal_input.value.trimStart()
+      return;
+    }
     let input = terminal_input.value;
     let checkAgainst = input;
 
@@ -163,37 +171,35 @@ terminal_input.addEventListener('keyup', (e) => {
 })
 
 terminal_input.addEventListener('keydown', (e) => {
-    if((e.key == 'Backspace' || e.key == 'Delete')){
-        autocomplete.innerHTML = '';
-        return;
-    }
-    if(e.key == 'Tab') {
-      e.preventDefault();
-      terminal_input.value = autocomplete.innerText;
+  switch(e.key) {  
+    case 'Backspace':
+    case 'Delete':
+      autocomplete.innerHTML = '';
       return;
-    }
-    if(e.key == 'ArrowUp') {
-      e.preventDefault();
-      let prev = buffer.prev();
-      if(prev!==undefined){
-          terminal_input.value = prev.join(' ');
+      case 'Tab':
+        e.preventDefault();
+        terminal_input.value = autocomplete.innerText;
+        return;
+        case 'ArrowUp':
+          e.preventDefault();
+          let prev = buffer.prev();
+          if(prev!==undefined){
+            terminal_input.value = prev.join(' ');
       }
       return;
-    }
-    if(e.key == 'ArrowDown') {
-        e.preventDefault();
-        let next = buffer.next();
-        if(next!==undefined){
-            terminal_input.value = next;
-        }
-        else {
-          clearInput();
-        }
-        return;
-    }
-    if(e.key == 'Enter') {
+    case 'ArrowDown':
+      e.preventDefault();
+      let next = buffer.next();
+      if(next!==undefined){
+        terminal_input.value = next.join(' ');
+      }
+      else {
+        clearInput();
+      }
+      return;
+    case 'Enter': {
       e.preventDefault()
-      let cmd = terminal_input.value.toLowerCase().match(/\w+/g)
+      let cmd = terminal_input.value.toLowerCase().match(/\w+/g).filter(word => !wordsFilter.includes(word))
       if(!cmd) { return; }
       while(buffer.next() !== undefined) {};
       buffer.push(cmd)
@@ -201,29 +207,26 @@ terminal_input.addEventListener('keydown', (e) => {
         case 'clear':
           clearLog();
           break;
-        
-        case 'help':
-          addToOutput(`hello! the commands that are available are ${wrapCmd(wordsFirst.join(', ').replaceAll('(', '...'))}.`)
-          break;
-        
-        default:
-          let CmdEvent = new CustomEvent('cmd', { 
-            detail: { value: cmd }
-          });
-          terminal_input.dispatchEvent(CmdEvent);
+          
+          case 'help':
+            addToOutput(`hello! the commands that are available are ${wrapCmd(wordsFirst.join(', ').replaceAll('(', '...'))}.`)
+            break;
+            
+            default:
+              let CmdEvent = new CustomEvent('cmd', { 
+                detail: { value: cmd }
+              });
+              terminal_input.dispatchEvent(CmdEvent);
           // addToLog(cmd);
         }
         clearInput();
         return;
-    }
+      }
+  }
 })
 
 // TERMINAL IO FUNCTIONS
 function addToOutput(output) {
-  if(logCount > logMax&&terminal_log.children.length) {
-    terminal_log.firstChild.remove();
-    return;
-  }
   let div = document.createElement('div');
   // if output is already a div, don't create a nested one.
   if(output.slice(0,4) == '<div') {
@@ -233,8 +236,13 @@ function addToOutput(output) {
     div.innerHTML = `${output}`;
   }
   div.classList += ` output`;
-  terminal_log.appendChild(div);
-  logCount++;
+  if(terminal_log.lastChild && div.innerHTML == terminal_log.lastChild.innerHTML) {
+    blink(terminal_log.lastChild);
+  }
+  else {
+    terminal_log.appendChild(div);
+    logCount++;
+  }
   
   // console.log(getTotalChildrenHeights(terminal_container), 'vs', document.getElementById("phaser_container").clientHeight);
   // TODO: FIX TERMINAL CLEARING ON TOO LARGE
@@ -292,4 +300,18 @@ function parseEncased(parentheses, input_arr) {
     i++; 
   } encased += ` ${word.slice(0, -1)}`;
   return encased
+}
+
+
+async function blink(e = document.getElementById('id')) {
+  let borderOriginal = (e.style.border ? e.style.border : ``);
+  let border = `thin solid rgba(255, 165, 0, 0.8)`
+  setTimeout(function() {
+     // e.style.display = (e.style.display == 'none' ? '' : 'none');
+     e.style.border = (e.style.border == border ? borderOriginal : border);
+  }, 200);
+  setTimeout(function() {
+     // e.style.display = (e.style.display == 'none' ? '' : 'none');
+     e.style.border = (e.style.border == border ? borderOriginal : border);
+  }, 800);
 }
