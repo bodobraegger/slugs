@@ -138,8 +138,8 @@ class Scene2 extends Phaser.Scene {
 
     /*
     if(this.follow = true) {
-      this.cameras.main.scrollX = this.yourSlug.body.x - document.getElementById("phaser_container").clientWidth/2;
-      this.cameras.main.scrollY = this.yourSlug.body.y - document.getElementById("phaser_container").clientHeight/2;
+      this.cameras.main.scrollX = this.yourSlug.torso.x - document.getElementById("phaser_container").clientWidth/2;
+      this.cameras.main.scrollY = this.yourSlug.torso.y - document.getElementById("phaser_container").clientHeight/2;
     }*/
     // this.slugs.forEach(element => { element.moveRandomly() });
   }
@@ -301,22 +301,22 @@ class Slug extends Phaser.GameObjects.Container {
     let tailColor = this.color.clone().lighten((Math.min(0.1+Math.random(), 0.8))*30);
 
     this.head   = this.scene.addGameCircle(x, y, radius/1.5, headColor.color);
-    this.body   = this.scene.addGameCircleTextured(x-radius+radius/1.5, y, radius, this.color.color);
+    this.torso   = this.scene.addGameCircleTextured(x-radius+radius/1.5, y, radius, this.color.color);
     this.tail_0 = this.scene.addGameCircle(x-radius+radius/1.5-(radius+radius/1.3), y, radius/1.3, tailColor.color);
     this.tail_1 = this.scene.addGameCircle(x-radius+radius/1.5-((radius+radius/1.3)+(radius/1.3+radius/2)), y, radius/2, tailColor.color);
 
     
     this.headjoint  = this.scene.matter.add.joint(
-      this.head, this.body, 
-      4+(this.head.radius+this.body.radius)/2, 0.6, 
+      this.head, this.torso, 
+      4+(this.head.radius+this.torso.radius)/2, 0.6, 
       { damping:0.1,
         pointA: {x: this.head.radius/2, y: 0}, 
-        pointB: {x: this.body.radius/2, y: 0} }
-    ); // , {pointA: {x: this.body.radius/2, y: 0}}
-    this.bodyjoint  = this.scene.matter.add.joint(
-      this.body, this.tail_0, 
-      4+(this.body.radius+this.tail_0.radius)/2, 0.6,
-      { pointA: {x: -this.body.radius/2, y: 0}, 
+        pointB: {x: this.torso.radius/2, y: 0} }
+    ); // , {pointA: {x: this.torso.radius/2, y: 0}}
+    this.torsojoint  = this.scene.matter.add.joint(
+      this.torso, this.tail_0, 
+      4+(this.torso.radius+this.tail_0.radius)/2, 0.6,
+      { pointA: {x: -this.torso.radius/2, y: 0}, 
         pointB: {x: -this.tail_0.radius/2, y: 0} }
     );
     this.tailjoint  = this.scene.matter.add.joint(
@@ -351,7 +351,7 @@ class Slug extends Phaser.GameObjects.Container {
 
     this.jointsBody = [
       this.headjoint,
-      this.bodyjoint,
+      this.torsojoint,
       this.tailjoint
     ]
     this.joints = [...this.jointsBody]
@@ -376,7 +376,7 @@ class Slug extends Phaser.GameObjects.Container {
     this.head.body.inertia=Infinity;
     this.a1.body.inertia=Infinity;
     this.a2.body.inertia=Infinity;
-    this.bodyparts = [this.a1, this.a2, this.head, this.body, this.tail_0, this.tail_1];
+    this.bodyparts = [this.a1, this.a2, this.head, this.torso, this.tail_0, this.tail_1];
     this.bodyparts.forEach((e, i) => {
       // e.setCollisionGroup(i*this.scene.GameObjects.length);
       // e.setCollidesWith(0);
@@ -542,8 +542,27 @@ class Slug extends Phaser.GameObjects.Container {
         return
       }
       let closestMatchNew = findClosest(this.head, foodMatching);
-      let vels = velocityToTarget(this.head, closestMatch, 10);
-      this.head.setVelocity(vels.velX, vels.velY);
+      let target = velocityToTarget(this.head, closestMatch, 10);
+      let vecTailTorso = velocityToTarget(this.tail_0, this.torso, 5);
+      let vecTorsoHead = velocityToTarget(this.torso, this.head, 5);
+      let vecSlug = vecTailTorso.add(vecTorsoHead);
+      let angleSlugTarget = getAngle(vecSlug, target);
+      console.log(angleSlugTarget);
+      let projectedVelocity = target.clone();
+      if(angleSlugTarget > 0) {
+        console.log(vecTorsoHead)
+        vecTorsoHead.rotate(Phaser.Math.DegToRad(90))
+        console.log(vecTorsoHead)
+        this.head.setVelocity(vecSlug.clone().rotate(Phaser.Math.DegToRad(90)));
+        this.tail_0.setVelocity(vecSlug.clone().rotate(Phaser.Math.DegToRad(-90)));
+      } else if(angleSlugTarget < -0) {
+        console.log(vecTorsoHead.rotate())
+        this.head.setVelocity(vecTorsoHead.clone().rotate(Phaser.Math.DegToRad(-90)));
+        this.tail_0.setVelocity(vecTailTorso.clone().rotate(Phaser.Math.DegToRad(90)));
+      }
+      projectedVelocity = target.add(vecTorsoHead);
+      this.head.setVelocity(projectedVelocity.x, projectedVelocity.y);
+      
       if(Phaser.Math.Distance.Between(this.head.x, this.head.y, closestMatch.x, closestMatch.y) < this.head.scaleX*this.head.radius+closestMatch.radius) {
         timedEvent.remove()
       }
@@ -603,7 +622,7 @@ function velocityToTarget(from, to, speed = 1) {
   const direction = Math.atan((to.x - from.x) / (to.y - from.y));
   const speed2 = to.y >= from.y ? speed : -speed;
  
-  return { velX: speed2 * Math.sin(direction), velY: speed2 * Math.cos(direction) };
+  return new Phaser.Math.Vector2({ x: speed2 * Math.sin(direction), y: speed2 * Math.cos(direction) });
 };
 
 function sameColorClass(color1, color2) { // color blindness: https://colororacle.org/?
@@ -671,4 +690,18 @@ function findClosest(A, B=[new Phaser.GameObjects.GameObject()]) {
     // console.log(distance)
   })
   return closest;
+}
+
+function getAngle(a, b, radians=false) {
+  offSet = 0;
+  // angle in radians
+  var angleRadians = Math.atan2(b.y - a.y, b.x - a.x);
+  // angle in degrees
+  var angleDeg = (Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI);
+  //add the offset
+  let result = offSet + angleDeg;
+  if(radians) {
+    result = offSet + angleRadians;
+  }
+  return result;
 }
