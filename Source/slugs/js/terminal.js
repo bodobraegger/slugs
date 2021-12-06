@@ -3,11 +3,13 @@ const ifWord = 'if',
     equalWord = 'is',
     thenWord = 'then',
     andWord = 'and',
-    orWord = 'or';
+    orWord = 'or',
+    stopWord = 'stop',
+    showWord = 'show';
 
 let wordsAction = ['eat', 'avoid']
 
-const wordsFirst = wordsAction.concat([ifWord, forWord, 'move', 'help', 'abracadabra', 'clear'])
+const wordsFirst = wordsAction.concat([ifWord, forWord, stopWord, showWord, 'help', 'abracadabra', 'clear'])
 const wordsForCmdString = [].concat(wordsFirst.slice(0, 2));
 let wordsIfConditionLeft = [].concat(ENTITY_TYPES);
 let wordsIfConditionRight = [].concat(SIZES, COLORCATS_HR, TEXTURES);

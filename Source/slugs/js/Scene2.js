@@ -21,6 +21,8 @@ RULES = [ ];
 let foodIndicesValid = []
 
 
+let massMultiplierConstant = 2.2860618138362114;
+
 class Scene2 extends Phaser.Scene {
   constructor() {
     super("playGame")
@@ -57,9 +59,10 @@ class Scene2 extends Phaser.Scene {
     let slug_x = getCanvasWidth()/2;
     let slug_y = getCanvasHeight()/2;
 
+
     let red = new Phaser.Display.Color().setFromHSV(0, 1, 1);
     this.yourSlug = new Slug(this, slug_x, slug_y, slug_r, red);
-    let s1 = new Slug(this, slug_x-80, slug_y-5, 10);
+    let s1 = new Slug(this, slug_x-280, slug_y-5, 10);
     this.slugs = [this.yourSlug, s1];
     
     this.food = [ 
@@ -73,13 +76,12 @@ class Scene2 extends Phaser.Scene {
       let rand = (Math.random()+0.2)*10
       let c =  new Phaser.Display.Color().random().saturate(100);
       
-      this.food.push(this.addGameSpriteCircle(c.color%(rand*10), c.color%(rand*10), 5*rand, c.color, 'flower'));
+      this.food.push(this.addGameSpriteCircle(20+c.color%(rand*10), c.color%(rand*10), 5*rand, c.color, 'flower'));
       
       // let s = new Slug(this, slug_x+i*10*rand, slug_y+i*10*rand, (slug_r+20)*rand/10)
       // this.slugs.push(s);
     }
     foodIndicesValid = [...this.food.keys()]
-    console.log(foodIndicesValid);
     
 
     
@@ -96,12 +98,9 @@ class Scene2 extends Phaser.Scene {
     this.food.forEach((f, f_index) => {
       // this.slugs.forEach
       [this.yourSlug].forEach(s => { 
-        f.setOnCollideWith(s.head, pair => {
-          // new CustomEvent('CollisionSlugFood', { 
-          //   detail: { a: f, b: s }
-          // })
+        f.setOnCollideWith(s.heady, pair => {
           if(f.targeted) {
-            if(f.radius <= s.head.radius*s.head.scaleX) {
+            if(f.radius <= s.heady.radius*s.heady.scaleX) {
               if(sameColorClass(f.color, s.color)) {
                 if(s.alpha < 1) {
                   s.setAlpha(1);
@@ -111,11 +110,14 @@ class Scene2 extends Phaser.Scene {
               } else {
                 s.setAlpha(0.5);
               }
+              f.targeted = false;
               f.destroy();
               foodIndicesValid.splice(foodIndicesValid.indexOf(f_index), 1);
+              s.eating = false;
               // this.food.splice(f_index);
             } else {
-              addToOutput(`the being can't eat anything bigger than its head :0`)
+              addToOutput(`the being can't eat anything bigger than its heady :0`)
+              s.eating = false;
             }
             f.targeted = false;
           }
@@ -126,7 +128,7 @@ class Scene2 extends Phaser.Scene {
     console.log(foodIndicesValid)
 
   }
-  update() {
+  update(time, delta) {
     let constraints = [ ]
     this.slugs.forEach(e => {
       // SHOW THE SKELETONS OF THE SLUGS
@@ -134,8 +136,6 @@ class Scene2 extends Phaser.Scene {
     })
     this.renderConstraint(constraints, 0xF9F6EE, 1, 1, 1, 0xF9F6EE, 1);
     
-
-
     /*
     if(this.follow = true) {
       this.cameras.main.scrollX = this.yourSlug.torso.x - document.getElementById("phaser_container").clientWidth/2;
@@ -166,7 +166,7 @@ class Scene2 extends Phaser.Scene {
     let cmd0 = cmd[0];
     
     switch (cmd0) {
-      case 'if':
+      case ifWord:
         let exception_if = `uh oh, an if rule needs to be of the form ${wrapCmd('if <i>condition</i> then <i>action</i>')}, for example: ${wrapCmd('if food is red then eat')}!`;
         if(cmd.length < 6 || !cmd.at(-2) == thenWord || !wordsAction.includes(cmd.at(-1))) { 
           addToOutput(exception_if);
@@ -179,55 +179,63 @@ class Scene2 extends Phaser.Scene {
         // console.log(action);
         RULES.push(cmd.join(' '));
         
-        addToOutput(`${wrapCmd(cmd.join(' '))}: your being learned the rule you gave it!`)
+        output += `your being learned the rule you gave it!`
         
         break;
-        case 'abracadabra':
-          this.yourSlug.moveRandomly();
-          this.yourSlug.joints.forEach(e=>{
-            this.matter.world.removeConstraint(e);
-          }); 
-          output += `oh no! that was a bad magic trick.`
-          addToOutput(output)
-          break;
-          case 'move':
-            this.yourSlug.moveRandomly();
-            output += `moving your being around :).`
-            addToOutput(output)
-            break;
-            case 'eat':
-              output += `you tell your being to eat.`
-              addToOutput(output)
-              this.yourSlug.eat();
-              break;
+      case 'abracadabra':
+        this.yourSlug.moveRandomly();
+        this.yourSlug.joints.forEach(e=>{
+          this.matter.world.removeConstraint(e);
+        }); 
+        output += `oh no! that was a bad magic trick.`
+        break;
+      case 'move':
+        this.yourSlug.moveRandomly();
+        output += `moving your being around :).`
+        break;
+      case 'eat':
+        output += `you tell your being to eat.`
+        this.yourSlug.eat();
+        break;
         
-              
-              default:
-                addToOutput(colorize(`
-              ${wrapCmd(cmd0)} is not a known command.<br> 
-              try a different one, or try typing ${wrapCmd('help')}!.
-            `, 'rgba(196, 77, 86, 0.2)' )); // new Phaser.Display.Color().random().rgba
-          break;
-    }
+      case stopWord:
+        this.yourSlug.stop();
+        output += `your being stops trying to complete the last action :)`
+        break;
+
+      default:
+        output = colorize(`
+        ${wrapCmd(cmd0)}: is not a known command.<br> 
+        try a different one, or try typing ${wrapCmd('help')}!.
+        `, 'rgba(196, 77, 86, 0.2)' ); // new Phaser.Display.Color().random().rgba
+        break;
+      }
+      addToOutput(output)
   }
 
   addGameCircle(x, y, radius, color) {
     let circle = this.add.circle(x, y, radius, color);
     let matterCircle = this.matter.add.circle(x, y, radius);
-    return this.matter.add.gameObject(
+    let o = this.matter.add.gameObject(
            circle,
       matterCircle
     )
+    o.radius = radius;
+    o.color = Phaser.Display.Color.IntegerToColor(color);
+    return o
   }
   addGameSpriteCircle(x, y, radius, color = new Phaser.Display.Color().random().saturate(75).color, source = 'circle') {
-    let img = this.add.sprite(x, y, source);
+    let img = new Phaser.GameObjects.Sprite(this, 0, 0, source);
     img.displayWidth = radius*2;
     img.displayHeight = radius*2;
     img.setTint(color);
 
+    let rt = this.add.renderTexture(x, y, radius*2, radius*2);
+    rt.draw(img, radius, radius);
+
     let matterCircle = this.matter.add.circle(x, y, radius);
     let o = this.matter.add.gameObject(
-           img,
+           rt,
       matterCircle
     ) 
     o.radius = radius;
@@ -267,8 +275,7 @@ class Scene2 extends Phaser.Scene {
     o.arc=crcl;
     o.textureType= texture.includes('spiky') ? 'spiky':'smooth';
   
-    // SHOW THE SKELETONS OF THE SLUGS
-    // TO ENSURE CIRCULAR MASKS ON THE TEXTURE FILES, IF PERFORAMCE HOG JUST CUT OUT THE TEXTURES BY HAND
+    // TO ENSURE CIRCULAR MASKS ON THE TEXTURE FILES, IF PERFORMANCE HOG JUST CUT OUT THE TEXTURES BY HAND
     this.events.on('postupdate', function() {
       crcl.copyPosition(rt)
     }, this);
@@ -297,67 +304,82 @@ class Slug extends Phaser.GameObjects.Container {
     this.setDataEnabled();
     this.data.values.color = color;
     this.color = color
-    let headColor = this.color.clone().lighten((Math.min(0.2+Math.random(), 0.8))*50);
+    let headyColor = this.color.clone().lighten((Math.min(0.2+Math.random(), 0.8))*50);
     let tailColor = this.color.clone().lighten((Math.min(0.1+Math.random(), 0.8))*30);
 
-    this.head   = this.scene.addGameCircle(x, y, radius/1.5, headColor.color);
-    this.torso   = this.scene.addGameCircleTextured(x-radius+radius/1.5, y, radius, this.color.color);
-    this.tail_0 = this.scene.addGameCircle(x-radius+radius/1.5-(radius+radius/1.3), y, radius/1.3, tailColor.color);
-    this.tail_1 = this.scene.addGameCircle(x-radius+radius/1.5-((radius+radius/1.3)+(radius/1.3+radius/2)), y, radius/2, tailColor.color);
+    let headyRadius = radius/1.5
+    let tail0Radius = radius/1.3
+    let tail1Radius = radius/2
 
-    
-    this.headjoint  = this.scene.matter.add.joint(
-      this.head, this.torso, 
-      4+(this.head.radius+this.torso.radius)/2, 0.6, 
+    this.heady   = this.scene.addGameCircle(x, y, headyRadius, headyColor.color);
+    this.torso   = this.scene.addGameCircleTextured(x-radius-headyRadius, y, radius, this.color.color);
+    this.tail0 = this.scene.addGameCircle(x-radius-headyRadius-tail0Radius, y, tail0Radius, tailColor.color);
+    this.tail1 = this.scene.addGameCircle(x-radius-headyRadius-tail0Radius-tail1Radius, y, tail1Radius, tailColor.color);
+
+
+    this.headyjoint  = this.scene.matter.add.joint(
+      this.heady, this.torso, 
+      2+(this.heady.radius+this.torso.radius)/2, 0.9, 
       { damping:0.1,
-        pointA: {x: this.head.radius/2, y: 0}, 
+        pointA: {x: -this.heady.radius/2, y: 0}, 
         pointB: {x: this.torso.radius/2, y: 0} }
     ); // , {pointA: {x: this.torso.radius/2, y: 0}}
+
     this.torsojoint  = this.scene.matter.add.joint(
-      this.torso, this.tail_0, 
-      4+(this.torso.radius+this.tail_0.radius)/2, 0.6,
+      this.torso, this.tail0, 
+      2+(this.torso.radius+this.tail0.radius)/2, 0.9,
       { pointA: {x: -this.torso.radius/2, y: 0}, 
-        pointB: {x: -this.tail_0.radius/2, y: 0} }
+        pointB: {x: this.tail0.radius/2, y: 0} }
     );
     this.tailjoint  = this.scene.matter.add.joint(
-      this.tail_0, this.tail_1, 
-      4+(this.tail_0.radius+this.tail_1.radius)/2, 0.6,
-      { pointA: {x: this.tail_0.radius/2, y: 0}, 
-        pointB: {x: this.tail_1.radius/2, y: 0} }
+      this.tail0, this.tail1, 
+      2+(this.tail0.radius+this.tail1.radius)/2, 0.9,
+      { pointA: {x: -this.tail0.radius/2, y: 0}, 
+        pointB: {x: this.tail1.radius/2, y: 0} }
     );
-    this.headjoint.angularStiffness = 0.8;
-    let antennaeColor = this.head.fillColor;
- 
-     
-     let antennaLength = this.head.radius;
-    let a1 = this.scene.matter.add.gameObject(
-      this.scene.add.rectangle(x+this.head.radius*2, y, antennaLength, antennaLength/4, antennaeColor),
-      this.scene.matter.add.rectangle(x+this.head.radius*2, y, antennaLength, antennaLength/4)
-    )
-    let a2 = this.scene.matter.add.gameObject(
-      this.scene.add.rectangle(x+this.head.radius*2, y, antennaLength, antennaLength/4, antennaeColor),
-      this.scene.matter.add.rectangle(x+this.head.radius*2, y, antennaLength, antennaLength/4)
-    )
-
-    this.antennaeJoints = [
-      // this.scene.matter.add.joint(a1, a2, antennaLength/2, 0.5, {pointA: {x: antennaLength/2, y: 0}, pointB: {x: antennaLength/2, y: 0}}),
-      this.scene.matter.add.joint(this.head, a1, 5, 0.5, {damping:0.1, pointA: {x: -this.head.radius, y: -this.head.radius/4}, pointB: {x: antennaLength/2, y: 0}}),
-      this.scene.matter.add.joint(this.head, a2, 5, 0.5, {damping:0.1,pointA: {x: -this.head.radius, y: this.head.radius/4}, pointB: {x: antennaLength/2, y: 0}}),
-      this.scene.matter.add.joint(a1, a2, 4+antennaLength, 0.5, {damping:0.1,pointA: {x: -antennaLength/2, y: 0}, pointB: {x: -antennaLength/2, y: 0}}),
-      this.scene.matter.add.joint(a1, a2, 4+antennaLength*1.5, 0.5, {damping:0.1,pointA: {x: -antennaLength/2, y: 0}, pointB: {x: antennaLength/2, y: 0}}),
-      this.scene.matter.add.joint(a2, a1, 4+antennaLength*1.5, 0.5, {damping:0.1,pointA: {x: -antennaLength/2, y: 0}, pointB: {x: antennaLength/2, y: 0}}),
-      
-    ]
+    this.headyjoint.angularStiffness = 0.8;
 
     this.jointsBody = [
-      this.headjoint,
+      this.headyjoint,
       this.torsojoint,
       this.tailjoint
     ]
     this.joints = [...this.jointsBody]
+
+      /*
+    let antennaeColor = this.heady.fillColor; 
+     let antennaLength = this.heady.radius;
+    let a1 = this.scene.matter.add.gameObject(
+      this.scene.add.rectangle(x-this.heady.radius*2, y, antennaLength, antennaLength/4, antennaeColor),
+      this.scene.matter.add.rectangle(x-this.heady.radius*2, y, antennaLength, antennaLength/4)
+    )
+    let a2 = this.scene.matter.add.gameObject(
+      this.scene.add.rectangle(x-this.heady.radius*2, y, antennaLength, antennaLength/4, antennaeColor),
+      this.scene.matter.add.rectangle(x-this.heady.radius*2, y, antennaLength, antennaLength/4)
+    )
+
+    this.antennaeJoints = [
+      // this.scene.matter.add.joint(a1, a2, antennaLength/2, 0.5, {pointA: {x: antennaLength/2, y: 0}, pointB: {x: antennaLength/2, y: 0}}),
+      this.scene.matter.add.joint(this.heady, a1, 5, 0.5, {damping:0.1, pointA: {x: this.heady.radius, y: -this.heady.radius/4}, pointB: {x: antennaLength/2, y: 0}}),
+      this.scene.matter.add.joint(this.heady, a2, 5, 0.5, {damping:0.1,pointA: {x: this.heady.radius, y: this.heady.radius/4}, pointB: {x: antennaLength/2, y: 0}}),
+      this.scene.matter.add.joint(a1, a2, 4+antennaLength, 0.5, {damping:0.1,pointA: {x: antennaLength/2, y: 0}, pointB: {x: antennaLength/2, y: 0}}),
+      this.scene.matter.add.joint(a1, a2, 4+antennaLength*1.5, 0.5, {damping:0.1,pointA: {x: antennaLength/2, y: 0}, pointB: {x: antennaLength/2, y: 0}}),
+      this.scene.matter.add.joint(a2, a1, 4+antennaLength*1.5, 0.5, {damping:0.1,pointA: {x: antennaLength/2, y: 0}, pointB: {x: antennaLength/2, y: 0}}),
+      
+    ]
     this.antennaeJoints.forEach(e=> {
       this.joints.push(e)
-    });
+     });
+     let antennae = [a1, a2]
+     antennae.forEach(e => {
+       e.setCollisionCategory(null);
+     });
+  
+     this.antennae = this.scene.add.group(antennae)
+     this.a1 = a1;
+     this.a2 = a2;
+   
+    */
 
     this.joints.forEach(e => {
       e.originalLength = e.length;
@@ -365,28 +387,17 @@ class Slug extends Phaser.GameObjects.Container {
 
 
 
-    let antennae = [a1, a2]
-    antennae.forEach(e => {
-      e.setCollisionCategory(null);
-    });
-
-    this.antennae = this.scene.add.group(antennae)
-    this.a1 = a1;
-    this.a2 = a2;
-    this.head.body.inertia=Infinity;
-    this.a1.body.inertia=Infinity;
-    this.a2.body.inertia=Infinity;
-    this.bodyparts = [this.a1, this.a2, this.head, this.torso, this.tail_0, this.tail_1];
+    this.bodyparts = [this.heady, this.torso, this.tail0, this.tail1]; //this.a1, this.a2, 
     this.bodyparts.forEach((e, i) => {
-      // e.setCollisionGroup(i*this.scene.GameObjects.length);
+      // e.setCollisionGroup(i);
       // e.setCollidesWith(0);
       // this.add(e);
     })
     this.list = this.bodyparts // + this.joints;
     this.alpha = 1;
     this.tint = color.color;
-    this.scaleX = 1;
-    this.scaleY = 1;
+    this.setScale(1);
+    this.body = this.torso.body;
   }
   
   setAlpha(a) {
@@ -409,8 +420,10 @@ class Slug extends Phaser.GameObjects.Container {
   setScale(sX, sY=undefined) {
     this.scaleX = sX;
     (sY) ? this.scaleY = sY : this.scaleY = sX;
+    this.scale = (this.scaleX+this.scaleY) / 2;
     this.list.forEach(element => {
       element.setScale(sX, sY);
+      element.scale = (element.scaleX+element.scaleY) / 2;
       if(element.type == 'RenderTexture' ) {
         let rt = element;
         let crcl = rt.arc;
@@ -427,24 +440,51 @@ class Slug extends Phaser.GameObjects.Container {
     for(let i = 0; i < this.jointsBody.length; i++) {
       let j = this.jointsBody[i];
       let diff = sX-1;
-      j.length = j.originalLength*(1+diff*Math.PI/2);
+      j.length = 4+j.originalLength*(1+diff*Math.PI/2);
     }
 
   }
 
+  getMass() {
+    let m = 0;
+    this.list.forEach(e => {
+      m += e.body.mass;
+    })
+    return m;
+
+    // radius-mass-area
+    // 20 2.8833982308888886 2872.873913134808
+    // 40 11.727165065555555 11491.495652539232
+    // 80 46.94205278022222 45965.98261015693
+
+    // A = Math.PI * (this.radius*this.scaleX)**2
+    // mass multiplier constant: 2.2860618138362114
+    // M = Math.PI * (this.radius*this.scaleX)**2 * 2.2860618138362114
+  }
+
+  getArea() {
+    let s = 0;
+    this.list.forEach(e => {
+      // s += Phaser.Geom.Circle.Area(e) // Math.PI * circle.radius * circle.radius
+      console.log(e.type, e.radius, e.scaleX)
+      s += Math.PI * (e.radius*(e.scaleX))**2
+    })
+    return s;
+  }
+
   moveRandomly() {
-    this.scene.matter.applyForce(this.head, {x: getRandomInclusive(-0.2, 0.2), y: getRandomInclusive(-0.2, 0.2)})
+    this.scene.matter.applyForce(this.heady, {x: getRandomInclusive(-0.2, 0.2), y: getRandomInclusive(-0.2, 0.2)})
   }
 
   eat(foodType='any') {
-    
+    this.eating = true;
     if(RULES.length) {
       addToOutput(`first, the being thinks of the rules you gave it.`)
     }
     
     let rulesFood = [];
     
-    let foodMatching = [ ];
+    this.foodMatching = [ ];
     
     for(let i = 0; i < RULES.length; i++) {
       let ifColor = false;
@@ -503,7 +543,7 @@ class Slug extends Phaser.GameObjects.Container {
             food = COLORCATS_HR[getColorClass(f.color)];
           }
           if(r.ifSize) {
-            food = (this.head.radius*this.head.scaleX < f.radius ? 'bigger':'smaller' )
+            food = (this.heady.radius*this.heady.scaleX < f.radius ? 'bigger':'smaller' )
           }
           if(r.ifTexture) {
             food = f.textureType;
@@ -511,7 +551,7 @@ class Slug extends Phaser.GameObjects.Container {
           console.log(booleanString, food);
           let evaluation = eval(booleanString);
           console.log(evaluation);
-          if(evaluation) {
+          if(evaluation && !r.avoid) {
             foodIndicesCurrentlySelected.push(foodIndicesSelected[i]);
           }
         }
@@ -519,70 +559,216 @@ class Slug extends Phaser.GameObjects.Container {
         foodIndicesSelected = foodIndicesCurrentlySelected;
       }
       for(let i = 0; i < foodIndicesSelected.length; i++) {
-        foodMatching.push(this.scene.food[foodIndicesSelected[i]])
+        this.foodMatching.push(this.scene.food[foodIndicesSelected[i]])
       }
     }
     else {
       addToOutput('none of the rules tell your being what to eat, so it will try to eat anything!')
       for(let i=0;i<foodIndicesValid.length;i++) {
-        foodMatching.push(this.scene.food[ foodIndicesValid[i] ]);
+        this.foodMatching.push(this.scene.food[ foodIndicesValid[i] ]);
       }
     }
-    if(!foodMatching.length) {
+    if(!this.foodMatching.length) {
       addToOutput(`there is no foody item which matches your beings rules close enough - try adapting your rules or moving your being closer :)`)
       return
     }
     // having found our food stuff, move to it until you're close!
-    let closestMatch = findClosest(this.head, foodMatching);
-    closestMatch.targeted = true;
-    let timedEvent = new Object();
-    const repeat = () => {
-      if(!closestMatch.active) {
-        timedEvent.remove();
-        return
+    this.closestMatch = findClosest(this.heady, this.foodMatching);
+    this.closestMatch.targeted = true;
+    let rotationDirection = 0;
+    /*
+      let timedEvent = new Object();
+      const repeat = () => {
+        if(!this.closestMatch.active) {
+          timedEvent.remove();
+          return
+        }
+        closestMatchNew = findClosest(this.heady, this.foodMatching);
+
+        let target = velocityToTarget(this.heady, this.closestMatch, 5);
+        let projectedVelocity = target.clone();
+
+        let angleSlugTarget = Phaser.Math.Angle.ShortestBetween(this.heady.angle, target.angle());
+        console.log(angleSlugTarget)
+        // console.log(this.getMass(), this.getArea())
+
+        let speedMod = 5
+
+        if(! rotationDirection) {
+          if(angleSlugTarget > 0 && angleSlugTarget <= 150) {
+            rotationDirection = -1;
+            console.log('rotating left')
+          } else if(angleSlugTarget < 0 && angleSlugTarget >= -150) {
+            rotationDirection = 1;
+            console.log('rotating right')
+          }
+        }
+        /*
+        if(rotationDirection == -1 && (angleSlugTarget > 0 && angleSlugTarget <= 150)) {
+           this.heady.thrustLeft(Math.sqrt(this.heady.body.mass)*0.008)
+          this.tail0.thrustRight(Math.sqrt(this.tail0.body.mass)*0.008)
+          timedEvent.repeatCount++;
+        }
+        else if(rotationDirection == 1 && (angleSlugTarget < 0 && angleSlugTarget >= -150)) {
+          this.heady.thrustRight(Math.sqrt(this.heady.body.mass)*0.008)
+           this.tail0.thrustLeft(Math.sqrt(this.tail0.body.mass)*0.008)
+          timedEvent.repeatCount++;
+        }
+        else {
+          console.log('looking at it')
+          this.heady.setVelocity(projectedVelocity.x, projectedVelocity.y);
+          this.torso.setVelocity(projectedVelocity.x, projectedVelocity.y);
+        }
+
+
+        if(angleSlugTarget > 0 && angleSlugTarget <= 150) {
+          this.heady.setVelocity(velocityLeft(this.heady, speedMod).x, velocityLeft(this.heady, speedMod).y);
+          this.tail0.setVelocity(velocityRight(this.tail0, speedMod).x, velocityRight(this.heady, speedMod).y);
+          timedEvent.repeatCount++;
+        }
+        else if(angleSlugTarget < 0 && angleSlugTarget >= -150) {
+          this.heady.setVelocity(velocityRight(this.heady, speedMod).x, velocityRight(this.heady, speedMod).y);
+          this.tail0.setVelocity(velocityLeft(this.tail0, speedMod).x, velocityLeft(this.tail0, speedMod).y);
+          timedEvent.repeatCount++;
+        }
+        else {
+          this.heady.setVelocity(projectedVelocity.x, projectedVelocity.y);
+        }
+        this.tail1.setVelocity(velocityFacing(this.tail1, speedMod).x, velocityFacing(this.tail1, 1).y)
+        this.tail0.setVelocity(velocityFacing(this.tail0, speedMod).x, velocityFacing(this.tail0, 1).y)
+        this.torso.setVelocity(velocityFacing(this.torso, speedMod).x, velocityFacing(this.torso, 1).y)
+        this.heady.setVelocity(velocityFacing(this.heady, speedMod).x, velocityFacing(this.heady, 1).y)
+
+        // this.heady.applyForce(this.heady, velocityFacing(this.heady, 30));
+
+        if(Phaser.Math.Distance.Between(this.heady.x, this.heady.y, this.closestMatch.x, this.closestMatch.y) < this.heady.scaleX*this.heady.radius+this.closestMatch.radius ||  this.eating == false) {
+          timedEvent.remove()
+        }
+
+        closestMatchNew = findClosest(this.heady, this.foodMatching);
+        if(this.closestMatch != closestMatchNew) {
+          this.closestMatch.targeted = false;
+          this.closestMatch = closestMatchNew;
+          this.closestMatch.targeted = true;
+          rotationDirection = 0;
+          this.chosenFood = this.closestMatch;
+          console.log('target switched')
+        }
+        if(timedEvent.getRepeatCount() == 0) {
+          this.closestMatch.targeted = false;
+          addToOutput(`your being couldn't reach the food it was looking for, maybe you could help it by moving it closer :)`)
+          this.eating = false;
+        }
       }
-      let closestMatchNew = findClosest(this.head, foodMatching);
-      let target = velocityToTarget(this.head, closestMatch, 10);
-      let vecTailTorso = velocityToTarget(this.tail_0, this.torso, 5);
-      let vecTorsoHead = velocityToTarget(this.torso, this.head, 5);
-      let vecSlug = vecTailTorso.add(vecTorsoHead);
-      let angleSlugTarget = getAngle(vecSlug, target);
-      console.log(angleSlugTarget);
-      let projectedVelocity = target.clone();
-      if(angleSlugTarget > 0) {
-        console.log(vecTorsoHead)
-        vecTorsoHead.rotate(Phaser.Math.DegToRad(90))
-        console.log(vecTorsoHead)
-        this.head.setVelocity(vecSlug.clone().rotate(Phaser.Math.DegToRad(90)));
-        this.tail_0.setVelocity(vecSlug.clone().rotate(Phaser.Math.DegToRad(-90)));
-      } else if(angleSlugTarget < -0) {
-        console.log(vecTorsoHead.rotate())
-        this.head.setVelocity(vecTorsoHead.clone().rotate(Phaser.Math.DegToRad(-90)));
-        this.tail_0.setVelocity(vecTailTorso.clone().rotate(Phaser.Math.DegToRad(90)));
+      timedEvent = this.scene.time.addEvent({
+        delay: 500,
+        startAt: 0,
+        repeat: 1,
+        callback: repeat,
+      })
+    */
+      // console.log('outside update', foodIndicesValid, this.foodMatching, this.scene.food);
+    let swimStates = [-20, 0, 20, 0];
+    swimStates.forEach((e, i) => {swimStates[i] = Phaser.Math.DegToRad(e)})
+    let waveIndex = 0;
+    console.log(swimStates)
+    this.timer = 0;
+    this.scene.events.on('update', function(time, delta) {
+      if(this.eating && this.foodMatching && this.heady.x && this.heady.y){
+        //console.log('inside update', foodIndicesValid, this.foodMatching, this.scene.food);
+        let closestMatchNew = findClosest(this.heady, this.foodMatching);
+        // console.log(this.closestMatch)
+        
+        let target = velocityToTarget(this.heady, this.closestMatch);
+
+        let angleSlugTarget = Phaser.Math.Angle.ShortestBetween(this.torso.angle, Phaser.Math.RadToDeg(target.angle()));
+        
+        let speed = 2;
+  
+        let tail1Vec = velocityFacing(this.tail1, speed/2); 
+        let tail0Vec = velocityFacing(this.tail0, speed/2); 
+        let torsoVec = velocityFacing(this.torso, speed/2); 
+        let headyVec = velocityFacing(this.heady, speed/2); 
+        // this.tail1.setVelocity(tail1Vec.x, tail1Vec.y)
+        // this.tail0.setVelocity(velocityFacing(this.tail0, speed).x, velocityFacing(this.tail0, 1).y)
+        // this.torso.setVelocity(velocityFacing(this.torso, speed).x, velocityFacing(this.torso, 1).y)
+        // this.heady.setVelocity(headyVec.x, headyVec.y)
+
+        
+        if(! rotationDirection) {
+          if(angleSlugTarget > 0 && angleSlugTarget > 50) {
+            rotationDirection = -1;
+            console.log('rotating left')
+          } else if(angleSlugTarget < 0 && angleSlugTarget < -50) {
+            rotationDirection = 1;
+            console.log('rotating right')
+          }
+        }
+
+        
+        let correctionAngle = Phaser.Math.DegToRad(90);
+        // console.log(Math.round(angleSlugTarget), rotationDirection)
+        
+        if(rotationDirection == -1 && (angleSlugTarget > 50 || angleSlugTarget < -50)) {
+          //console.log('counter clockwise', headyVec.setLength(speed/2))
+          headyVec.setAngle(this.heady.rotation - correctionAngle).setLength(speed/2)
+          // console.log('transformed', headyVec)
+          tail0Vec.setAngle(this.tail0.rotation + correctionAngle).setLength(speed/2);
+          this.heady.setVelocity(headyVec.x, headyVec.y);
+          this.tail0.setVelocity(tail0Vec.x, tail0Vec.y);
+        }
+        else if(rotationDirection == 1 && (angleSlugTarget > 50 || angleSlugTarget < -50)) {
+          console.log('clockwise (right)')
+          headyVec.setAngle(this.heady.rotation + correctionAngle).setLength(speed/2)
+          tail0Vec.setAngle(this.tail0.rotation - correctionAngle).setLength(speed/2);
+          this.heady.setVelocity(headyVec.x, headyVec.y);
+          this.tail0.setVelocity(tail0Vec.x, tail0Vec.y);
+        }
+        else if((angleSlugTarget > 0 && angleSlugTarget < 50)||(angleSlugTarget < 0 && angleSlugTarget > -50)){
+          headyVec.add(target);
+          // this.tail1.setVelocity(headyVec.x, headyVec.y);
+          headyVec.rotate(swimStates[waveIndex]);
+          this.tail0.setVelocity(headyVec.x, headyVec.y);
+          // this.torso.setVelocity(headyVec.x, headyVec.y);
+          this.heady.setVelocity(headyVec.x, headyVec.y);
+          // this.heady.applyForce(this.heady, this.heady, headyVec);
+        }
+        
+        
+        if(this.closestMatch != closestMatchNew) {
+          console.log(closestMatchNew)
+          closestMatchNew.targeted = true;
+          this.closestMatch.targeted = false;
+          this.closestMatch = closestMatchNew;
+          rotationDirection = 0;
+          console.log('target switched')
+          this.chosenFood = this.closestMatch;
+        }
+        this.timer += delta;
+        while(this.timer > 400) {
+          waveIndex = (waveIndex+1) % swimStates.length;
+          this.timer -= 400;
+        }
+        this.foodMatching.forEach((e, i) => {
+          if(!e.active) {
+            this.foodMatching.splice(i, 1)
+          }
+        })
       }
-      projectedVelocity = target.add(vecTorsoHead);
-      this.head.setVelocity(projectedVelocity.x, projectedVelocity.y);
-      
-      if(Phaser.Math.Distance.Between(this.head.x, this.head.y, closestMatch.x, closestMatch.y) < this.head.scaleX*this.head.radius+closestMatch.radius) {
-        timedEvent.remove()
+      else {
+        rotationDirection = 0
       }
-      if(closestMatch != closestMatchNew) {
-        closestMatch.targeted = false;
-        closestMatch = closestMatchNew;
-      }
-      if(timedEvent.getRepeatCount() == 0) {
-        closestMatch.targeted = false;
-        addToOutput(`your being couldn't reach the food it was looking for, maybe you could help it by moving it closer :)`)
-      }
-    }
-    timedEvent = this.scene.time.addEvent({
-      delay: 500,
-      startAt: 0,
-      repeat: 10,
-      callback: repeat,
-    })
+    }, this);
   }
 
+  stop() {
+    this.eating = false;
+    if(this.chosenFood) {
+      this.chosenFood.targeted = false;
+      this.chosenFood = null;
+    }
+
+  }
 
 }
 
@@ -608,22 +794,6 @@ class Antenna extends Phaser.GameObjects.Group {
 function getRandomInclusive(min, max) {
   return Math.random() * (max - min) + min; //The maximum is inclusive and the minimum is inclusive
 }
-
-
-
-class Food extends Phaser.GameObjects.Polygon {
-    constructor(scene, x, y, radius, color) {
-        super(scene, x, y, )
-    }
-}
-
-function velocityToTarget(from, to, speed = 1) {
-  // console.log(from.x, from.y, to.x, to.y)
-  const direction = Math.atan((to.x - from.x) / (to.y - from.y));
-  const speed2 = to.y >= from.y ? speed : -speed;
- 
-  return new Phaser.Math.Vector2({ x: speed2 * Math.sin(direction), y: speed2 * Math.cos(direction) });
-};
 
 function sameColorClass(color1, color2) { // color blindness: https://colororacle.org/?
   let cat1=-1; let cat2 = -1;
@@ -678,30 +848,18 @@ function getCanvasWidth() {
 function findClosest(A, B=[new Phaser.GameObjects.GameObject()]) {
   let distance = Infinity;
   let closest;
+  // console.log(A, B)
   // console.log(A.x, A.y);
-  B.forEach(e=> {
-    // console.log(e.x, e.y)
+  B.forEach(b=> {
+    // console.log(b.x, b.y)
     // distance squared is faster
-    currentDistance = Phaser.Math.Distance.Squared(A.x, A.y, e.x, e.y);
+    currentDistance = Phaser.Math.Distance.Squared(A.x, A.y, b.x, b.y);
+    // console.log(A.x, A.y, b.x, b.y)
     if(currentDistance < distance) {
       distance = currentDistance;
-      closest = e;
+      closest = b;
     }
     // console.log(distance)
   })
   return closest;
-}
-
-function getAngle(a, b, radians=false) {
-  offSet = 0;
-  // angle in radians
-  var angleRadians = Math.atan2(b.y - a.y, b.x - a.x);
-  // angle in degrees
-  var angleDeg = (Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI);
-  //add the offset
-  let result = offSet + angleDeg;
-  if(radians) {
-    result = offSet + angleRadians;
-  }
-  return result;
 }
