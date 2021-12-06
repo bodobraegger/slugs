@@ -178,16 +178,17 @@ terminal_input.addEventListener('keydown', (e) => {
     case 'Delete':
       autocomplete.innerHTML = '';
       return;
-      case 'Tab':
-        e.preventDefault();
-        terminal_input.value = autocomplete.innerText;
-        return;
-        case 'ArrowUp':
-          e.preventDefault();
-          let prev = buffer.prev();
-          if(prev!==undefined){
-            terminal_input.value = prev.join(' ');
-      }
+    case 'Tab':
+      e.preventDefault();
+      terminal_input.value = autocomplete.innerText;
+      return;
+    /*
+    case 'ArrowUp':
+      e.preventDefault();
+      let prev = buffer.prev();
+      if(prev!==undefined){
+        terminal_input.value = prev.join(' ');
+    }
       return;
     case 'ArrowDown':
       e.preventDefault();
@@ -199,7 +200,8 @@ terminal_input.addEventListener('keydown', (e) => {
         clearInput();
       }
       return;
-    case 'Enter': {
+    */
+      case 'Enter': {
       e.preventDefault()
       let cmd = terminal_input.value.toLowerCase().match(/\w+/g).filter(word => !wordsFilter.includes(word))
       if(!cmd) { return; }

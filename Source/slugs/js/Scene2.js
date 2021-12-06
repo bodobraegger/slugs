@@ -29,40 +29,40 @@ class Scene2 extends Phaser.Scene {
   }
 
   create() {
-    this.matter.world.setBounds();
+    // this.matter.world.setBounds();
     this.matter.add.mouseSpring();
-    //this.matter.enableAttractorPlugin();
+    // this.matter.enableAttractorPlugin();  
+    // this.cursors = this.input.keyboard.createCursorKeys()
     
-    // this.cameras.main.setZoom(0.5);
-    // this.cameras.main.centerOn(document.getElementById("phaser_container").clientWidth/2, document.getElementById("phaser_container").clientHeight/2);
-  
-
+    
     let circle = this.add.circle(1, 1, 10, 0xFFF000);
     let arc = this.add.arc(100, 100, 50, 1, 180, false, 0xFFF000)
     let rectangle = this.matter.add.gameObject(this.add.rectangle(400, 200, 20, 10, 0x9966ff), this.matter.add.rectangle(400, 200, 20, 10))
-
+    
     let radius = 20
-
+    
     let antenna_vertices = `0 0 0 ${2*radius} ${2*radius} ${1.5*radius} ${2*radius} ${0.5*radius}`;
     // let antenna_vertices = [0,0, 0,2*radius, 2*radius,1.5*radius, 2*radius,.5*radius]
-
+    
     let polygon = this.matter.add.gameObject(this.add.polygon(200, 400, antenna_vertices, 0xFF22FF),  { shape: { type: 'fromVerts', verts: antenna_vertices, flagInternal: true } });
     // polygon = this.matter.add.gameObject(polygon, m_polygon);
     // polygon.setScale(0.2, 0.2);
-
+    
     let group = this.add.group([circle, arc, rectangle, polygon]);
     group.setAlpha(0.5)
-
+    
     let matterArc = this.matter.add.trapezoid(1, 1, 10, 20, 0.5);
-
+    
     let slug_r = 20;
     let slug_x = getCanvasWidth()/2;
     let slug_y = getCanvasHeight()/2;
-
-
+    
+    
     let red = new Phaser.Display.Color().setFromHSV(0, 1, 1);
     this.yourSlug = new Slug(this, slug_x, slug_y, slug_r, red);
     let s1 = new Slug(this, slug_x-280, slug_y-5, 10);
+    this.cameras.main.startFollow(this.yourSlug.torso, true, 0.008, 0.008);
+    this.stage = 1;
     this.slugs = [this.yourSlug, s1];
     
     this.food = [ 
@@ -83,12 +83,12 @@ class Scene2 extends Phaser.Scene {
     }
     foodIndicesValid = [...this.food.keys()]
     
-
+    
     
     // RENDER TERMINAL ON TOP OF PHASER
     // const ph_terminal_container = this.add.dom(0.8*document.getElementById("phaser_container").clientWidth, 0.9*document.getElementById("phaser_container").clientHeight/2, terminal_container)
     // const terminal_input = document.getElementById('terminal_input');
-
+    
     terminal_input.addEventListener('cmd', (e) => {
       // WE HAVE A HOOK INTO THE TERMINAL
       this.processCommand(e.detail.value);
@@ -126,8 +126,23 @@ class Scene2 extends Phaser.Scene {
       })
     }); 
     console.log(foodIndicesValid)
-
+    let controlConfig = {
+      camera: this.cameras.main,
+      left: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT),
+      right: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT),
+      up: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP),
+      down: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN),
+      // zoomIn: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.PLUS),
+      // zoomOut: this.input.mouse.onMouseWheel() ,
+      acceleration: 0.03,
+      drag: 0.0003,
+      maxSpeed: 0.8
+  };
+    this.controls = new Phaser.Cameras.Controls.SmoothedKeyControl(controlConfig);
+    this.input.keyboard.preventDefault = false;
   }
+
+
   update(time, delta) {
     let constraints = [ ]
     this.slugs.forEach(e => {
@@ -135,6 +150,12 @@ class Scene2 extends Phaser.Scene {
       constraints = constraints.concat(e.jointsBody);
     })
     this.renderConstraint(constraints, 0xF9F6EE, 1, 1, 1, 0xF9F6EE, 1);
+
+    if(this.yourSlug.scale > this.stage+1) {
+      this.stage++;
+      this.cameras.main.zoomTo(1/this.stage, 2000, 'Sine.easeInOut');
+    }
+    this.controls.update(delta)
     
     /*
     if(this.follow = true) {
@@ -195,8 +216,9 @@ class Scene2 extends Phaser.Scene {
         break;
       case 'eat':
         output += `you tell your being to eat.`
+        addToOutput(output)
         this.yourSlug.eat();
-        break;
+        return;
         
       case stopWord:
         this.yourSlug.stop();
@@ -319,25 +341,25 @@ class Slug extends Phaser.GameObjects.Container {
 
     this.headyjoint  = this.scene.matter.add.joint(
       this.heady, this.torso, 
-      2+(this.heady.radius+this.torso.radius)/2, 0.9, 
-      { damping:0.1,
+      2+(this.heady.radius+this.torso.radius)/2, 0.1, 
+      {
         pointA: {x: -this.heady.radius/2, y: 0}, 
         pointB: {x: this.torso.radius/2, y: 0} }
     ); // , {pointA: {x: this.torso.radius/2, y: 0}}
 
     this.torsojoint  = this.scene.matter.add.joint(
       this.torso, this.tail0, 
-      2+(this.torso.radius+this.tail0.radius)/2, 0.9,
+      2+(this.torso.radius+this.tail0.radius)/2, 0.1,
       { pointA: {x: -this.torso.radius/2, y: 0}, 
         pointB: {x: this.tail0.radius/2, y: 0} }
     );
     this.tailjoint  = this.scene.matter.add.joint(
       this.tail0, this.tail1, 
-      2+(this.tail0.radius+this.tail1.radius)/2, 0.9,
+      2+(this.tail0.radius+this.tail1.radius)/2, 0.1,
       { pointA: {x: -this.tail0.radius/2, y: 0}, 
         pointB: {x: this.tail1.radius/2, y: 0} }
     );
-    this.headyjoint.angularStiffness = 0.8;
+    this.headyjoint.angularStiffness = 0.2;
 
     this.jointsBody = [
       this.headyjoint,
@@ -392,6 +414,7 @@ class Slug extends Phaser.GameObjects.Container {
       // e.setCollisionGroup(i);
       // e.setCollidesWith(0);
       // this.add(e);
+      e.setBounce(0.0)
     })
     this.list = this.bodyparts // + this.joints;
     this.alpha = 1;
@@ -440,7 +463,8 @@ class Slug extends Phaser.GameObjects.Container {
     for(let i = 0; i < this.jointsBody.length; i++) {
       let j = this.jointsBody[i];
       let diff = sX-1;
-      j.length = 4+j.originalLength*(1+diff*Math.PI/2);
+      j.length = 2+j.originalLength*(1+diff*Math.PI/2);
+      // j.length = Math.max(2+(j.bodyA.circleRadius+j.bodyB.circleRadius)/2, j.originalLength*(1+diff*Math.PI/2))
     }
 
   }
@@ -570,6 +594,7 @@ class Slug extends Phaser.GameObjects.Container {
     }
     if(!this.foodMatching.length) {
       addToOutput(`there is no foody item which matches your beings rules close enough - try adapting your rules or moving your being closer :)`)
+      this.eating = false;
       return
     }
     // having found our food stuff, move to it until you're close!
@@ -681,9 +706,10 @@ class Slug extends Phaser.GameObjects.Container {
         
         let target = velocityToTarget(this.heady, this.closestMatch);
 
-        let angleSlugTarget = Phaser.Math.Angle.ShortestBetween(this.torso.angle, Phaser.Math.RadToDeg(target.angle()));
+        let vecTorsoHeady = velocityToTarget(this.torso, this.heady)
+        let angleSlugTarget = Phaser.Math.Angle.ShortestBetween(Phaser.Math.RadToDeg(vecTorsoHeady.angle()), Phaser.Math.RadToDeg(target.angle()));
         
-        let speed = 2;
+        let speed = 4;
   
         let tail1Vec = velocityFacing(this.tail1, speed/2); 
         let tail0Vec = velocityFacing(this.tail0, speed/2); 
@@ -705,12 +731,22 @@ class Slug extends Phaser.GameObjects.Container {
           }
         }
 
-        
-        let correctionAngle = Phaser.Math.DegToRad(90);
+        let correctionAngle = Phaser.Math.DegToRad(40);
         // console.log(Math.round(angleSlugTarget), rotationDirection)
         
-        if(rotationDirection == -1 && (angleSlugTarget > 50 || angleSlugTarget < -50)) {
-          //console.log('counter clockwise', headyVec.setLength(speed/2))
+        if((angleSlugTarget > 0 && angleSlugTarget < 70)||(angleSlugTarget < 0 && angleSlugTarget > -70)){
+          headyVec.add(target);
+          // this.tail1.setVelocity(headyVec.x, headyVec.y);
+          this.torso.setVelocity(headyVec.x, headyVec.y);
+          headyVec.rotate(swimStates[waveIndex]);
+          this.heady.setVelocity(headyVec.x, headyVec.y);
+          headyVec.mirror(vecTorsoHeady);
+          this.tail0.setVelocity(headyVec.x, headyVec.y);
+          // this.heady.applyForce(this.heady, this.heady, headyVec);
+          this.heady.setAngle(Phaser.Math.RadToDeg(headyVec.angle()))
+        }
+        else if(rotationDirection == -1 && (angleSlugTarget > 50 || angleSlugTarget < -50)) {
+          console.log('counter clockwise')
           headyVec.setAngle(this.heady.rotation - correctionAngle).setLength(speed/2)
           // console.log('transformed', headyVec)
           tail0Vec.setAngle(this.tail0.rotation + correctionAngle).setLength(speed/2);
@@ -724,25 +760,20 @@ class Slug extends Phaser.GameObjects.Container {
           this.heady.setVelocity(headyVec.x, headyVec.y);
           this.tail0.setVelocity(tail0Vec.x, tail0Vec.y);
         }
-        else if((angleSlugTarget > 0 && angleSlugTarget < 50)||(angleSlugTarget < 0 && angleSlugTarget > -50)){
-          headyVec.add(target);
-          // this.tail1.setVelocity(headyVec.x, headyVec.y);
-          headyVec.rotate(swimStates[waveIndex]);
-          this.tail0.setVelocity(headyVec.x, headyVec.y);
-          // this.torso.setVelocity(headyVec.x, headyVec.y);
-          this.heady.setVelocity(headyVec.x, headyVec.y);
-          // this.heady.applyForce(this.heady, this.heady, headyVec);
-        }
         
         
         if(this.closestMatch != closestMatchNew) {
-          console.log(closestMatchNew)
-          closestMatchNew.targeted = true;
-          this.closestMatch.targeted = false;
-          this.closestMatch = closestMatchNew;
-          rotationDirection = 0;
-          console.log('target switched')
-          this.chosenFood = this.closestMatch;
+          let closer = Phaser.Math.Distance.BetweenPoints(this.heady, closestMatchNew) - Phaser.Math.Distance.BetweenPoints(this.heady, this.closestMatch);
+          if( closer > 20){
+            
+            console.log(closestMatchNew)
+            closestMatchNew.targeted = true;
+            this.closestMatch.targeted = false;
+            this.closestMatch = closestMatchNew;
+            rotationDirection = 0;
+            console.log('target switched')
+            this.chosenFood = this.closestMatch;
+          } 
         }
         this.timer += delta;
         while(this.timer > 400) {
