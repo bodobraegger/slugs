@@ -157,6 +157,9 @@ class Scene2 extends Phaser.Scene {
     }
     this.controls.update(delta)
     
+    let vecTorsoHeady = velocityToTarget(this.yourSlug.torso, this.yourSlug.heady);
+    if(Phaser.Math.Angle.ShortestBetween(Phaser.Math.RadToDeg(vecTorsoHeady.angle()), this.yourSlug.heady.angle) > 40)
+    this.yourSlug.heady.setAngle(Phaser.Math.RadToDeg(vecTorsoHeady.angle()))
     /*
     if(this.follow = true) {
       this.cameras.main.scrollX = this.yourSlug.torso.x - document.getElementById("phaser_container").clientWidth/2;
@@ -341,7 +344,7 @@ class Slug extends Phaser.GameObjects.Container {
 
     this.headyjoint  = this.scene.matter.add.joint(
       this.heady, this.torso, 
-      2+(this.heady.radius+this.torso.radius)/2, 0.1, 
+      2+(this.heady.radius+this.torso.radius)/2, 1, 
       {
         pointA: {x: -this.heady.radius/2, y: 0}, 
         pointB: {x: this.torso.radius/2, y: 0} }
@@ -349,13 +352,13 @@ class Slug extends Phaser.GameObjects.Container {
 
     this.torsojoint  = this.scene.matter.add.joint(
       this.torso, this.tail0, 
-      2+(this.torso.radius+this.tail0.radius)/2, 0.1,
+      2+(this.torso.radius+this.tail0.radius)/2, 1,
       { pointA: {x: -this.torso.radius/2, y: 0}, 
         pointB: {x: this.tail0.radius/2, y: 0} }
     );
     this.tailjoint  = this.scene.matter.add.joint(
       this.tail0, this.tail1, 
-      2+(this.tail0.radius+this.tail1.radius)/2, 0.1,
+      2+(this.tail0.radius+this.tail1.radius)/2, 1,
       { pointA: {x: -this.tail0.radius/2, y: 0}, 
         pointB: {x: this.tail1.radius/2, y: 0} }
     );
@@ -747,16 +750,19 @@ class Slug extends Phaser.GameObjects.Container {
         }
         else if(rotationDirection == -1 && (angleSlugTarget > 50 || angleSlugTarget < -50)) {
           console.log('counter clockwise')
-          headyVec.setAngle(this.heady.rotation - correctionAngle).setLength(speed/2)
-          // console.log('transformed', headyVec)
-          tail0Vec.setAngle(this.tail0.rotation + correctionAngle).setLength(speed/2);
+          let torsoVec = headyVec.clone().setLength(0.25*speed);
+          this.torso.setVelocity(torsoVec.x, torsoVec.y);
+          headyVec.setAngle(this.heady.rotation - correctionAngle)
+          tail0Vec.setAngle(this.tail0.rotation + correctionAngle);
           this.heady.setVelocity(headyVec.x, headyVec.y);
           this.tail0.setVelocity(tail0Vec.x, tail0Vec.y);
         }
         else if(rotationDirection == 1 && (angleSlugTarget > 50 || angleSlugTarget < -50)) {
           console.log('clockwise (right)')
-          headyVec.setAngle(this.heady.rotation + correctionAngle).setLength(speed/2)
-          tail0Vec.setAngle(this.tail0.rotation - correctionAngle).setLength(speed/2);
+          let torsoVec = headyVec.clone().setLength(0.25*speed);
+          this.torso.setVelocity(torsoVec.x, torsoVec.y);
+          headyVec.setAngle(this.heady.rotation + correctionAngle)
+          tail0Vec.setAngle(this.tail0.rotation - correctionAngle);
           this.heady.setVelocity(headyVec.x, headyVec.y);
           this.tail0.setVelocity(tail0Vec.x, tail0Vec.y);
         }
