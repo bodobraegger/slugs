@@ -282,12 +282,6 @@ terminal_input.addEventListener('keydown', (e) => {
 
 function addToLog(output) {
   // console.log(getTotalChildrenHeights(terminal_container), 'vs', document.getElementById("phaser_container").clientHeight);
-  // TODO: FIX TERMINAL CLEARING ON TOO LARGE
-  while(getTotalChildrenHeights(terminal_container) > getCanvasHeight() && logCount > 0 && terminal_container.children.length) {
-    terminal_log.firstChild.remove();
-    // console.log('trimming log to make room! bigger than canvas currently')
-    logCount--;
-  }
   let div = document.createElement('div');
   if(!(output instanceof HTMLDivElement) ) {
     // if output is already a stringified div, don't create a nested one.
@@ -308,6 +302,11 @@ function addToLog(output) {
   else {
     terminal_log.appendChild(div);
     logCount++;
+  }
+  while(getTotalChildrenHeights(terminal_container) > getCanvasHeight() && logCount > 0 && terminal_container.children.length) {
+    terminal_log.firstChild.remove();
+    // console.log('trimming log to make room! bigger than canvas currently')
+    logCount--;
   }
 }
 
