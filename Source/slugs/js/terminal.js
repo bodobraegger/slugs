@@ -256,10 +256,10 @@ terminal_input.addEventListener('keydown', (e) => {
 
 // TERMINAL IO FUNCTIONS
 
-function logOutput(output) {
+function addToLog(output) {
   // console.log(getTotalChildrenHeights(terminal_container), 'vs', document.getElementById("phaser_container").clientHeight);
   // TODO: FIX TERMINAL CLEARING ON TOO LARGE
-  if(getTotalChildrenHeights(terminal_container) > getCanvasHeight() && logCount > 0) {
+  if(getTotalChildrenHeights(terminal_container) > getCanvasHeight() && logCount > 0 && terminal_container.children.length) {
     terminal_log.firstChild.remove();
     // console.log('trimming log to make room! bigger than canvas currently')
     logCount--;
@@ -270,9 +270,7 @@ function logOutput(output) {
     div.innerHTML = `${output}`;
     div = div.firstElementChild;
   } else {
-    output = colorize(`${output}`, rgbaOutput);
     div.innerHTML = output;
-    div = div.firstElementChild;
   }
   div.classList += ` output`;
   if(terminal_log.lastChild && div.innerHTML == terminal_log.lastChild.innerHTML) {
@@ -282,36 +280,18 @@ function logOutput(output) {
     terminal_log.appendChild(div);
     logCount++;
   }
-  
+}
+
+function logOutput(output) {
+  addToLog(colorize(output, rgbaOutput));
 }
 
 function logInput(output) {
-  let div = document.createElement('div');
-  // if output is already a div, don't create a nested one.
-  if(output.slice(0,4) == '<div') {
-    div.innerHTML = `${output}`;
-    div = div.firstElementChild;
-  } else {
-    output = colorize(`${output}`, rgbaInput);
-    div.innerHTML = output;
-    div = div.firstElementChild;
-  }
-  div.classList += ` output`;
-  if(terminal_log.lastChild && div.innerHTML == terminal_log.lastChild.innerHTML) {
-    blink(terminal_log.lastChild);
-  }
-  else {
-    terminal_log.appendChild(div);
-    logCount++;
-  }
-  
-  // console.log(getTotalChildrenHeights(terminal_container), 'vs', document.getElementById("phaser_container").clientHeight);
-  // TODO: FIX TERMINAL CLEARING ON TOO LARGE
-  if(getTotalChildrenHeights(terminal_container) > getCanvasHeight() && logCount > 0) {
-    terminal_log.firstChild.remove();
-    // console.log('trimming log to make room! bigger than canvas currently')
-    logCount--;
-  }
+  addToLog(colorize(output, rgbaInput));
+}
+
+function logError(output) {
+  addToLog(colorize(output, rgbaError));
 }
 
 function clearLog() {

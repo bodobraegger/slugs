@@ -262,19 +262,16 @@ class Scene2 extends Phaser.Scene {
               logOutput(`your being tells you its color is ${COLORCATS_HR[getColorClass(this.yourSlug.color)]}`); 
             } 
           } else {
-            output = colorize(`
-            ${wrapCmd(cmd0)}: is not something your being could know!.<br> 
-            `, rgbaError );
+            logError(`${wrapCmd(cmd0)}: is not something your being could know!.<br>`);
           }
         })
         return;
       
       default:
-        output = colorize(`
-        ${wrapCmd(cmd0)}: is not a known command.<br> 
+        logError(`${wrapCmd(cmd0)}: is not a known command.<br> 
         try a different one, or try typing ${wrapCmd('help')}!.
-        `, rgbaError ); // new Phaser.Display.Color().random().rgba
-        break;
+        `); // new Phaser.Display.Color().random().rgba
+        return;
       }
       logOutput(output)
   }
