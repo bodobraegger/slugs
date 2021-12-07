@@ -265,14 +265,19 @@ function addToLog(output) {
     logCount--;
   }
   let div = document.createElement('div');
-  // if output is already a div, don't create a nested one.
-  if(output.slice(0,4) == '<div') {
-    div.innerHTML = `${output}`;
-    div = div.firstElementChild;
-  } else {
-    div.innerHTML = output;
+  if(!(output instanceof HTMLDivElement) ) {
+    // if output is already a stringified div, don't create a nested one.
+    if(output.slice(0,4) == '<div') {
+      div.innerHTML = `${output}`;
+      div = div.firstElementChild;
+    } else {
+      div.innerHTML = output;
+    }
   }
-  div.classList += ` output`;
+  else {
+    div = output;
+  }
+  div.classList += ` logEntry`;
   if(terminal_log.lastChild && div.innerHTML == terminal_log.lastChild.innerHTML) {
     blink(terminal_log.lastChild);
   }
@@ -283,15 +288,27 @@ function addToLog(output) {
 }
 
 function logOutput(output) {
-  addToLog(colorize(output, rgbaOutput));
+  let div = document.createElement('div');
+  div.innerHTML = colorize(output, rgbaOutput);
+  div = div.firstElementChild;
+  div.classList += ' output';
+  addToLog(div);
 }
 
-function logInput(output) {
-  addToLog(colorize(output, rgbaInput));
+function logInput(input) {
+  let div = document.createElement('div');
+  div.innerHTML = colorize(input, rgbaInput);
+  div = div.firstElementChild;
+  div.classList += ' input';
+  addToLog(div);
 }
 
-function logError(output) {
-  addToLog(colorize(output, rgbaError));
+function logError(error) {
+  let div = document.createElement('div');
+  div.innerHTML = colorize(error, rgbaError);
+  div = div.firstElementChild;
+  div.classList += ' error';
+  addToLog(div);
 }
 
 function clearLog() {

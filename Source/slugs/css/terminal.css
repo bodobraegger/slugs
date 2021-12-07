@@ -56,7 +56,7 @@
    font-weight: bold;
 }
 
-.output {
+.logEntry {
     background-color:rgba(93, 255, 206, 0.1);
     border-radius: 15px;
     padding: 10px; 
