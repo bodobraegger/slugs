@@ -7,6 +7,6 @@ showcase designing for girls and game build up
 5. preliminary conclusion
 
 ## game
-1. natural movement
-2. editing and viewing rules
-3. parsing for loop
+1. [x] natural movement
+1. editing and viewing rules
+2. parsing for loop
