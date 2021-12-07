@@ -53,29 +53,85 @@
 }
 
 
-
-.cmd {
-   font-weight: bold;
-   color: black;
-}
-
 .logEntry {
     background-color:rgba(93, 255, 206, 0.1);
     border-radius: 15px;
     padding: 10px; 
     margin: 5px 3px;
 }
-
 .input {
     background-color: rgba(255,130,20);
 }
-
 .output {
     background-color: rgba(175,143,233);
     color: ivory;
 }
-
 .error {
     background-color: rgba(255,102,0);
-
 }
+
+.cmd {
+    font-weight: bold;
+    color: black;
+    background-color:rgba(240, 240, 240, .2);
+    border-radius: 15px;
+    padding: 2px 3px;
+}
+
+.wordsAction {
+    color: #d82f39;
+}
+.wordsFirst {
+    color: #8be9fd;
+}
+.wordsIfConditionLeft {
+    color: #008504;
+}
+.wordsIfConditionRight {
+    color: #008504;
+}
+.wordsBoolean {
+    color: #6272a4;
+}
+.wordsToShow {
+    color: #ff79c6;
+}
+/*
+BGDarker 	#282a36 	#282a36 	#282a36 	#282a36 	13.4
+COLOR7 	#f8f8f2 	#f8f8f2 	#f8f8f2 	#f8f8f2 	1
+SELECTION 	#44475a 	#44475a 	#c5c8de 	#c5c8de 	1.6
+COLOR8 	#6272a4 	#6272a4 	#7e8ec2 	#7e8ec2 	3
+COLOR6 	#8be9fd 	#8be9fd 	#007e90 	#007e90 	4.5
+COLOR2 	#50fa7b 	#50fa7b 	#008504 	#008504 	4.5
+ORANGE 	#ffb86c 	#ffb86c 	#a0651b 	#a0651b 	4.5
+COLOR5 	#ff79c6 	#ff79c6 	#c13f8e 	#c13f8e 	4.5
+COLOR4 	#bd93f9 	#bd93f9 	#855fbf 	#855fbf 	4.5
+COLOR1 	#ff5555 	#ff5555 	#d82f39 	#d82f39 	4.5
+COLOR3 	#f1fa8c 	#f1fa8c 	#6c7908 	#6c7908 	4.5
+COLOR0 	#21222c 	#21222c 	#eaebf9 	#eaebf9 	1.1
+COLOR1 	#ff5555 	#ff5555 	#d82f39 	#d82f39 	4.5
+COLOR2 	#50fa7b 	#50fa7b 	#008504 	#008504 	4.5
+COLOR3 	#f1fa8c 	#f1fa8c 	#6c7908 	#6c7908 	4.5
+COLOR4 	#bd93f9 	#bd93f9 	#855fbf 	#855fbf 	4.5
+COLOR5 	#ff79c6 	#ff79c6 	#c13f8e 	#c13f8e 	4.5
+COLOR6 	#8be9fd 	#8be9fd 	#007e90 	#007e90 	4.5
+COLOR7 	#f8f8f2 	#f8f8f2 	#f8f8f2 	#f8f8f2 	1
+COLOR8 	#6272a4 	#6272a4 	#7e8ec2 	#7e8ec2 	3
+COLOR9 	#ff6e6e 	#ff6e6e 	#cb4046 	#cb4046 	4.5
+COLOR10 	#69ff94 	#69ff94 	#008525 	#008525 	4.5
+COLOR11 	#ffffa5 	#ffffa5 	#727724 	#727724 	4.5
+COLOR12 	#d6acff 	#d6acff 	#8762ae 	#8762ae 	4.5
+COLOR13 	#ff92df 	#ff92df 	#b34b97 	#b34b97 	4.5
+COLOR14 	#a4ffff 	#a4ffff 	#157f80 	#157f80 	4.5
+WHITE 	#ffffff 	#ffffff 	#727272 	#727272 	4.5
+TEMP_QUOTES 	#e9f284 	#e9f284 	#6c7907 	#6c7907 	4.5
+TEMP_PROPERTY_QUOTES 	#8be9fe 	#8be9fe 	#007e91 	#007e91 	4.5
+LineHighlight 	#44475a75 	#44475a75 	#c5c8de75 	#c5c8de75 	1.6
+BGLighter 	#424450 	#424450 	#424450 	#424450 	9.1
+WHITE 	#ffffff 	#ffffff 	#727272 	#727272 	4.5
+TAB_DROP_BG 	#44475a70 	#44475a70 	#44475a70 	#44475a70 	8.6
+BGLighter 	#424450 	#424450 	#424450 	#424450 	9.1
+BGLight 	#343746 	#343746 	#343746 	#343746 	11.1
+BGDarker 	#282a36 	#282a36 	#282a36 	#282a36 	13.4
+BGDarker
+*/

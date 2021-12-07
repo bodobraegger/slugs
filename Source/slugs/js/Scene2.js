@@ -257,7 +257,7 @@ class Scene2 extends Phaser.Scene {
           if(wordsToShow.includes(e)) {
             if(e=='rules') {
               if(RULES.length) {
-                logOutput(`it knows the following rules: <br>`)
+                logOutput(`it knows the following ${wrapCmd('rules')}: <br>`)
                 output = '';
                 RULES.forEach( (e, i) => {
                   output += `${i+1}. ${e} <br>`; //•

@@ -7,13 +7,13 @@ const ifWord = 'if',
     stopWord = 'stop',
     showWord = 'show';
 
-let wordsAction = ['eat', 'avoid']
+let wordsAction = ['eat', 'avoid', stopWord]
 
-const wordsFirst = wordsAction.concat([ifWord, forWord, stopWord, showWord, 'help', 'abracadabra', 'clear'])
+const wordsFirst = wordsAction.concat([ifWord, forWord, showWord, 'help', 'abracadabra', 'clear'])
 const wordsForCmdString = [].concat(wordsFirst.slice(0, 2));
 let wordsIfConditionLeft = [].concat(ENTITY_TYPES);
 let wordsIfConditionRight = [].concat(SIZES, COLORCATS_HR, TEXTURES);
-const wordsBoolean = [thenWord, andWord, orWord];
+const wordsBoolean = [thenWord, andWord, orWord, equalWord];
 
 let wordsToShow = ['rules', 'routines',  'color', 'texture', 'shape']
 
@@ -21,6 +21,8 @@ let wordsAll = wordsFirst.concat(wordsIfConditionLeft, wordsIfConditionRight, eq
 
 let wordsFilter = ['the', 'a', 'my']
 
+let wordsAllArrays = [wordsAction, wordsFirst, wordsIfConditionLeft, wordsIfConditionRight, wordsBoolean, wordsToShow];
+let wordsAllArraysStrings = ['wordsAction', 'wordsFirst', 'wordsIfConditionLeft', 'wordsIfConditionRight', 'wordsBoolean', 'wordsToShow'];
 
 let logCount = 0;
 let logMax = 5;
@@ -355,7 +357,26 @@ function colorize(output, color) {
 }
 
 function wrapCmd(cmd) {
-  return `<span class='cmd'>${cmd}</span>`
+  if(cmd.split(' ').length > 1) {
+    let r = ''
+    cmd.split(' ').forEach(e => {
+      let wrapped = wrapCmd(e);
+      if(e.at(-1) == ',') {
+        wrapped = `${wrapCmd(e.slice(0, e.length-1))},`;
+      }
+      r += `${wrapped} `;
+    });
+    return r.trimEnd();
+  }
+  let i = 0;
+  let classList = `cmd `
+  for(i; i<wordsAllArrays.length; i++) {
+      if(wordsAllArrays[i].includes(cmd)) {
+        classList += `${cmd} ${wordsAllArraysStrings[i]}`;
+        break;
+      }
+  }
+  return `<span class='${classList}'>${cmd}</span>`
 }
 
 // STRING HELPERS
