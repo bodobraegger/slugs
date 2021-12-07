@@ -15,7 +15,7 @@ let wordsIfConditionLeft = [].concat(ENTITY_TYPES);
 let wordsIfConditionRight = [].concat(SIZES, COLORCATS_HR, TEXTURES);
 const wordsBoolean = [thenWord, andWord, orWord];
 
-let wordsToShow = ['rules', 'color', 'texture', 'shape']
+let wordsToShow = ['rules', 'routines',  'color', 'texture', 'shape']
 
 let wordsAll = wordsFirst.concat(wordsIfConditionLeft, wordsIfConditionRight, equalWord, wordsBoolean, wordsAction, wordsToShow);
 

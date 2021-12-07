@@ -146,6 +146,10 @@ class Scene2 extends Phaser.Scene {
   };
     this.controls = new Phaser.Cameras.Controls.SmoothedKeyControl(controlConfig);
     this.input.keyboard.preventDefault = false;
+
+    // NARRATION
+    narration_intro();
+
   }
 
 
@@ -317,6 +321,10 @@ class Scene2 extends Phaser.Scene {
           }
           logOutput(output)
         }
+        return;
+
+      case 'intro':
+        narration_intro();
         return;
 
       default:
@@ -651,7 +659,7 @@ class Slug extends Phaser.GameObjects.Container {
         let r = rulesFood[i]; 
         let booleanExpr = r.booleanExpr;
         let booleanString = booleanExpr.join(' '); // .splice(1, 0, '(').push(')')
-        logOutput(`${booleanString.replaceAll("'", "")} ${i<rulesFood.length-1 ? 'and' : ''}`)
+        logOutput(`${i+1}. ${booleanString.replaceAll("'", "")} ${i<rulesFood.length-1 ? 'and' : ''}`)
         booleanString = booleanString.replaceAll(equalWord, '==').replaceAll(andWord, '&&').replaceAll(` ${orWord}`, ` ||`);
 
 
