@@ -40,14 +40,16 @@ class Scene2 extends Phaser.Scene {
     let arc = this.add.arc(100, 100, 50, 1, 180, false, 0xFFF000)
     let rectangle = this.matter.add.gameObject(this.add.rectangle(400, 200, 20, 10, 0x9966ff), this.matter.add.rectangle(400, 200, 20, 10))
     
-    let radius = 20
+    let length = 20
     
-    let antenna_vertices = `0 0 0 ${2*radius} ${2*radius} ${1.5*radius} ${2*radius} ${0.5*radius}`;
-    // let antenna_vertices = [0,0, 0,2*radius, 2*radius,1.5*radius, 2*radius,.5*radius]
+    let antenna_vertices = `0 0 0 ${2*length} ${2*length} ${1.5*length} ${2*length} ${0.5*length}`;
+    // let antenna_vertices = [0,0, 0,2*length, 2*length,1.5*length, 2*length,.5*length]
     
     let polygon = this.matter.add.gameObject(this.add.polygon(200, 400, antenna_vertices, 0xFF22FF),  { shape: { type: 'fromVerts', verts: antenna_vertices, flagInternal: true } });
     // polygon = this.matter.add.gameObject(polygon, m_polygon);
     // polygon.setScale(0.2, 0.2);
+
+    // let svg = this.add.image(250, 400, 'antennae').setScale(0.05);
     
     let group = this.add.group([circle, arc, rectangle, polygon]);
     group.setAlpha(0.5)
@@ -181,6 +183,8 @@ class Scene2 extends Phaser.Scene {
     this.load.image('flower', 'assets/flower.png');
     this.load.image('square_rounded', 'assets/square_rounded.png');
     this.load.image('circle_leopard', 'assets/circle_leopard.png');
+
+    // this.load.svg('antennae', 'assets/antennae-dotgrid.svg')
 }
   processCommand(input = []) {
     let cmd = input;
@@ -409,25 +413,26 @@ class Slug extends Phaser.GameObjects.Container {
     ]
     this.joints = [...this.jointsBody]
 
-
+    
     let antennaeColor = this.heady.fillColor; 
-     let antennaLength = this.heady.radius;
+    let antennaLength = this.heady.radius;
     let a1 = this.scene.matter.add.gameObject(
       this.scene.add.rectangle(x-this.heady.radius*2, y, antennaLength, antennaLength/4, antennaeColor),
       this.scene.matter.add.rectangle(x-this.heady.radius*2, y, antennaLength, antennaLength/4)
-    )
-    let a2 = this.scene.matter.add.gameObject(
-      this.scene.add.rectangle(x-this.heady.radius*2, y, antennaLength, antennaLength/4, antennaeColor),
-      this.scene.matter.add.rectangle(x-this.heady.radius*2, y, antennaLength, antennaLength/4)
-    )
-
-    this.antennaeJoints = [
+      )
+      let a2 = this.scene.matter.add.gameObject(
+        this.scene.add.rectangle(x-this.heady.radius*2, y, antennaLength, antennaLength/4, antennaeColor),
+        this.scene.matter.add.rectangle(x-this.heady.radius*2, y, antennaLength, antennaLength/4)
+        )
+      /*
+        this.antennaeJoints = [
       // this.scene.matter.add.joint(a1, a2, antennaLength/2, 0.5, {pointA: {x: antennaLength/2, y: 0}, pointB: {x: antennaLength/2, y: 0}}),
-      this.scene.matter.add.joint(this.heady, a1, 5, 0.5, {damping:0.1, pointA: {x: this.heady.radius, y: -this.heady.radius/4}, pointB: {x: antennaLength/2, y: 0}}),
-      this.scene.matter.add.joint(this.heady, a2, 5, 0.5, {damping:0.1,pointA: {x: this.heady.radius, y: this.heady.radius/4}, pointB: {x: antennaLength/2, y: 0}}),
-      this.scene.matter.add.joint(a1, a2, 4+antennaLength, 0.5, {damping:0.1,pointA: {x: antennaLength/2, y: 0}, pointB: {x: antennaLength/2, y: 0}}),
-      this.scene.matter.add.joint(a1, a2, 4+antennaLength*1.5, 0.5, {damping:0.1,pointA: {x: antennaLength/2, y: 0}, pointB: {x: antennaLength/2, y: 0}}),
-      this.scene.matter.add.joint(a2, a1, 4+antennaLength*1.5, 0.5, {damping:0.1,pointA: {x: antennaLength/2, y: 0}, pointB: {x: antennaLength/2, y: 0}}),
+      this.scene.matter.add.joint(this.heady, a1, 0, 0.5, {damping:0.05,pointA: {x: this.heady.radius, y: -this.heady.radius/4}, pointB: {x: antennaLength/2, y: 0}}),
+      this.scene.matter.add.joint(this.heady, a2, 0, 0.5, {damping:0.05,pointA: {x: this.heady.radius, y: this.heady.radius/4}, pointB: {x: antennaLength/2, y: 0}}),
+      // this.scene.matter.add.joint(a1, a2, 4+antennaLength, 0.5, {damping:0.05,pointA: {x: antennaLength/2, y: 0}, pointB: {x: -antennaLength/2, y: 0}}),
+      
+      this.scene.matter.add.joint(a1, a2, 4+antennaLength*1.5, 0.5, {damping:0.05,pointA: {x: antennaLength/2, y: 0}, pointB: {x: -antennaLength/2, y: 0}}),
+      // this.scene.matter.add.joint(a2, a1, 4+antennaLength*1.5, 0.5, {damping:0.05,pointA: {x: antennaLength/2, y: 0}, pointB: {x: -antennaLength/2, y: 0}}),
       
     ]
     this.antennaeJoints.forEach(e=> {
@@ -441,7 +446,7 @@ class Slug extends Phaser.GameObjects.Container {
      this.antennae = this.scene.add.group(antennae)
      this.a1 = a1;
      this.a2 = a2;
-   
+   */
     
 
     this.joints.forEach(e => {
