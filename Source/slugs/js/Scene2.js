@@ -20,6 +20,7 @@ let RULES = [ ];
 
 let foodIndicesValid = []
 
+let playersBeing = new Object
 
 let massMultiplierConstant = 2.2860618138362114;
 let ifExample = 'if food is red then eat';
@@ -62,11 +63,13 @@ class Scene2 extends Phaser.Scene {
     
     
     let red = new Phaser.Display.Color().setFromHSV(0, 1, 1);
-    this.yourSlug = new Slug(this, slug_x, slug_y, slug_r, red);
+    this.playersBeing = new Slug(this, slug_x, slug_y, slug_r, red);
+    playersBeing = this.playersBeing;
+    
     let s1 = new Slug(this, slug_x-280, slug_y-5, 10);
-    this.cameras.main.startFollow(this.yourSlug.torso, true, 0.008, 0.008);
+    this.cameras.main.startFollow(this.playersBeing.torso, true, 0.008, 0.008);
     this.stage = 1;
-    this.slugs = [this.yourSlug, s1];
+    this.slugs = [this.playersBeing, s1];
     
     this.food = [ 
       this.addGameSpriteCircle(0, 0, 10, red.color, 'flower'),
@@ -100,7 +103,7 @@ class Scene2 extends Phaser.Scene {
     // EATING THE FOOD
     this.food.forEach((f, f_index) => {
       // this.slugs.forEach
-      [this.yourSlug].forEach(s => { 
+      [this.playersBeing].forEach(s => { 
         f.setOnCollideWith(s.heady, pair => {
           if(f.targeted) {
             if(f.radius <= s.heady.radius*s.heady.scaleX) {
@@ -154,19 +157,19 @@ class Scene2 extends Phaser.Scene {
     })
     this.renderConstraint(constraints, 0xF9F6EE, 1, 1, 1, 0xF9F6EE, 1);
 
-    if(this.yourSlug.scale > this.stage+1) {
+    if(this.playersBeing.scale > this.stage+1) {
       this.stage++;
       this.cameras.main.zoomTo(1/this.stage, 2000, 'Sine.easeInOut');
     }
     this.controls.update(delta)
     
-    let vecTorsoHeady = velocityToTarget(this.yourSlug.torso, this.yourSlug.heady);
-    if(Phaser.Math.Angle.ShortestBetween(Phaser.Math.RadToDeg(vecTorsoHeady.angle()), this.yourSlug.heady.angle) > 40)
-    this.yourSlug.heady.setAngle(Phaser.Math.RadToDeg(vecTorsoHeady.angle()))
+    let vecTorsoHeady = velocityToTarget(this.playersBeing.torso, this.playersBeing.heady);
+    if(Phaser.Math.Angle.ShortestBetween(Phaser.Math.RadToDeg(vecTorsoHeady.angle()), this.playersBeing.heady.angle) > 40)
+    this.playersBeing.heady.setAngle(Phaser.Math.RadToDeg(vecTorsoHeady.angle()))
     /*
     if(this.follow = true) {
-      this.cameras.main.scrollX = this.yourSlug.torso.x - document.getElementById("phaser_container").clientWidth/2;
-      this.cameras.main.scrollY = this.yourSlug.torso.y - document.getElementById("phaser_container").clientHeight/2;
+      this.cameras.main.scrollX = this.playersBeing.torso.x - document.getElementById("phaser_container").clientWidth/2;
+      this.cameras.main.scrollY = this.playersBeing.torso.y - document.getElementById("phaser_container").clientHeight/2;
     }*/
     // this.slugs.forEach(element => { element.moveRandomly() });
   }
@@ -194,9 +197,7 @@ class Scene2 extends Phaser.Scene {
 
     // logInput(output);
     
-    let cmd0 = cmd[0];
-    
-    switch (cmd0) {
+    switch (cmd[0]) {
       case ifWord:
         let exception_if = `uh oh, an if rule needs to be of the form ${wrapCmd('if <i>condition</i> then <i>action</i>')}, for example: ${wrapCmd(ifExample)}!`;
         if(cmd.length < 6 || !cmd.at(-2) == thenWord || !wordsAction.includes(cmd.at(-1))) { 
@@ -219,24 +220,24 @@ class Scene2 extends Phaser.Scene {
         logInput(output);
         return;
       case 'abracadabra':
-        this.yourSlug.moveRandomly();
-        this.yourSlug.joints.forEach(e=>{
+        this.playersBeing.moveRandomly();
+        this.playersBeing.joints.forEach(e=>{
           this.matter.world.removeConstraint(e);
         }); 
         output = `oh no! that was a bad magic trick.`
         break;
       case 'move':
-        this.yourSlug.moveRandomly();
+        this.playersBeing.moveRandomly();
         output = `moving your being around :).`
         break;
       case 'eat':
         output += `you tell your being to eat.`
         logInput(output)
-        this.yourSlug.eat();
+        this.playersBeing.eat();
         return;
         
       case stopWord:
-        this.yourSlug.stop();
+        this.playersBeing.stop();
         output = `your being stops trying to complete the last action :)`
         break;
 
@@ -263,16 +264,63 @@ class Scene2 extends Phaser.Scene {
               }
             }
             if(e=='color') {
-              logOutput(`your being tells you its color is ${COLORCATS_HR[getColorClass(this.yourSlug.color)]}`); 
+              logOutput(`your being tells you its color is ${COLORCATS_HR[getColorClass(this.playersBeing.color)]}.`); 
             } 
+            if(e=='texture') {
+              logOutput(`your being says its texture feels ${this.playersBeing.texture}.`); 
+            }
+            if(e=='shape') {
+              logOutput(`because your being is made of circles, it thinks it is ${this.playersBeing.shape}.`); 
+            }
           } else {
-            logError(`${wrapCmd(cmd0)}: is not something your being could know!.<br>`);
+            logError(`${wrapCmd(e)}: is not something your being could know!<br>`);
           }
         })
         return;
-      
+
+      case 'hello':
+      case 'help':
+        output = 'hello! '
+        if(cmd.length == 1) {
+          output += `the commands that are available are ${wrapCmd(wordsFirst.join(', ').replaceAll('(', '...'))}.`
+          logOutput(output)
+          logOutput(`to learn more about a specific command, try writing ${wrapCmd('help "command"')}, and replacing "command" with one of the commands above.`)
+        } else {
+          switch(cmd[1]) {
+            case 'eat':
+              output += `you can use the ${wrapCmd('eat')} command to tell your being to look for food :). if you give it rules using the ${wrapCmd(ifWord)} about the food it should eat, then it won't just eat the first thing it can.`
+              break;
+            case 'avoid':
+              output += `TODO`
+              break;
+            case ifWord:
+              output += `with the ${wrapCmd('if')} keyword you can give rules to your being! your being will use these rules to figure out what to ${wrapCmd('eat')} and what to ${wrapCmd('avoid')} :). An if rule needs to be of the form ${wrapCmd('if <i>condition</i> then <i>action</i>')}, for example: ${wrapCmd(ifExample)}!`;
+              break;
+            case forWord:
+              output += `TODO`
+              break;
+            case stopWord:
+              output += `this will stop your being from doing the last action you told it to do, probably ${wrapCmd('eat')}ing!`
+              break;
+            case showWord:
+              output += `${wrapCmd(showWord)} will help you learn about the being: use it just like that for a list of everything, or if you want to learn a specific thing, type ${wrapCmd(showWord)} followed by one of the options: ${wrapCmd(wordsToShow.join(', '))}; for example: ${wrapCmd(showWord + ' ' + wordsToShow[Math.floor(Math.random() * wordsToShow.length)])}.`
+              break;
+            case 'help':
+              output += `displays this ${wrapCmd('help')} message haha!`
+              break;
+            case 'clear':
+              output += `${wrapCmd('clear')} will remove the logs content so it's less cluttered :).`
+              break;
+            default:
+              output += `we don't know this command, sorry!`
+              break;
+          }
+          logOutput(output)
+        }
+        return;
+
       default:
-        logError(`${wrapCmd(cmd0)}: is not a known command.<br> 
+        logError(`${wrapCmd(cmd[0])}: is not a known command.<br> 
         try a different one, or try typing ${wrapCmd('help')}!.
         `); // new Phaser.Display.Color().random().rgba
         return;
@@ -371,6 +419,8 @@ class Slug extends Phaser.GameObjects.Container {
     this.setDataEnabled();
     this.data.values.color = color;
     this.color = color
+    this.texture = 'smooth';
+    this.shape = 'round';
     let headyColor = this.color.clone().lighten((Math.min(0.2+Math.random(), 0.8))*50);
     let tailColor = this.color.clone().lighten((Math.min(0.1+Math.random(), 0.8))*30);
 
@@ -647,102 +697,11 @@ class Slug extends Phaser.GameObjects.Container {
     this.closestMatch = findClosest(this.heady, this.foodMatching);
     this.closestMatch.targeted = true;
     let rotationDirection = 0;
-    /*
-      let timedEvent = new Object();
-      const repeat = () => {
-        if(!this.closestMatch.active) {
-          timedEvent.remove();
-          return
-        }
-        closestMatchNew = findClosest(this.heady, this.foodMatching);
-
-        let target = velocityToTarget(this.heady, this.closestMatch, 5);
-        let projectedVelocity = target.clone();
-
-        let angleSlugTarget = Phaser.Math.Angle.ShortestBetween(this.heady.angle, target.angle());
-        console.log(angleSlugTarget)
-        // console.log(this.getMass(), this.getArea())
-
-        let speedMod = 5
-
-        if(! rotationDirection) {
-          if(angleSlugTarget > 0 && angleSlugTarget <= 150) {
-            rotationDirection = -1;
-            console.log('rotating left')
-          } else if(angleSlugTarget < 0 && angleSlugTarget >= -150) {
-            rotationDirection = 1;
-            console.log('rotating right')
-          }
-        }
-        /*
-        if(rotationDirection == -1 && (angleSlugTarget > 0 && angleSlugTarget <= 150)) {
-           this.heady.thrustLeft(Math.sqrt(this.heady.body.mass)*0.008)
-          this.tail0.thrustRight(Math.sqrt(this.tail0.body.mass)*0.008)
-          timedEvent.repeatCount++;
-        }
-        else if(rotationDirection == 1 && (angleSlugTarget < 0 && angleSlugTarget >= -150)) {
-          this.heady.thrustRight(Math.sqrt(this.heady.body.mass)*0.008)
-           this.tail0.thrustLeft(Math.sqrt(this.tail0.body.mass)*0.008)
-          timedEvent.repeatCount++;
-        }
-        else {
-          console.log('looking at it')
-          this.heady.setVelocity(projectedVelocity.x, projectedVelocity.y);
-          this.torso.setVelocity(projectedVelocity.x, projectedVelocity.y);
-        }
-
-
-        if(angleSlugTarget > 0 && angleSlugTarget <= 150) {
-          this.heady.setVelocity(velocityLeft(this.heady, speedMod).x, velocityLeft(this.heady, speedMod).y);
-          this.tail0.setVelocity(velocityRight(this.tail0, speedMod).x, velocityRight(this.heady, speedMod).y);
-          timedEvent.repeatCount++;
-        }
-        else if(angleSlugTarget < 0 && angleSlugTarget >= -150) {
-          this.heady.setVelocity(velocityRight(this.heady, speedMod).x, velocityRight(this.heady, speedMod).y);
-          this.tail0.setVelocity(velocityLeft(this.tail0, speedMod).x, velocityLeft(this.tail0, speedMod).y);
-          timedEvent.repeatCount++;
-        }
-        else {
-          this.heady.setVelocity(projectedVelocity.x, projectedVelocity.y);
-        }
-        this.tail1.setVelocity(velocityFacing(this.tail1, speedMod).x, velocityFacing(this.tail1, 1).y)
-        this.tail0.setVelocity(velocityFacing(this.tail0, speedMod).x, velocityFacing(this.tail0, 1).y)
-        this.torso.setVelocity(velocityFacing(this.torso, speedMod).x, velocityFacing(this.torso, 1).y)
-        this.heady.setVelocity(velocityFacing(this.heady, speedMod).x, velocityFacing(this.heady, 1).y)
-
-        // this.heady.applyForce(this.heady, velocityFacing(this.heady, 30));
-
-        if(Phaser.Math.Distance.Between(this.heady.x, this.heady.y, this.closestMatch.x, this.closestMatch.y) < this.heady.scaleX*this.heady.radius+this.closestMatch.radius ||  this.eating == false) {
-          timedEvent.remove()
-        }
-
-        closestMatchNew = findClosest(this.heady, this.foodMatching);
-        if(this.closestMatch != closestMatchNew) {
-          this.closestMatch.targeted = false;
-          this.closestMatch = closestMatchNew;
-          this.closestMatch.targeted = true;
-          rotationDirection = 0;
-          this.chosenFood = this.closestMatch;
-          console.log('target switched')
-        }
-        if(timedEvent.getRepeatCount() == 0) {
-          this.closestMatch.targeted = false;
-          logOutput(`your being couldn't reach the food it was looking for, maybe you could help it by moving it closer :)`)
-          this.eating = false;
-        }
-      }
-      timedEvent = this.scene.time.addEvent({
-        delay: 500,
-        startAt: 0,
-        repeat: 1,
-        callback: repeat,
-      })
-    */
-      // console.log('outside update', foodIndicesValid, this.foodMatching, this.scene.food);
+   
     let swimStates = [-20, 0, 20, 0];
     swimStates.forEach((e, i) => {swimStates[i] = Phaser.Math.DegToRad(e)})
     let waveIndex = 0;
-    console.log(swimStates)
+
     this.timer = 0;
     this.scene.events.on('update', function(time, delta) {
       if(this.eating && this.foodMatching && this.heady.x && this.heady.y){

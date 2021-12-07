@@ -9,13 +9,13 @@ const ifWord = 'if',
 
 let wordsAction = ['eat', 'avoid']
 
-const wordsFirst = wordsAction.concat([ifWord, forWord, stopWord, showWord, 'hello', 'help',  'abracadabra', 'clear'])
+const wordsFirst = wordsAction.concat([ifWord, forWord, stopWord, showWord, 'help', 'abracadabra', 'clear'])
 const wordsForCmdString = [].concat(wordsFirst.slice(0, 2));
 let wordsIfConditionLeft = [].concat(ENTITY_TYPES);
 let wordsIfConditionRight = [].concat(SIZES, COLORCATS_HR, TEXTURES);
 const wordsBoolean = [thenWord, andWord, orWord];
 
-let wordsToShow = ['rules', 'color']
+let wordsToShow = ['rules', 'color', 'texture', 'shape']
 
 let wordsAll = wordsFirst.concat(wordsIfConditionLeft, wordsIfConditionRight, equalWord, wordsBoolean, wordsAction, wordsToShow);
 
@@ -175,6 +175,25 @@ terminal_input.addEventListener('keyup', (e) => {
         return;
       }
     }
+    else if(wordsOfInterest[0] == 'help') {
+      wordsToCompare = wordsFirst;
+      checkAgainst = wordsOfInterest.at(-1);
+      let i = 1
+      for( ; i < wordsOfInterest.length; i++) {
+        if(!wordsAll.includes(wordsOfInterest[i])) {
+          console.log(wordsOfInterest[i], 'not in list of all words!')
+          wordsOfInterest = wordsOfInterest.slice(0, i);
+          current_word = wordsOfInterest[i-1];
+          break
+        }
+      }
+      if(i == wordsInput.length) {
+        checkAgainst = '';
+      }
+      if(i>1) {
+        return;
+      }
+    }
     // console.log(input, wordsOfInterest, current_word);
     // console.log(checkAgainst, wordsToCompare);
     
@@ -190,6 +209,16 @@ terminal_input.addEventListener('keyup', (e) => {
           autocomplete.innerHTML = autocomplete.innerHTML.trimEnd();
         }
       	autocomplete.innerHTML += wordsToCompare[i].slice(checkAgainst.length, wordsToCompare[i].length);
+        
+        if(wordsToCompare != wordsIfConditionLeft && wordsToCompare != wordsAction && wordsToCompare != wordsBoolean) {
+          console.log('shuffling', wordsToCompare)
+          /*
+          let t = wordsToCompare[0];
+          wordsToCompare.splice(0, 1);
+          wordsToCompare.push(t)
+          */
+          shuffleArray(wordsToCompare)
+        }
         break;
       }
     }
@@ -235,17 +264,12 @@ terminal_input.addEventListener('keydown', (e) => {
         case 'clear':
           clearLog();
           break;
-          
-          case 'hello':
-          case 'help':
-            logOutput(`hello! the commands that are available are ${wrapCmd(wordsFirst.join(', ').replaceAll('(', '...'))}.`)
-            break;
             
-            default:
-              let CmdEvent = new CustomEvent('cmd', { 
-                detail: { value: cmd }
-              });
-              terminal_input.dispatchEvent(CmdEvent);
+          default:
+            let CmdEvent = new CustomEvent('cmd', { 
+              detail: { value: cmd }
+            });
+            terminal_input.dispatchEvent(CmdEvent);
           // addToLog(cmd);
         }
         clearInput();
@@ -259,7 +283,7 @@ terminal_input.addEventListener('keydown', (e) => {
 function addToLog(output) {
   // console.log(getTotalChildrenHeights(terminal_container), 'vs', document.getElementById("phaser_container").clientHeight);
   // TODO: FIX TERMINAL CLEARING ON TOO LARGE
-  if(getTotalChildrenHeights(terminal_container) > getCanvasHeight() && logCount > 0 && terminal_container.children.length) {
+  while(getTotalChildrenHeights(terminal_container) > getCanvasHeight() && logCount > 0 && terminal_container.children.length) {
     terminal_log.firstChild.remove();
     // console.log('trimming log to make room! bigger than canvas currently')
     logCount--;
@@ -372,4 +396,11 @@ async function blink(e = document.getElementById('id')) {
      // e.style.display = (e.style.display == 'none' ? '' : 'none');
      e.style.border = (e.style.border == border ? borderOriginal : border);
   }, 800);
+}
+
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+  }
 }
