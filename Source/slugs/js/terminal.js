@@ -9,16 +9,17 @@ const ifWord = 'if',
 
 let wordsAction = ['eat', 'avoid']
 
-const wordsFirst = wordsAction.concat([ifWord, forWord, stopWord, showWord, 'help', 'abracadabra', 'clear'])
+const wordsFirst = wordsAction.concat([ifWord, forWord, stopWord, showWord, 'hello', 'help',  'abracadabra', 'clear'])
 const wordsForCmdString = [].concat(wordsFirst.slice(0, 2));
 let wordsIfConditionLeft = [].concat(ENTITY_TYPES);
 let wordsIfConditionRight = [].concat(SIZES, COLORCATS_HR, TEXTURES);
 const wordsBoolean = [thenWord, andWord, orWord];
 
+let wordsToShow = ['rules', 'color']
 
-let wordsAll = wordsFirst.concat(wordsIfConditionLeft).concat(wordsIfConditionRight).concat(equalWord).concat(wordsBoolean).concat(wordsAction);
+let wordsAll = wordsFirst.concat(wordsIfConditionLeft, wordsIfConditionRight, equalWord, wordsBoolean, wordsAction, wordsToShow);
 
-let wordsFilter = ['the', 'a']
+let wordsFilter = ['the', 'a', 'my']
 
 
 let logCount = 0;
@@ -28,6 +29,11 @@ const terminal_container = document.getElementById('terminal_container');
 const terminal_log = document.getElementById('terminal_log');
 const autocomplete = document.getElementById('autocomplete');
 const terminal_input = document.getElementById('terminal_input');
+
+let rgbaError = 'rgba(255,102,0)'
+let rgbaOutput ='rgba(175,143,233)'
+let rgbaInput = 'rgba(240,160,75)'
+
 
 function clearInput() {
   terminal_input.value = '';
@@ -150,6 +156,24 @@ terminal_input.addEventListener('keyup', (e) => {
           }
         }
       }
+    } else if(wordsOfInterest[0] == showWord) {
+      wordsToCompare = wordsToShow;
+      checkAgainst = wordsOfInterest.at(-1);
+      let i = 1
+      for( ; i < wordsOfInterest.length; i++) {
+        if(!wordsAll.includes(wordsOfInterest[i])) {
+          console.log(wordsOfInterest[i], 'not in list of all words!')
+          wordsOfInterest = wordsOfInterest.slice(0, i);
+          current_word = wordsOfInterest[i-1];
+          break
+        }
+      }
+      if(i == wordsInput.length) {
+        checkAgainst = '';
+      }
+      if(i>1) {
+        return;
+      }
     }
     // console.log(input, wordsOfInterest, current_word);
     // console.log(checkAgainst, wordsToCompare);
@@ -212,8 +236,9 @@ terminal_input.addEventListener('keydown', (e) => {
           clearLog();
           break;
           
+          case 'hello':
           case 'help':
-            addToOutput(`hello! the commands that are available are ${wrapCmd(wordsFirst.join(', ').replaceAll('(', '...'))}.`)
+            logOutput(`hello! the commands that are available are ${wrapCmd(wordsFirst.join(', ').replaceAll('(', '...'))}.`)
             break;
             
             default:
@@ -230,14 +255,46 @@ terminal_input.addEventListener('keydown', (e) => {
 })
 
 // TERMINAL IO FUNCTIONS
-function addToOutput(output) {
+
+function logOutput(output) {
+  // console.log(getTotalChildrenHeights(terminal_container), 'vs', document.getElementById("phaser_container").clientHeight);
+  // TODO: FIX TERMINAL CLEARING ON TOO LARGE
+  if(getTotalChildrenHeights(terminal_container) > getCanvasHeight() && logCount > 0) {
+    terminal_log.firstChild.remove();
+    // console.log('trimming log to make room! bigger than canvas currently')
+    logCount--;
+  }
   let div = document.createElement('div');
   // if output is already a div, don't create a nested one.
   if(output.slice(0,4) == '<div') {
     div.innerHTML = `${output}`;
     div = div.firstElementChild;
   } else {
+    output = colorize(`${output}`, rgbaOutput);
+    div.innerHTML = output;
+    div = div.firstElementChild;
+  }
+  div.classList += ` output`;
+  if(terminal_log.lastChild && div.innerHTML == terminal_log.lastChild.innerHTML) {
+    blink(terminal_log.lastChild);
+  }
+  else {
+    terminal_log.appendChild(div);
+    logCount++;
+  }
+  
+}
+
+function logInput(output) {
+  let div = document.createElement('div');
+  // if output is already a div, don't create a nested one.
+  if(output.slice(0,4) == '<div') {
     div.innerHTML = `${output}`;
+    div = div.firstElementChild;
+  } else {
+    output = colorize(`${output}`, rgbaInput);
+    div.innerHTML = output;
+    div = div.firstElementChild;
   }
   div.classList += ` output`;
   if(terminal_log.lastChild && div.innerHTML == terminal_log.lastChild.innerHTML) {
@@ -296,7 +353,7 @@ function parseEncased(parentheses, input_arr) {
   } word = input_arr[i].slice(1);
   while(word.at(-1) != parentheses[1]) {
     if(i >= input_arr.length) {
-      addToOutput(exception_if);
+      logOutput(exception_if);
       return;
     }
     encased += ` ${word}`;
