@@ -312,24 +312,27 @@ function addToLog(output) {
 
 function logOutput(output) {
   let div = document.createElement('div');
-  div.innerHTML = colorize(output, rgbaOutput);
-  div = div.firstElementChild;
+  // output = colorize(output, rgbaOutput);
+  div.innerHTML = output;
+  // div = div.firstElementChild;
   div.classList += ' output';
   addToLog(div);
 }
 
 function logInput(input) {
   let div = document.createElement('div');
-  div.innerHTML = colorize(input, rgbaInput);
-  div = div.firstElementChild;
+  // input = colorize(input, rgbaInput);
+  div.innerHTML = input;
+  // div = div.firstElementChild;
   div.classList += ' input';
   addToLog(div);
 }
 
 function logError(error) {
   let div = document.createElement('div');
-  div.innerHTML = colorize(error, rgbaError);
-  div = div.firstElementChild;
+  // error = colorize(error, rgbaError);
+  div.innerHTML = error
+  // div = div.firstElementChild;
   div.classList += ' error';
   addToLog(div);
 }

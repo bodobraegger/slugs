@@ -1,6 +1,6 @@
 .terminal {
     font-family: 'Inconsolata', monospace;
-    background-color:rgba(255, 152, 238, 0.3);
+    background-color:rgba(255, 152, 238, 0.5);
     border-radius: 15px;
 }
 
@@ -52,8 +52,11 @@
     color: rgba(204, 0, 255, 0.9);
 }
 
+
+
 .cmd {
    font-weight: bold;
+   color: black;
 }
 
 .logEntry {
@@ -61,4 +64,18 @@
     border-radius: 15px;
     padding: 10px; 
     margin: 5px 3px;
+}
+
+.input {
+    background-color: rgba(255,130,20);
+}
+
+.output {
+    background-color: rgba(175,143,233);
+    color: ivory;
+}
+
+.error {
+    background-color: rgba(255,102,0);
+
 }
