@@ -211,8 +211,8 @@ terminal_input.addEventListener('keyup', (e) => {
       	autocomplete.innerHTML += wordsToCompare[i].slice(checkAgainst.length, wordsToCompare[i].length);
         
         if(wordsToCompare != wordsIfConditionLeft && wordsToCompare != wordsAction && wordsToCompare != wordsBoolean) {
-          console.log('shuffling', wordsToCompare)
           /*
+          console.log('shuffling', wordsToCompare)
           let t = wordsToCompare[0];
           wordsToCompare.splice(0, 1);
           wordsToCompare.push(t)
