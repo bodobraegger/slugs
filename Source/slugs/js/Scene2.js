@@ -256,7 +256,7 @@ class Scene2 extends Phaser.Scene {
                 logOutput(`it knows the following rules: <br>`)
                 output = '';
                 RULES.forEach( (e, i) => {
-                  output += `• ${e} <br>`;
+                  output += `${i+1}. ${e} <br>`; //•
                 })
                 logOutput(output)
               } else {
@@ -300,7 +300,7 @@ class Scene2 extends Phaser.Scene {
               output += `TODO`
               break;
             case stopWord:
-              output += `this will stop your being from doing the last action you told it to do, probably ${wrapCmd('eat')}ing!`
+              output += `${wrapCmd(stopWord)} will ${wrapCmd(stopWord)} your being from doing the last action you told it to do, probably ${wrapCmd('eat')}ing!`
               break;
             case showWord:
               output += `${wrapCmd(showWord)} will help you learn about the being: use it just like that for a list of everything, or if you want to learn a specific thing, type ${wrapCmd(showWord)} followed by one of the options: ${wrapCmd(wordsToShow.join(', '))}; for example: ${wrapCmd(showWord + ' ' + wordsToShow[Math.floor(Math.random() * wordsToShow.length)])}.`
