@@ -6,18 +6,19 @@ const ifWord = 'if',
     orWord = 'or',
     stopWord = 'stop',
     showWord = 'show',
-    editWord = 'edit';
+    editWord = 'replace',
+    deleteWord = 'forget';
 
 let wordsAction = ['eat', 'avoid', stopWord]
 
-const wordsFirst = wordsAction.concat([ifWord, forWord, showWord, 'help', 'abracadabra', 'clear'])
+const wordsFirst = wordsAction.concat([ifWord, forWord, showWord, editWord, deleteWord, 'help', 'abracadabra', 'clear'])
 const wordsForCmdString = [].concat(wordsFirst.slice(0, 2));
 let wordsIfConditionLeft = [].concat(ENTITY_TYPES);
 let wordsIfConditionRight = [].concat(SIZES, COLORCATS_HR, TEXTURES);
 const wordsBoolean = [thenWord, andWord, orWord, equalWord];
 
 
-let wordsToShow = ['rules', 'routines', ].concat(ATTRIBUTES);
+let wordsToShow = EDITABLE.concat(ATTRIBUTES);
 
 let wordsAll = wordsFirst.concat(wordsIfConditionLeft, wordsIfConditionRight, equalWord, wordsBoolean, wordsAction, wordsToShow);
 
@@ -178,9 +179,26 @@ terminal_input.addEventListener('keyup', (e) => {
       if(i>1) {
         return;
       }
-    }
-    else if(wordsOfInterest[0] == 'help') {
+    } else if(wordsOfInterest[0] == 'help') {
       wordsToCompare = wordsFirst;
+      checkAgainst = wordsOfInterest.at(-1);
+      let i = 1
+      for( ; i < wordsOfInterest.length; i++) {
+        if(!wordsAll.includes(wordsOfInterest[i])) {
+          console.log(wordsOfInterest[i], 'not in list of all words!')
+          wordsOfInterest = wordsOfInterest.slice(0, i);
+          current_word = wordsOfInterest[i-1];
+          break
+        }
+      }
+      if(i == wordsInput.length) {
+        checkAgainst = '';
+      }
+      if(i>1) {
+        return;
+      }
+    } else if(wordsOfInterest[0] == deleteWord || wordsOfInterest[0] == editWord) {
+      wordsToCompare = EDITABLE_withSingular;
       checkAgainst = wordsOfInterest.at(-1);
       let i = 1
       for( ; i < wordsOfInterest.length; i++) {

@@ -9,6 +9,9 @@ let COLORCATS     = [ 0 ];
 
 let ATTRIBUTES = ['color', 'texture', 'shape']
 
+let EDITABLE = ['rules', 'routines']
+let EDITABLE_withSingular = ['rule', 'routine'].concat(EDITABLE)
+
 for(let i = 0; i < COLORCATS_360.length; i++) {
   COLORCATS.push(COLORCATS_360[i]/360);
 }
@@ -29,7 +32,9 @@ let foodIndicesValid = []
 let playersBeing = new Object
 
 let massMultiplierConstant = 2.2860618138362114;
-let ifExample = 'if food is red then eat';
+const ifExample = 'if food is red then eat';
+const editExample = `replace rule 1 with ${ifExample}`;
+const deleteExample = 'forget rule 1'
 
 class Scene2 extends Phaser.Scene {
   constructor() {
@@ -282,7 +287,7 @@ class Scene2 extends Phaser.Scene {
             let RULESorROUTINES = []
             if(e=='rules') { RULESorROUTINES = RULES;
             } else if(e=='routines') { RULESorROUTINES = ROUTINES; }  
-            if(e=='rules'||e=='routines'){
+            if(EDITABLE.includes(e)){
               if(RULESorROUTINES.length) {
                 logOutput(`it knows the following ${wrapCmd(e)}: <br>`)
                 output = '';
@@ -304,6 +309,49 @@ class Scene2 extends Phaser.Scene {
             logError(`${wrapCmd(e)}: is not something your being could know!<br>`);
           }
         })
+        return;
+      case deleteWord:
+        var ruleOrroutine = (['rules', 'rule'].includes(cmd[1]) ? 'rule':'routine')
+        var RULESorROUTINES = (['rules', 'rule'].includes(cmd[1]) ? RULES:ROUTINES)
+        var index = cmd[2]-1;
+        logInput(`you ask your being to ${wrapCmd(deleteWord)} the ${ruleOrroutine} with the number ${cmd[2]}...`)
+        if(cmd.length < 3 || !EDITABLE_withSingular.includes(cmd[1])) {
+          logError(`to make your being ${wrapCmd(deleteWord)} a rule, simply write ${wrapCmd('forget rule <i>number</i>')}, like  ${deleteExample} :)`);
+          return;
+        }
+        if(index >= RULESorROUTINES.length) {
+          logError(`your being does not remember the ${ruleOrroutine} with the number ${cmd[2]}, so it can't ${wrapCmd(deleteWord)} it!`)
+          return;
+        }
+        RULESorROUTINES.splice(index, 1);
+        logOutput(`your being forgot the ${ruleOrroutine} with the number ${cmd[2]} :)`)
+        return;
+
+      case editWord: 
+        logInput(`you ask your being to ${wrapCmd(editWord)} the ${ruleOrroutine} with the number ${cmd[2]} :)`)
+        if(cmd.length < 4 || !EDITABLE_withSingular.includes(cmd[1]) || !cmd.includes('with')) {
+          logError(`hmm, to replace a rule or routine, you need to write ${wrapCmd('replace rule <i>number</i> with <i>new rule</i>')}, for example like ${wrapCmd(editExample)}. to make your being forget a rule, simply write ${wrapCmd('forget rule <i>number</i>')}`);
+          return;
+        }
+        var index = cmd[2]-1;
+        var RULESorROUTINES = (['rules', 'rule'].includes(cmd[1]) ? RULES:ROUTINES)
+        var ruleOrroutine = (['rules', 'rule'].includes(cmd[1]) ? 'rule':'routine')
+        if(index >= RULESorROUTINES.length) {
+          logError(`your being does not remember the ${ruleOrroutine} with this number, so it can't ${wrapCmd(editWord)} it!`)
+          return;
+        }
+
+        let cmdEvent = new CustomEvent('cmd', { 
+          detail: { value: cmd.slice(4) }
+        });
+        let oldLength = RULESorROUTINES.length;
+        terminal_input.dispatchEvent(cmdEvent);
+        if(oldLength < RULESorROUTINES.length) {
+          let newRule = RULESorROUTINES.at(-1);
+          RULESorROUTINES[index] = newRule;
+          RULESorROUTINES.splice(RULESorROUTINES.length-1, 1)
+        }
+        logOutput(`your being ${wrapCmd(editWord)}d the ${ruleOrroutine} with the number ${cmd[2]} :)`)
         return;
 
       case 'hello':
@@ -332,6 +380,12 @@ class Scene2 extends Phaser.Scene {
               break;
             case showWord:
               output += `${wrapCmd(showWord)} will help you learn about the being: use it just like that for a list of everything, or if you want to learn a specific thing, type ${wrapCmd(showWord)} followed by one of the options: ${wrapCmd(wordsToShow.join(', '))}; for example: ${wrapCmd(showWord + ' ' + wordsToShow[Math.floor(Math.random() * wordsToShow.length)])}.`
+              break;
+            case deleteWord:
+              output += `${wrapCmd(deleteWord)} will let you ask the being to forget about a rule or routine, to use it type ${wrapCmd('forget rule <i>number</i>')}, like  ${wrapCmd(deleteExample)}.`
+              break;
+            case editWord:
+              output += `${wrapCmd(editWord)} will let you ask the being to replace a rule or routine, to use it type ${wrapCmd('replace rule <i>number</i> with <i>new rule</i>')}, for example like ${wrapCmd(editExample)}.`
               break;
             case 'help':
               output += `displays this ${wrapCmd('help')} message haha!`
@@ -745,7 +799,7 @@ class Slug extends Phaser.GameObjects.Container {
       }
     }
     if(!this.foodMatching.length) {
-      logOutput(`there is no food item which matches your beings ${wrapCmd('rules')} close enough - try adapting your ${wrapCmd('rules')} or moving your being closer :)`)
+      logOutput(`there is no food item which matches your beings ${wrapCmd('rules')} close enough - try ${wrapCmd(editWord)}ing your ${wrapCmd('rules')} or moving your being closer :)`)
       this.eating = false;
       return
     }
