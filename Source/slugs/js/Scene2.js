@@ -33,6 +33,7 @@ let playersBeing = new Object
 
 let massMultiplierConstant = 2.2860618138362114;
 const ifExample = 'if food is red then eat';
+const forExample = 'while there is food eat';
 const editExample = `replace rule 1 with ${ifExample}`;
 const deleteExample = 'forget rule 1'
 
@@ -73,7 +74,7 @@ class Scene2 extends Phaser.Scene {
     let slug_y = getCanvasHeight()/2;
     
     
-    let playersBeingColor = new Phaser.Display.Color().random(0, 150)
+    let playersBeingColor = new Phaser.Display.Color().random(0, 255).saturate(75)
     this.playersBeing = new Slug(this, slug_x, slug_y, slug_r, playersBeingColor);
     playersBeing = this.playersBeing;
     
@@ -215,9 +216,9 @@ class Scene2 extends Phaser.Scene {
     
     switch (cmd[0]) {
       case ifWord:
-        let exception_if = `uh oh, an if rule needs to be of the form ${wrapCmd('if <i>condition</i> then <i>action</i>')}, for example: ${wrapCmd(ifExample)}!`;
+        const ifError = `uh oh, an if rule needs to be of the form ${wrapCmd('if <i>condition</i> then <i>action</i>')}, for example: ${wrapCmd(ifExample)}!`
         if(cmd.length < 6 || !cmd.at(-2) == thenWord || !wordsAction.includes(cmd.at(-1))) { 
-          logOutput(exception_if);
+          logOutput(ifError);
           return;
         }
         let thenIndex = cmd.indexOf(thenWord); 
@@ -235,6 +236,13 @@ class Scene2 extends Phaser.Scene {
         }
         logInput(output);
         return;
+      case forWord:
+        if(cmd.length < 5 || !wordsAction.includes(cmd.at(-1))) { 
+          logOutput(`uh oh, a for routine needs to be of the form ${wrapCmd('for <i>condition</i> <i>action</i>')}, for example: ${wrapCmd(forExample)}!`);
+          return;
+        }
+        return;
+
       case 'abracadabra':
         this.playersBeing.moveRandomly();
         this.playersBeing.joints.forEach(e=>{
