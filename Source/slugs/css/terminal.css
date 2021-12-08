@@ -135,3 +135,26 @@ BGLight 	#343746 	#343746 	#343746 	#343746 	11.1
 BGDarker 	#282a36 	#282a36 	#282a36 	#282a36 	13.4
 BGDarker
 */
+
+
+.red {
+    color: red;
+}
+.blue {
+    color: blue;
+}
+.green {
+    color: green;
+}
+.yellow {
+    color: yellow;
+} 
+.orange {
+    color: orange;
+}
+.purple {
+    color: purple;
+}
+.pink {
+    color: pink;
+}

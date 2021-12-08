@@ -372,7 +372,7 @@ function wrapCmd(cmd) {
   let classList = `cmd `
   for(i; i<wordsAllArrays.length; i++) {
       if(wordsAllArrays[i].includes(cmd)) {
-        classList += `${cmd} ${wordsAllArraysStrings[i]}`;
+        classList += `${cmd.replace('/', ' ')} ${wordsAllArraysStrings[i]}`;
         break;
       }
   }
