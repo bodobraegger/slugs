@@ -5,7 +5,8 @@ const ifWord = 'if',
     andWord = 'and',
     orWord = 'or',
     stopWord = 'stop',
-    showWord = 'show';
+    showWord = 'show',
+    editWord = 'edit';
 
 let wordsAction = ['eat', 'avoid', stopWord]
 
