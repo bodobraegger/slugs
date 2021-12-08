@@ -6,6 +6,9 @@
 let COLORCATS_HR  = ['red', 'yellow/orange', 'green', 'blue', 'purple', 'pink']
 let COLORCATS_360 = [15, 75, 165, 240, 285, 330]
 let COLORCATS     = [ 0 ];
+
+let ATTRIBUTES = ['color', 'texture', 'shape']
+
 for(let i = 0; i < COLORCATS_360.length; i++) {
   COLORCATS.push(COLORCATS_360[i]/360);
 }
@@ -15,6 +18,8 @@ let ENTITY_TYPES = ['food', 'others']
 let TEXTURES = ['smooth', 'spiky']
 
 let SIZES = ['smaller', 'bigger']
+
+let SHAPES = ['round', 'edgy']
 
 let RULES = [ ];
 let ROUTINES = [ ];
@@ -366,8 +371,8 @@ class Scene2 extends Phaser.Scene {
     o.color = Phaser.Display.Color.IntegerToColor(color);
     return o
   }
-  addGameSpriteCircle(x, y, radius, color = new Phaser.Display.Color().random().saturate(75).color, source = 'circle') {
-    let img = new Phaser.GameObjects.Sprite(this, 0, 0, source);
+  addGameSpriteCircle(x, y, radius, color = new Phaser.Display.Color().random().saturate(75).color, texture = 'circle') {
+    let img = new Phaser.GameObjects.Sprite(this, 0, 0, texture);
     img.displayWidth = radius*2;
     img.displayHeight = radius*2;
     img.setTint(color);
@@ -382,6 +387,7 @@ class Scene2 extends Phaser.Scene {
     ) 
     o.radius = radius;
     o.color = Phaser.Display.Color.IntegerToColor(color);
+    o.textureType= texture.includes('spiky') ? 'spiky':'smooth';
     return o;
   }
 
@@ -415,6 +421,8 @@ class Scene2 extends Phaser.Scene {
     ) 
     o.radius = radius;
     o.arc=crcl;
+    o.radius = radius;
+    o.color = Phaser.Display.Color.IntegerToColor(color);
     o.textureType= texture.includes('spiky') ? 'spiky':'smooth';
   
     // TO ENSURE CIRCULAR MASKS ON THE TEXTURE FILES, IF PERFORMANCE HOG JUST CUT OUT THE TEXTURES BY HAND
@@ -637,6 +645,7 @@ class Slug extends Phaser.GameObjects.Container {
       let ifColor = false;
       let ifTexture = false;
       let ifSize = false;
+      let ifShape = false;
       let avoid = false;
       let r = RULES[i].split(" ");
       let type = r.at(1);
@@ -649,22 +658,26 @@ class Slug extends Phaser.GameObjects.Container {
           if(wordsIfConditionRight.includes(e)) {
             booleanExpr[i] = `'${e}'`
           }
-          if(COLORCATS_HR.includes(e)) {
+          if(COLORCATS_HR.includes(e) || e=='color') {
             ifColor = true;
           }
-          if(TEXTURES.includes(e)) {
+          if(TEXTURES.includes(e) || e=='texture') {
             ifTexture = true;
           }
-          if(SIZES.includes(e)) {
+          if(SIZES.includes(e) || e=='size') {
+            ifSize = true;
+          }
+          if(SHAPES.includes(e) || e=='shape') {
             ifSize = true;
           }
         });
         rulesFood.push({
-          booleanExpr: booleanExpr,
-          ifColor: ifColor,
-          ifTexture: ifTexture,
-          ifSize: ifSize,
-          avoid: avoid,
+          booleanExpr,
+          ifColor,
+          ifTexture,
+          ifSize,
+          ifShape,
+          avoid,
         });
       }
     }
@@ -680,7 +693,18 @@ class Slug extends Phaser.GameObjects.Container {
         let booleanString = booleanExpr.join(' '); // .splice(1, 0, '(').push(')')
         logOutput(`${i+1}. ${wrapCmd(booleanString.replaceAll("'", ""))} ${i<rulesFood.length-1 ? 'and' : ''}`)
         booleanString = booleanString.replaceAll(equalWord, '==').replaceAll(andWord, '&&').replaceAll(` ${orWord}`, ` ||`);
-
+        if(booleanString.includes('beings ')) {
+          ATTRIBUTES.forEach( (e,i) => {
+            if(booleanString.includes(`beings ${e}`)) {
+              // console.log(booleanString, e)
+              let replacement = playersBeing[e];
+              if(replacement instanceof Phaser.Display.Color) {
+                replacement = COLORCATS_HR[getColorClass(replacement)];
+              }
+              booleanString = booleanString.replaceAll(`beings ${e}`, `'${replacement}'`)
+            }
+          })
+        }
 
         for(let i = 0; i < foodIndicesSelected.length; i++) {
           let f = this.scene.food[ foodIndicesSelected[i] ];
@@ -690,12 +714,17 @@ class Slug extends Phaser.GameObjects.Container {
             food = COLORCATS_HR[getColorClass(f.color)];
           }
           if(r.ifSize) {
-            food = (this.heady.radius*this.heady.scaleX < f.radius ? 'bigger':'smaller' )
+            if(booleanString.includes('beings size')) {
+              booleanString.replaceAll('beings size', `'beings size'`);
+              food = (this.heady.radius*this.scale > f.radius - 5*this.scale || this.heady.radius*this.heady.scaleX < f.radius - 5*this.scale ? "beings size":"not same size" );
+            } else{
+              food = (this.heady.radius*this.heady.scaleX < f.radius ? 'bigger':'smaller' )
+            }
           }
           if(r.ifTexture) {
             food = f.textureType;
           }
-          console.log(booleanString, food);
+          console.log(booleanString, 'food var:', food);
           let evaluation = eval(booleanString);
           console.log(evaluation);
           if(evaluation && !r.avoid) {
