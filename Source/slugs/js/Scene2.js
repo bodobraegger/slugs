@@ -17,6 +17,7 @@ let TEXTURES = ['smooth', 'spiky']
 let SIZES = ['smaller', 'bigger']
 
 let RULES = [ ];
+let ROUTINES = [ ];
 
 let foodIndicesValid = []
 
@@ -62,20 +63,20 @@ class Scene2 extends Phaser.Scene {
     let slug_y = getCanvasHeight()/2;
     
     
-    let red = new Phaser.Display.Color().setFromHSV(0, 1, 1);
-    this.playersBeing = new Slug(this, slug_x, slug_y, slug_r, red);
+    let playersBeingColor = new Phaser.Display.Color().random(0, 150)
+    this.playersBeing = new Slug(this, slug_x, slug_y, slug_r, playersBeingColor);
     playersBeing = this.playersBeing;
     
-    let s1 = new Slug(this, slug_x-280, slug_y-5, 10);
+    // let s1 = new Slug(this, slug_x-280, slug_y-5, 10);
     this.cameras.main.startFollow(this.playersBeing.torso, true, 0.008, 0.008);
     this.stage = 1;
-    this.slugs = [this.playersBeing, s1];
+    this.slugs = [this.playersBeing];
     
     this.food = [ 
-      this.addGameSpriteCircle(0, 0, 10, red.color, 'flower'),
-      this.addGameSpriteCircle(getCanvasWidth(), 0, 15, red.color, 'flower'),
-      this.addGameSpriteCircle(getCanvasWidth(), getCanvasHeight(), 20, red.color, 'flower'),
-      this.addGameSpriteCircle(0, getCanvasHeight(), 25, red.color, 'circle_spiky'),
+      this.addGameSpriteCircle(0, 0, 10, playersBeingColor.color, 'flower'),
+      this.addGameSpriteCircle(getCanvasWidth(), 0, 15, playersBeingColor.color, 'flower'),
+      this.addGameSpriteCircle(getCanvasWidth(), getCanvasHeight(), 20, playersBeingColor.color, 'flower'),
+      this.addGameSpriteCircle(0, getCanvasHeight(), 25, playersBeingColor.color, 'circle_spiky'),
     ];
     
     for(var i = 0; i < 5; i++) {
@@ -118,11 +119,12 @@ class Scene2 extends Phaser.Scene {
               }
               f.targeted = false;
               f.destroy();
+              this.food[f_index] = null;
               foodIndicesValid.splice(foodIndicesValid.indexOf(f_index), 1);
               s.eating = false;
               // this.food.splice(f_index);
             } else {
-              logOutput(`the being can't eat anything bigger than its heady :0`)
+              logOutput(`the being can't eat anything bigger than its head :0`)
               s.eating = false;
             }
             f.targeted = false;
@@ -253,28 +255,45 @@ class Scene2 extends Phaser.Scene {
         if(cmd.length > 1) {
           toShow = cmd.slice(1);
         }
+        if(['rules', 'rule'].includes(toShow[0]) && toShow.length > 1) {
+          if(toShow[1]-1 < RULES.length) {
+            logOutput(`this is the rule number ${toShow[1]}.: ${RULES[toShow[1]-1]}.<br>`)
+          } else {
+            logError(`your being knows no rule number ${toShow[1]}<br>`);
+            return;
+          }
+        } else if(['routines', 'routine'].includes(toShow[0]) && toShow.length > 1) {
+          if(toShow[1]-1 < ROUTINES.length) {
+            if(toShow[1]-1 < ROUTINES.length) {
+              logOutput(`this is the routine number ${toShow[1]}.: ${ROUTINES[toShow[1]-1]}.<br>`)
+            } else {
+              logError(`your being knows no routine number ${toShow[1]}<br>`);
+            }
+            return;
+          }
+        }
         toShow.forEach((e, i) => {
           if(wordsToShow.includes(e)) {
-            if(e=='rules') {
-              if(RULES.length) {
-                logOutput(`it knows the following ${wrapCmd('rules')}: <br>`)
+            let RULESorROUTINES = []
+            if(e=='rules') { RULESorROUTINES = RULES;
+            } else if(e=='routines') { RULESorROUTINES = ROUTINES; }  
+            if(e=='rules'||e=='routines'){
+              if(RULESorROUTINES.length) {
+                logOutput(`it knows the following ${wrapCmd(e)}: <br>`)
                 output = '';
-                RULES.forEach( (e, i) => {
+                RULESorROUTINES.forEach( (e, i) => {
                   output += `${i+1}. ${e} <br>`; //•
                 })
                 logOutput(output)
               } else {
-                logOutput(`your being does not know any rules yet. try giving it one by typing ${wrapCmd(ifExample)}!<br>`);
+                logOutput(`your being does not know any ${wrapCmd(e)} yet. try giving it one by typing ${wrapCmd(ifExample)}!<br>`);
               }
-            }
-            if(e=='color') {
-              logOutput(`your being tells you its color is ${COLORCATS_HR[getColorClass(this.playersBeing.color)]}.`); 
-            } 
-            if(e=='texture') {
-              logOutput(`your being says its texture feels ${this.playersBeing.texture}.`); 
-            }
-            if(e=='shape') {
-              logOutput(`because your being is made of circles, it thinks it is ${this.playersBeing.shape}.`); 
+            } else if(e=='color') {
+              logOutput(`your being tells you its ${wrapCmd(e)} is ${wrapCmd(COLORCATS_HR[getColorClass(this.playersBeing.color)])}.`); 
+            } else if(e=='texture') {
+              logOutput(`your being says its ${wrapCmd(e)} feels ${wrapCmd(this.playersBeing.texture)}.`); 
+            } else if(e=='shape') {
+              logOutput(`because your being is made of circles, it thinks its ${wrapCmd(e)} is ${wrapCmd(this.playersBeing.shape)}.`); 
             }
           } else {
             logError(`${wrapCmd(e)}: is not something your being could know!<br>`);
@@ -607,7 +626,7 @@ class Slug extends Phaser.GameObjects.Container {
   eat(foodType='any') {
     this.eating = true;
     if(RULES.length) {
-      logOutput(`first, the being thinks of the rules you gave it.`)
+      logOutput(`first, the being thinks of the ${wrapCmd('rules')} you gave it.`)
     }
     
     let rulesFood = [];
@@ -651,7 +670,7 @@ class Slug extends Phaser.GameObjects.Container {
     }
 
     if(rulesFood.length) {
-      logOutput(`it remembers the following food rules:`)
+      logOutput(`it remembers the following food ${wrapCmd('rules')}:`)
       let foodIndicesSelected = foodIndicesValid;
       
       for(let i = 0; i < rulesFood.length; i++) {
@@ -659,7 +678,7 @@ class Slug extends Phaser.GameObjects.Container {
         let r = rulesFood[i]; 
         let booleanExpr = r.booleanExpr;
         let booleanString = booleanExpr.join(' '); // .splice(1, 0, '(').push(')')
-        logOutput(`${i+1}. ${booleanString.replaceAll("'", "")} ${i<rulesFood.length-1 ? 'and' : ''}`)
+        logOutput(`${i+1}. ${wrapCmd(booleanString.replaceAll("'", ""))} ${i<rulesFood.length-1 ? 'and' : ''}`)
         booleanString = booleanString.replaceAll(equalWord, '==').replaceAll(andWord, '&&').replaceAll(` ${orWord}`, ` ||`);
 
 
@@ -691,13 +710,13 @@ class Slug extends Phaser.GameObjects.Container {
       }
     }
     else {
-      logOutput('none of the rules tell your being what to eat, so it will try to eat anything!')
+      logOutput(`none of the ${wrapCmd('rules')} tell your being what to eat, so it will try to eat anything!`)
       for(let i=0;i<foodIndicesValid.length;i++) {
         this.foodMatching.push(this.scene.food[ foodIndicesValid[i] ]);
       }
     }
     if(!this.foodMatching.length) {
-      logOutput(`there is no foody item which matches your beings rules close enough - try adapting your rules or moving your being closer :)`)
+      logOutput(`there is no food item which matches your beings ${wrapCmd('rules')} close enough - try adapting your ${wrapCmd('rules')} or moving your being closer :)`)
       this.eating = false;
       return
     }
