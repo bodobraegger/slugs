@@ -228,7 +228,7 @@ class Scene2 extends Phaser.Scene {
 
     // this.load.svg('antennae', 'assets/antennae-dotgrid.svg')
 }
-  processCommand(input = []) {
+  processCommand(input = [], newSegment=true) {
     let cmd = input;
     let output = `${wrapCmd(cmd.join(' '))}: `
 
@@ -238,10 +238,10 @@ class Scene2 extends Phaser.Scene {
     
     // TODO: IMPLEMENT SOME SORT OF WAY TO RECOGNIZE CONNECTED OUTPUT BUBBLES FOR COLORING CURRENT OUTPUT
     // startOutput();
-    startNewLogSegment();
+    if(newSegment) { startNewLogSegment(); }
 
     switch (cmd[0]) {
-      case ifWord:
+      case ifWord: {
         const ifError = `uh oh, an if rule needs to be of the form ${wrapCmd('if <i>condition</i> then <i>action</i>')}, for example: ${wrapCmd(ifExample)}!`
         if(cmd.length < 6 || !cmd.at(-2) == thenWord || !wordsAction.includes(cmd.at(-1))) { 
           logOutput(ifError);
@@ -262,36 +262,39 @@ class Scene2 extends Phaser.Scene {
         }
         logInput(output);
         return;
-      case forWord:
+      }
+      case forWord: {
         if(cmd.length < 5 || !wordsAction.includes(cmd.at(-1))) { 
           logOutput(`uh oh, a for routine needs to be of the form ${wrapCmd('for <i>condition</i> <i>action</i>')}, for example: ${wrapCmd(forExample)}!`);
           return;
         }
         return;
-
-      case 'abracadabra':
+      }
+      case 'abracadabra': {
         this.playersBeing.moveRandomly();
         this.playersBeing.joints.forEach(e=>{
           this.matter.world.removeConstraint(e);
         }); 
         output = `oh no! that was a bad magic trick.`
         break;
-      case 'move':
+      }
+      case 'move': {
         this.playersBeing.moveRandomly();
         output = `moving your being around :).`
         break;
-      case 'eat':
+      }
+      case 'eat': {
         output += `you tell your being to eat.`
         logInput(output)
         this.playersBeing.eat();
         return;
-        
-      case stopWord:
+      }
+      case stopWord: {
         this.playersBeing.stop();
         output = `your being stops trying to complete the last action :)`
         break;
-
-      case showWord:
+      }
+      case showWord: {
         output += `you ask your being to tell you about itself`
         logInput(output);
         output = `it knows the following: <br>`
@@ -326,7 +329,7 @@ class Scene2 extends Phaser.Scene {
                 logOutput(`it knows the following ${wrapCmd(e)}: <br>`)
                 output = '';
                 RULESorROUTINES.forEach( (e, i) => {
-                  output += `${i+1}. ${e} <br>`; //•
+                  output += `${i+1}. ${wrapCmd(e)} <br>`; //•
                 })
                 logOutput(output)
               } else {
@@ -344,9 +347,10 @@ class Scene2 extends Phaser.Scene {
           }
         })
         return;
-      case deleteWord:
-        var ruleOrRoutine = (['rules', 'rule'].includes(cmd[1]) ? 'rule':'routine')
-        var RULESorROUTINES = (['rules', 'rule'].includes(cmd[1]) ? RULES:ROUTINES)
+      }
+      case deleteWord: {
+        let ruleOrRoutine = (['rules', 'rule'].includes(cmd[1]) ? 'rule':'routine')
+        let RULESorROUTINES = (['rules', 'rule'].includes(cmd[1]) ? RULES:ROUTINES)
         var index = cmd[2]-1;
         logInput(`you ask your being to ${wrapCmd(deleteWord)} the ${ruleOrRoutine} with the number ${cmd[2]}...`)
         if(cmd.length < 3 || !EDITABLE_withSingular.includes(cmd[1])) {
@@ -360,26 +364,24 @@ class Scene2 extends Phaser.Scene {
         RULESorROUTINES.splice(index, 1);
         logOutput(`your being forgot the ${ruleOrRoutine} with the number ${cmd[2]} :)`)
         return;
+      }
 
-      case editWord: 
+      case editWord: {
+        let ruleOrRoutine = (['rules', 'rule'].includes(cmd[1]) ? 'rule':'routine')
+        let RULESorROUTINES = (['rules', 'rule'].includes(cmd[1]) ? RULES:ROUTINES)
         logInput(`you ask your being to ${wrapCmd(editWord)} the ${ruleOrRoutine} with the number ${cmd[2]} :)`)
         if(cmd.length < 4 || !EDITABLE_withSingular.includes(cmd[1]) || !cmd.includes('with')) {
           logError(`hmm, to replace a rule or routine, you need to write ${wrapCmd('replace rule <i>number</i> with <i>new rule</i>')}, for example like ${wrapCmd(editExample)}. to make your being forget a rule, simply write ${wrapCmd('forget rule <i>number</i>')}`);
           return;
         }
         var index = cmd[2]-1;
-        var RULESorROUTINES = (['rules', 'rule'].includes(cmd[1]) ? RULES:ROUTINES)
-        var ruleOrRoutine = (['rules', 'rule'].includes(cmd[1]) ? 'rule':'routine')
         if(index >= RULESorROUTINES.length) {
           logError(`your being does not remember the ${ruleOrRoutine} with this number, so it can't ${wrapCmd(editWord)} it!`)
           return;
         }
 
-        let cmdEvent = new CustomEvent('cmd', { 
-          detail: { value: cmd.slice(4) }
-        });
         let oldLength = RULESorROUTINES.length;
-        terminal_input.dispatchEvent(cmdEvent);
+        this.processCommand(cmd.slice(4), false)
         if(oldLength < RULESorROUTINES.length) {
           let newRule = RULESorROUTINES.at(-1);
           RULESorROUTINES[index] = newRule;
@@ -387,9 +389,10 @@ class Scene2 extends Phaser.Scene {
         }
         logOutput(`your being ${wrapCmd(editWord)}d the ${ruleOrRoutine} with the number ${cmd[2]} :)`)
         return;
+      }
 
-      case 'hello':
-      case 'help':
+      case 'hello': { }
+      case 'help': {
         output = 'hello! '
         if(cmd.length == 1) {
           output += `the commands that are available are ${wrapCmd(wordsFirst.join(', ').replaceAll('(', '...'))}.`
@@ -434,18 +437,19 @@ class Scene2 extends Phaser.Scene {
           logOutput(output)
         }
         return;
-
-      case 'intro':
+      }
+      case 'intro':{
         narration_intro();
         return;
-
-      default:
+      }
+      default: {
         logError(`${wrapCmd(cmd[0])}: is not a known command.<br> 
         try a different one, or try typing ${wrapCmd('help')}!.
         `); // new Phaser.Display.Color().random().rgba
         return;
       }
-      logOutput(output)
+    }
+    logOutput(output)
   }
 
   addGameCircle(x, y, radius, color) {
