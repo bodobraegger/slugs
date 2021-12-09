@@ -11,7 +11,7 @@ const ifWord = 'if',
 
 let wordsAction = ['eat', 'avoid', stopWord]
 
-const wordsFirst = wordsAction.concat([ifWord, forWord, showWord, editWord, deleteWord, 'help', 'abracadabra', 'clear'])
+const wordsFirst = wordsAction.concat([ifWord, forWord, showWord, editWord, deleteWord, 'help', 'clear'])
 const wordsForCmdString = [].concat(wordsFirst.slice(0, 2));
 let wordsIfConditionLeft = [].concat(ENTITY_TYPES);
 let wordsIfConditionRight = [].concat(SIZES, COLORCATS_HR, TEXTURES);
@@ -22,7 +22,7 @@ let wordsToShow = EDITABLE.concat(ATTRIBUTES);
 
 let wordsAll = wordsFirst.concat(wordsIfConditionLeft, wordsIfConditionRight, equalWord, wordsBoolean, wordsAction, wordsToShow);
 
-let wordsFilter = ['the', 'a', 'my']
+let wordsFilter = ['the', 'a', 'my', 'me']
 
 let wordsAllArrays = [wordsAction, wordsFirst, wordsIfConditionLeft, wordsIfConditionRight, wordsBoolean, wordsToShow];
 let wordsAllArraysStrings = ['wordsAction', 'wordsFirst', 'wordsIfConditionLeft', 'wordsIfConditionRight', 'wordsBoolean', 'wordsToShow'];
