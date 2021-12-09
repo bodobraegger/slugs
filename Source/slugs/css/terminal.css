@@ -69,6 +69,10 @@
 .error {
     background-color: rgba(255,102,0);
 }
+.old {
+ opacity: 0.5;  
+ filter: saturate(0.5); 
+}
 
 .cmd {
     font-weight: bold;
@@ -156,5 +160,5 @@ BGDarker
     color: purple;
 }
 .pink {
-    color: deeppink;
+    color: magenta;
 }

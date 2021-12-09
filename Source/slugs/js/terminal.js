@@ -317,7 +317,7 @@ function addToLog(output) {
   else {
     div = output;
   }
-  div.classList += ` logEntry`;
+  div.classList.add(`logEntry`);
   if(terminal_log.lastChild && div.innerHTML == terminal_log.lastChild.innerHTML) {
     blink(terminal_log.lastChild);
   }
@@ -337,7 +337,7 @@ function logOutput(output) {
   // output = colorize(output, rgbaOutput);
   div.innerHTML = output;
   // div = div.firstElementChild;
-  div.classList += ' output';
+  div.classList.add('output');
   addToLog(div);
 }
 
@@ -346,7 +346,7 @@ function logInput(input) {
   // input = colorize(input, rgbaInput);
   div.innerHTML = input;
   // div = div.firstElementChild;
-  div.classList += ' input';
+  div.classList.add('input');
   addToLog(div);
 }
 
@@ -355,7 +355,7 @@ function logError(error) {
   // error = colorize(error, rgbaError);
   div.innerHTML = error
   // div = div.firstElementChild;
-  div.classList += ' error';
+  div.classList.add('error');
   addToLog(div);
 }
 
@@ -446,5 +446,11 @@ function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+function startNewLogSegment() {
+  for(let i = 0; i < terminal_log.children.length; i++) {
+      terminal_log.children[i].classList.add('old');
   }
 }

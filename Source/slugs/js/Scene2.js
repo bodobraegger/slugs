@@ -3,8 +3,8 @@
 */
 
 // 6 categories of hues, hue of 0 and 1 both correspond to red, so cats need to be shifted by half a value
-let COLORCATS_HR  = ['red', 'yellow/orange', 'green', 'blue', 'purple', 'pink','red']
-let COLORCATS_360 = [0, 15, 75, 165, 240, 285, 330]
+let COLORCATS_HR  = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink','red']
+let COLORCATS_360 = [0, 15, 45, 75, 165, 240, 285, 330]
 let COLORCATS     = [ 0 ];
 
 let ATTRIBUTES = ['color', 'texture', 'shape']
@@ -134,7 +134,6 @@ class Scene2 extends Phaser.Scene {
                   s.setScale(0.3+s.scaleX);
                   output += `your being was able to grow!🥰<br>`
                 }
-                logOutput()
               } else {
                 //console.log(sameColorClass(f.color, s.color), f.textureType == s.texture, f.shape == s.shape)
                 output = `oh no, the being did not like what it ate!🤢<br>`
@@ -239,6 +238,7 @@ class Scene2 extends Phaser.Scene {
     
     // TODO: IMPLEMENT SOME SORT OF WAY TO RECOGNIZE CONNECTED OUTPUT BUBBLES FOR COLORING CURRENT OUTPUT
     // startOutput();
+    startNewLogSegment();
 
     switch (cmd[0]) {
       case ifWord:
@@ -345,33 +345,33 @@ class Scene2 extends Phaser.Scene {
         })
         return;
       case deleteWord:
-        var ruleOrroutine = (['rules', 'rule'].includes(cmd[1]) ? 'rule':'routine')
+        var ruleOrRoutine = (['rules', 'rule'].includes(cmd[1]) ? 'rule':'routine')
         var RULESorROUTINES = (['rules', 'rule'].includes(cmd[1]) ? RULES:ROUTINES)
         var index = cmd[2]-1;
-        logInput(`you ask your being to ${wrapCmd(deleteWord)} the ${ruleOrroutine} with the number ${cmd[2]}...`)
+        logInput(`you ask your being to ${wrapCmd(deleteWord)} the ${ruleOrRoutine} with the number ${cmd[2]}...`)
         if(cmd.length < 3 || !EDITABLE_withSingular.includes(cmd[1])) {
           logError(`to make your being ${wrapCmd(deleteWord)} a rule, simply write ${wrapCmd('forget rule <i>number</i>')}, like  ${deleteExample} :)`);
           return;
         }
         if(index >= RULESorROUTINES.length) {
-          logError(`your being does not remember the ${ruleOrroutine} with the number ${cmd[2]}, so it can't ${wrapCmd(deleteWord)} it!`)
+          logError(`your being does not remember the ${ruleOrRoutine} with the number ${cmd[2]}, so it can't ${wrapCmd(deleteWord)} it!`)
           return;
         }
         RULESorROUTINES.splice(index, 1);
-        logOutput(`your being forgot the ${ruleOrroutine} with the number ${cmd[2]} :)`)
+        logOutput(`your being forgot the ${ruleOrRoutine} with the number ${cmd[2]} :)`)
         return;
 
       case editWord: 
-        logInput(`you ask your being to ${wrapCmd(editWord)} the ${ruleOrroutine} with the number ${cmd[2]} :)`)
+        logInput(`you ask your being to ${wrapCmd(editWord)} the ${ruleOrRoutine} with the number ${cmd[2]} :)`)
         if(cmd.length < 4 || !EDITABLE_withSingular.includes(cmd[1]) || !cmd.includes('with')) {
           logError(`hmm, to replace a rule or routine, you need to write ${wrapCmd('replace rule <i>number</i> with <i>new rule</i>')}, for example like ${wrapCmd(editExample)}. to make your being forget a rule, simply write ${wrapCmd('forget rule <i>number</i>')}`);
           return;
         }
         var index = cmd[2]-1;
         var RULESorROUTINES = (['rules', 'rule'].includes(cmd[1]) ? RULES:ROUTINES)
-        var ruleOrroutine = (['rules', 'rule'].includes(cmd[1]) ? 'rule':'routine')
+        var ruleOrRoutine = (['rules', 'rule'].includes(cmd[1]) ? 'rule':'routine')
         if(index >= RULESorROUTINES.length) {
-          logError(`your being does not remember the ${ruleOrroutine} with this number, so it can't ${wrapCmd(editWord)} it!`)
+          logError(`your being does not remember the ${ruleOrRoutine} with this number, so it can't ${wrapCmd(editWord)} it!`)
           return;
         }
 
@@ -385,7 +385,7 @@ class Scene2 extends Phaser.Scene {
           RULESorROUTINES[index] = newRule;
           RULESorROUTINES.splice(RULESorROUTINES.length-1, 1)
         }
-        logOutput(`your being ${wrapCmd(editWord)}d the ${ruleOrroutine} with the number ${cmd[2]} :)`)
+        logOutput(`your being ${wrapCmd(editWord)}d the ${ruleOrRoutine} with the number ${cmd[2]} :)`)
         return;
 
       case 'hello':
