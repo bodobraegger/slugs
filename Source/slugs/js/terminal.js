@@ -377,9 +377,10 @@ function colorize(output, color) {
 }
 
 function wrapCmd(cmd) {
-  if(cmd.split(' ').length > 1) {
+  let cmdArr = cmd.split(' ')
+  if(cmdArr.length > 1) {
     let r = ''
-    cmd.split(' ').forEach(e => {
+    cmdArr.forEach(e => {
       let wrapped = wrapCmd(e);
       if(e.at(-1) == ',') {
         wrapped = `${wrapCmd(e.slice(0, e.length-1))},`;

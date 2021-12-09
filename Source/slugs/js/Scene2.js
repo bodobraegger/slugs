@@ -3,8 +3,8 @@
 */
 
 // 6 categories of hues, hue of 0 and 1 both correspond to red, so cats need to be shifted by half a value
-let COLORCATS_HR  = ['red', 'yellow/orange', 'green', 'blue', 'purple', 'pink']
-let COLORCATS_360 = [15, 75, 165, 240, 285, 330]
+let COLORCATS_HR  = ['red', 'yellow/orange', 'green', 'blue', 'purple', 'pink','red']
+let COLORCATS_360 = [0, 15, 75, 165, 240, 285, 330]
 let COLORCATS     = [ 0 ];
 
 let ATTRIBUTES = ['color', 'texture', 'shape']
@@ -15,6 +15,7 @@ let EDITABLE_withSingular = ['rule', 'routine'].concat(EDITABLE)
 for(let i = 0; i < COLORCATS_360.length; i++) {
   COLORCATS[i] = COLORCATS_360[i]/360;
 }
+console.log(COLORCATS)
 
 let ENTITY_TYPES = ['food', 'others']
 
@@ -994,10 +995,10 @@ function sameColorClass(color1, color2) { // color blindness: https://colororacl
   let i = 0;
   for(i = 0; i < COLORCATS.length; i++) {
     if(color1.h - COLORCATS[i] >= 0) {
-      cat1 = i % (COLORCATS.length-1);
+      cat1 = i//+1;
     } 
     if(color2.h - COLORCATS[i] >= 0) {
-      cat2 = i % (COLORCATS.length-1);
+      cat2 = i//+1;
     }
   }
   let colorDiff = Math.min(Math.abs(color1.h - color2.h), Math.abs(COLORCATS[cat1] - color2.h), Math.abs(COLORCATS[cat2] - color1.h));
@@ -1014,12 +1015,13 @@ function sameColorClass(color1, color2) { // color blindness: https://colororacl
 }
 
 function getColorClass(color) {
-  let cat1 = -1;
+  let cat1 = 0;
   let i = 0;
   for(i = 0; i < COLORCATS.length; i++) {
     if(color.h - COLORCATS[i] >= 0) {
-      cat1 = i % (COLORCATS.length-1);
+      cat1 = i;
     } 
+    // console.log(color.h - COLORCATS[i])
   }
   return cat1;
 }
@@ -1082,14 +1084,14 @@ class gameSpriteCircle extends Phaser.GameObjects.GameObject {
 
 function getRandomColorInCat(cat=-1) {
   let chosenCatIndex = Math.floor(Math.random()*COLORCATS.length)
-  if(cat != -1) { chosenCatIndex = cat+1 }
+  if(cat != -1) { chosenCatIndex = cat+1}
   let hue = -1;
   let padding = 0.03
   let rangeStart = COLORCATS.at(chosenCatIndex-1)+padding;
   let rangeEnd = COLORCATS.at(chosenCatIndex)-padding;
   hue = getRandomInclusive(rangeStart, rangeEnd)
-
-  if(chosenCatIndex == 0) {
+  
+  if(chosenCatIndex == 0 || chosenCatIndex == COLORCATS.length) {
     padding = 0.003
     if(Math.random() <= 2/3) {
       rangeStart = COLORCATS.at(-1)+padding
@@ -1106,8 +1108,9 @@ function getRandomColorInCat(cat=-1) {
   r.setFromHSV(hue, getRandomInclusive(0.85, 0.95), getRandomInclusive(0.8, 0.9))
   // hack to make hue saved on it...
   r.setTo(r.red, r.green, r.blue, r.alpha, true);
-
-  console.log(rangeEnd - rangeStart, chosenCatIndex == 0)
+  
+  // console.log(rangeEnd - rangeStart, chosenCatIndex == 0)
+  console.log(rangeStart, rangeEnd, cat, r.h, getColorClass(r), COLORCATS_HR[getColorClass(r)])
   // console.log(rangeStart, hue, rangeEnd, COLORCATS_HR[getColorClass(r)], r)
   return r;
 }
