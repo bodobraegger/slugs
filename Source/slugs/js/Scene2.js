@@ -13,7 +13,7 @@ let EDITABLE = ['rules', 'routines']
 let EDITABLE_withSingular = ['rule', 'routine'].concat(EDITABLE)
 
 for(let i = 0; i < COLORCATS_360.length; i++) {
-  COLORCATS.push(COLORCATS_360[i]/360);
+  COLORCATS[i] = COLORCATS_360[i]/360;
 }
 
 let ENTITY_TYPES = ['food', 'others']
@@ -74,7 +74,7 @@ class Scene2 extends Phaser.Scene {
     let slug_y = getCanvasHeight()/2;
     
     
-    let playersBeingColor = new Phaser.Display.Color().random(0, 255).saturate(75)
+    let playersBeingColor = getRandomColorInCat();
     this.playersBeing = new Slug(this, slug_x, slug_y, slug_r, playersBeingColor);
     playersBeing = this.playersBeing;
     
@@ -84,15 +84,19 @@ class Scene2 extends Phaser.Scene {
     this.slugs = [this.playersBeing];
     
     this.food = [ 
-      this.addGameSpriteCircle(0, 0, 10, playersBeingColor.color, 'flower'),
-      this.addGameSpriteCircle(getCanvasWidth(), 0, 15, playersBeingColor.color, 'flower'),
-      this.addGameSpriteCircle(getCanvasWidth(), getCanvasHeight(), 20, playersBeingColor.color, 'flower'),
-      this.addGameSpriteCircle(0, getCanvasHeight(), 25, playersBeingColor.color, 'circle_spiky'),
+      // new gameSpriteCircle(this, 0, 0, 10, playersBeingColor.color, 'flower'),
+      // new gameSpriteCircle(this, getCanvasWidth(), 0, 15, playersBeingColor.color, 'flower'),
+      // new gameSpriteCircle(this, getCanvasWidth(), getCanvasHeight(), 20, playersBeingColor.color, 'flower'),
+      // new gameSpriteCircle(this, 0, getCanvasHeight(), 25, playersBeingColor.color, 'circle_spiky'),
+      this.addGameSpriteCircle(0, 0, 10, getRandomColorInCat(getColorClass(playersBeing.color)).color, 'flower'),
+      this.addGameSpriteCircle(getCanvasWidth(), 0, 15, getRandomColorInCat(getColorClass(playersBeing.color)).color, 'flower'),
+      this.addGameSpriteCircle(getCanvasWidth(), getCanvasHeight(), 20, getRandomColorInCat(getColorClass(playersBeing.color)).color, 'flower'),
+      this.addGameSpriteCircle(0, getCanvasHeight(), 25, getRandomColorInCat(getColorClass(playersBeing.color)).color, 'circle_spiky'),
     ];
     
     for(var i = 0; i < 5; i++) {
       let rand = (Math.random()+0.2)*10
-      let c =  new Phaser.Display.Color().random().saturate(100);
+      let c = getRandomColorInCat();
       
       this.food.push(this.addGameSpriteCircle(20+c.color%(rand*10), c.color%(rand*10), 5*rand, c.color, 'flower'));
       
@@ -119,14 +123,27 @@ class Scene2 extends Phaser.Scene {
         f.setOnCollideWith(s.heady, pair => {
           if(f.targeted) {
             if(f.radius <= s.heady.radius*s.heady.scaleX) {
-              if(sameColorClass(f.color, s.color)) {
+              if(sameColorClass(f.color, s.color) && f.textureType == s.texture && f.shape == s.shape) {
                 if(s.alpha < 1) {
                   s.setAlpha(1);
                 } else {
                   s.setScale(0.3+s.scaleX);
+                  logOutput(`the being enjoyed this snack!🥰`)
                 }
               } else {
                 s.setAlpha(0.5);
+                output = `oh no, the being did not like what it ate!🤢<br>`
+                if(!sameColorClass(f.color, s.color)) {
+                  output += `perhaps it did not like its color...<br>`
+                }
+                if(!f.textureType == s.texture) {
+                  output += `perhaps it did not like its texture...<br>`
+                }
+                if(!f.shape == s.shape) {
+                  output += `perhaps it did not like its shape...<br>`
+                }
+                logOutput(output)
+
               }
               f.targeted = false;
               f.destroy();
@@ -214,6 +231,9 @@ class Scene2 extends Phaser.Scene {
 
     // logInput(output);
     
+    // TODO: IMPLEMENT SOME SORT OF WAY TO RECOGNIZE CONNECTED OUTPUT BUBBLES FOR COLORING CURRENT OUTPUT
+    // startOutput();
+
     switch (cmd[0]) {
       case ifWord:
         const ifError = `uh oh, an if rule needs to be of the form ${wrapCmd('if <i>condition</i> then <i>action</i>')}, for example: ${wrapCmd(ifExample)}!`
@@ -433,7 +453,7 @@ class Scene2 extends Phaser.Scene {
     o.color = Phaser.Display.Color.IntegerToColor(color);
     return o
   }
-  addGameSpriteCircle(x, y, radius, color = new Phaser.Display.Color().random().saturate(75).color, texture = 'circle') {
+  addGameSpriteCircle(x, y, radius, color = getRandomColorInCat().color, texture = 'circle') {
     let img = new Phaser.GameObjects.Sprite(this, 0, 0, texture);
     img.displayWidth = radius*2;
     img.displayHeight = radius*2;
@@ -453,7 +473,7 @@ class Scene2 extends Phaser.Scene {
     return o;
   }
 
-  addGameCircleTextured(x, y, radius, color = new Phaser.Display.Color().random().saturate(75).color, texture = 'circle_leopard') {
+  addGameCircleTextured(x, y, radius, color =getRandomColorInCat().color, texture = 'circle_leopard') {
     
     let g = this.add.graphics()
 
@@ -511,7 +531,7 @@ class Scene2 extends Phaser.Scene {
 }
 
 class Slug extends Phaser.GameObjects.Container {
-  constructor(scene=Scene2, x=0, y=0, radius=20, color=new Phaser.Display.Color().random().saturate(75)) {
+  constructor(scene=Scene2, x=0, y=0, radius=20, color=getRandomColorInCat().color) {
     super(scene, x, y);
     this.setDataEnabled();
     this.data.values.color = color;
@@ -1027,4 +1047,56 @@ function findClosest(A, B=[new Phaser.GameObjects.GameObject()]) {
     // console.log(distance)
   })
   return closest;
+}
+
+class gameSpriteCircle extends Phaser.GameObjects.GameObject {
+  constructor(scene, x, y, radius, color = getRandomColorInCat().color, texture = 'circle') {
+    super(scene, 'Arc')
+    let img = new Phaser.GameObjects.Sprite(scene, 0, 0, texture);
+    img.displayWidth = radius*2;
+    img.displayHeight = radius*2;
+    img.setTint(color);
+  
+    let rt = scene.add.renderTexture(x, y, radius*2, radius*2);
+    rt.draw(img, radius, radius);
+  
+    let matterCircle = scene.matter.add.circle(x, y, radius);
+    // this = scene.matter.add.gameObject( rt, matterCircle ) 
+    this.radius = radius;
+    this.color = Phaser.Display.Color.IntegerToColor(color);
+    this.textureType= texture.includes('spiky') ? 'spiky':'smooth';
+  }
+}
+
+
+function getRandomColorInCat(cat=-1) {
+  let chosenCatIndex = Math.floor(Math.random()*COLORCATS.length)
+  if(cat != -1) { chosenCatIndex = cat+1 }
+  let hue = -1;
+  let padding = 0.03
+  let rangeStart = COLORCATS.at(chosenCatIndex-1)+padding;
+  let rangeEnd = COLORCATS.at(chosenCatIndex)-padding;
+  hue = getRandomInclusive(rangeStart, rangeEnd)
+
+  if(chosenCatIndex == 0) {
+    padding = 0.003
+    if(Math.random() <= 2/3) {
+      rangeStart = COLORCATS.at(-1)+padding
+      rangeEnd = 1;
+      hue = getRandomInclusive(rangeStart, rangeEnd)
+    } else {
+      rangeStart = 0;
+      rangeEnd = COLORCATS[0]-padding
+      hue = getRandomInclusive(rangeStart, rangeEnd)
+    }
+  }
+  // console.log(chosenCatIndex, COLORCATS_HR[chosenCatIndex])
+  let r = new Phaser.Display.Color();
+  r.setFromHSV(hue, getRandomInclusive(0.85, 0.95), getRandomInclusive(0.8, 0.9))
+  // hack to make hue saved on it...
+  r.setTo(r.red, r.green, r.blue, r.alpha, true);
+
+  console.log(rangeEnd - rangeStart, chosenCatIndex == 0)
+  // console.log(rangeStart, hue, rangeEnd, COLORCATS_HR[getColorClass(r)], r)
+  return r;
 }
