@@ -123,27 +123,31 @@ class Scene2 extends Phaser.Scene {
         f.setOnCollideWith(s.heady, pair => {
           if(f.targeted) {
             if(f.radius <= s.heady.radius*s.heady.scaleX) {
+              let output = ``
               if(sameColorClass(f.color, s.color) && f.textureType == s.texture && f.shape == s.shape) {
+                output += `the being enjoyed this snack😋<br>`
                 if(s.alpha < 1) {
                   s.setAlpha(1);
+                  output += `it feels healthy again!➕<br>`
                 } else {
                   s.setScale(0.3+s.scaleX);
-                  logOutput(`the being enjoyed this snack!🥰`)
+                  output += `your being was able to grow!🥰<br>`
                 }
+                logOutput()
               } else {
-                s.setAlpha(0.5);
+                //console.log(sameColorClass(f.color, s.color), f.textureType == s.texture, f.shape == s.shape)
                 output = `oh no, the being did not like what it ate!🤢<br>`
+                s.setAlpha(0.5);
                 if(!sameColorClass(f.color, s.color)) {
-                  output += `perhaps it did not like its color...<br>`
+                  output += `perhaps it did not like its color 🤕...<br>`
                 }
-                if(!f.textureType == s.texture) {
-                  output += `perhaps it did not like its texture...<br>`
+                if(!(f.textureType == s.texture)) {
+                  output += `perhaps it did not like its texture 🤕...<br>`
+                  console.log('what')
                 }
-                if(!f.shape == s.shape) {
-                  output += `perhaps it did not like its shape...<br>`
+                if(!(f.shape == s.shape)) {
+                  output += `perhaps it did not like its shape 🤕...<br>`
                 }
-                logOutput(output)
-
               }
               f.targeted = false;
               f.destroy();
@@ -151,6 +155,7 @@ class Scene2 extends Phaser.Scene {
               foodIndicesValid.splice(foodIndicesValid.indexOf(f_index), 1);
               s.eating = false;
               // this.food.splice(f_index);
+              logOutput(output)
             } else {
               logOutput(`the being can't eat anything bigger than its head :0`)
               s.eating = false;
@@ -470,6 +475,8 @@ class Scene2 extends Phaser.Scene {
     o.radius = radius;
     o.color = Phaser.Display.Color.IntegerToColor(color);
     o.textureType= texture.includes('spiky') ? 'spiky':'smooth';
+    // o.shape = texture.includes('circle') ? 'round':'edgy'
+    o.shape = 'round'
     return o;
   }
 
@@ -506,6 +513,8 @@ class Scene2 extends Phaser.Scene {
     o.radius = radius;
     o.color = Phaser.Display.Color.IntegerToColor(color);
     o.textureType= texture.includes('spiky') ? 'spiky':'smooth';
+    // o.shape = texture.includes('circle') ? 'round':'edgy'
+    o.shape = 'round'
   
     // TO ENSURE CIRCULAR MASKS ON THE TEXTURE FILES, IF PERFORMANCE HOG JUST CUT OUT THE TEXTURES BY HAND
     this.events.on('postupdate', function() {
@@ -1064,7 +1073,9 @@ class gameSpriteCircle extends Phaser.GameObjects.GameObject {
     // this = scene.matter.add.gameObject( rt, matterCircle ) 
     this.radius = radius;
     this.color = Phaser.Display.Color.IntegerToColor(color);
-    this.textureType= texture.includes('spiky') ? 'spiky':'smooth';
+    this.textureType = texture.includes('spiky') ? 'spiky':'smooth';
+    this.shape = texture.includes('circle') ? 'round':'edgy'
+    this.shape = 'round'
   }
 }
 
