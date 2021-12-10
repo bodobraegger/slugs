@@ -149,12 +149,14 @@ class Scene2 extends Phaser.Scene {
             console.log(FOOD_HEALTHY)
             if(FOOD_HEALTHY.getMatching('active', true).length < FOOD_MINIMUM) {
               let newFood = this.addGameSpriteCircle(
-                playersBeing.x+Phaser.Math.Between(-500, 500), playersBeing.y+Phaser.Math.Between(-500, 500), 
+                playersBeing.x+Phaser.Math.Between(-2000, 2000), playersBeing.y+Phaser.Math.Between(-2000, 2000), 
                 Phaser.Math.Between(playersBeing.heady.radius, playersBeing.heady.radius * playersBeing.scale), 
                 getRandomColorInCat(getColorCategory(playersBeing.color)), 'flower');
               console.log(`spawning new food near being at ${newFood.x}, ${newFood.y}`, newFood)
+              console.log(FOOD.getChildren().length, FOOD_HEALTHY.getChildren().length)
               FOOD.add(newFood);
               FOOD_HEALTHY.add(newFood);
+              console.log(FOOD.getChildren().length, FOOD_HEALTHY.getChildren().length)
             }
           }})
     );
@@ -609,6 +611,8 @@ function updateHealthyFood() {
   FOOD.getMatching('active', true).forEach(f => {
       if( !(playersBeing.txtr == f.txtr && playersBeing.shape == f.shape && sameColorCategory(playersBeing.color, f.color) && playersBeing.scale*playersBeing.heady.radius <= f.radius) ) {
         FOOD_HEALTHY.remove(f);
+      } else if(!FOOD_HEALTHY.getChildren().includes(f)) {
+        FOOD_HEALTHY.add(f);
       }
   })
 }
