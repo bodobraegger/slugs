@@ -606,8 +606,8 @@ class gameSpriteCircle extends Phaser.GameObjects.GameObject {
 function getHealthyFood(being) {
   let healthy = []
   FOOD.getMatching('active', true).forEach(f => {
+    /*console.log(being.txtr == f.txtr, being.shape == f.shape, sameColorCategory(being.color, f.color), being.scale*being.heady.radius <= f.radius)
     console.log(f, )
-      /*console.log(being.txtr == f.txtr, being.shape == f.shape, sameColorCategory(being.color, f.color), being.scale*being.heady.radius <= f.radius)
       console.log(being.txtr, f.txtr) 
       console.log(being.shape, f.shape) 
       console.log(getColorCategory(being.color), getColorCategory(f.color)) 
