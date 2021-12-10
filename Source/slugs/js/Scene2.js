@@ -30,7 +30,7 @@ let ROUTINES = [ ];
 
 let FOOD = {}
 let FOOD_MATCHING = []
-let FOOD_HEALTHY = []
+let FOOD_HEALTHY = {}
 let FOOD_MINIMUM = 3;
 
 let playersBeing = new Object
@@ -104,6 +104,7 @@ class Scene2 extends Phaser.Scene {
     ];
     
     FOOD = new Phaser.GameObjects.Group(this, foodsInitial)
+    FOOD_HEALTHY = new Phaser.GameObjects.Group(this, foodsInitial)
 
     console.log(FOOD)
 
@@ -144,15 +145,16 @@ class Scene2 extends Phaser.Scene {
     timerEvents.push(
       this.time.addEvent({ delay: Phaser.Math.Between(1000, 8000),
           loop: true, callbackScope: this, callback: function() {
-            FOOD_HEALTHY = getHealthyFood(playersBeing);
-            if(FOOD_HEALTHY.length < FOOD_MINIMUM) {
+            updateHealthyFood();
+            console.log(FOOD_HEALTHY)
+            if(FOOD_HEALTHY.getMatching('active', true).length < FOOD_MINIMUM) {
               let newFood = this.addGameSpriteCircle(
                 playersBeing.x+Phaser.Math.Between(-500, 500), playersBeing.y+Phaser.Math.Between(-500, 500), 
                 Phaser.Math.Between(playersBeing.heady.radius, playersBeing.heady.radius * playersBeing.scale), 
                 getRandomColorInCat(getColorCategory(playersBeing.color)), 'flower');
               console.log(`spawning new food near being at ${newFood.x}, ${newFood.y}`, newFood)
               FOOD.add(newFood);
-              FOOD_HEALTHY.push(newFood);
+              FOOD_HEALTHY.add(newFood);
             }
           }})
     );
@@ -603,20 +605,10 @@ class gameSpriteCircle extends Phaser.GameObjects.GameObject {
   }
 }
 
-function getHealthyFood(being) {
-  let healthy = []
+function updateHealthyFood() {
   FOOD.getMatching('active', true).forEach(f => {
-    /*console.log(being.txtr == f.txtr, being.shape == f.shape, sameColorCategory(being.color, f.color), being.scale*being.heady.radius <= f.radius)
-    console.log(f, )
-      console.log(being.txtr, f.txtr) 
-      console.log(being.shape, f.shape) 
-      console.log(getColorCategory(being.color), getColorCategory(f.color)) 
-      console.log(being.scale*being.heady.radius, f.radius)
-      console.log(being.heady)
-      */
-      if(being.txtr == f.txtr && being.shape == f.shape && sameColorCategory(being.color, f.color) && being.scale*being.heady.radius <= f.radius) {
-        healthy.push(f);
+      if( !(playersBeing.txtr == f.txtr && playersBeing.shape == f.shape && sameColorCategory(playersBeing.color, f.color) && playersBeing.scale*playersBeing.heady.radius <= f.radius) ) {
+        FOOD_HEALTHY.remove(f);
       }
   })
-  return healthy;
 }
