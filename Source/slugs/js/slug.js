@@ -144,7 +144,9 @@ class Slug extends Phaser.GameObjects.Container {
       for(let i = 0; i < this.jointsBody.length; i++) {
         let j = this.jointsBody[i];
         let diff = sX-1;
-        j.length = 2+j.originalLength*(1+diff*Math.PI/2);
+        j.length = (2+j.originalLength)*(1+diff*Math.PI/2);
+        // if(j.length < 2+this.heady.radius*this.scale+this.torso.radius*this.scale)
+        // j.length = 2+(this.bodyparts[i].radius*this.scale+this.bodyparts[i+1].radius*this.scale)/2
         // j.length = Math.max(2+(j.bodyA.circleRadius+j.bodyB.circleRadius)/2, j.originalLength*(1+diff*Math.PI/2))
       }
   
