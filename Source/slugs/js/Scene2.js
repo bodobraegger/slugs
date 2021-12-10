@@ -28,7 +28,10 @@ let SHAPES = ['round', 'edgy']
 let RULES = [ ];
 let ROUTINES = [ ];
 
-let foodIndicesValid = []
+let FOOD = {}
+let FOOD_MATCHING = []
+let FOOD_HEALTHY = []
+let FOOD_MINIMUM = 3;
 
 let playersBeing = new Object
 
@@ -37,6 +40,8 @@ const ifExample = 'if food is red then eat';
 const forExample = 'while there is food eat';
 const editExample = `replace rule 1 with ${ifExample}`;
 const deleteExample = 'forget rule 1'
+
+let timerEvents = [ ]
 
 class Scene2 extends Phaser.Scene {
   constructor() {
@@ -68,6 +73,7 @@ class Scene2 extends Phaser.Scene {
     let group = this.add.group([circle, arc, rectangle, polygon]);
     group.setAlpha(0.5)
     
+
     let matterArc = this.matter.add.trapezoid(1, 1, 10, 20, 0.5);
     
     let slug_r = 20;
@@ -84,31 +90,32 @@ class Scene2 extends Phaser.Scene {
     this.stage = 1;
     this.slugs = [this.playersBeing];
     
-    this.food = [ 
+    let foodsInitial = [ 
       // new gameSpriteCircle(this, 0, 0, 10, playersBeingColor.color, 'flower'),
       // new gameSpriteCircle(this, getCanvasWidth(), 0, 15, playersBeingColor.color, 'flower'),
       // new gameSpriteCircle(this, getCanvasWidth(), getCanvasHeight(), 20, playersBeingColor.color, 'flower'),
       // new gameSpriteCircle(this, 0, getCanvasHeight(), 25, playersBeingColor.color, 'circle_spiky'),
-      this.addGameSpriteCircle(0, 0, 10, getRandomColorInCat(getColorCategory(playersBeing.color)).color, 'flower'),
-      this.addGameSpriteCircle(getCanvasWidth(), 0, 15, getRandomColorInCat(getColorCategory(playersBeing.color)).color, 'flower'),
-      this.addGameSpriteCircle(getCanvasWidth(), getCanvasHeight(), 20, getRandomColorInCat(getColorCategory(playersBeing.color)).color, 'flower'),
-      this.addGameSpriteCircle(getCanvasWidth(), getCanvasHeight()+5, 20, getRandomColorInCat(getColorCategory(playersBeing.color)).color, 'flower'),
-      this.addGameSpriteCircle(getCanvasWidth()+5, getCanvasHeight()+5, 20, getRandomColorInCat(getColorCategory(playersBeing.color)).color, 'flower'),
-      this.addGameSpriteCircle(0, getCanvasHeight(), 25, getRandomColorInCat(getColorCategory(playersBeing.color)).color, 'circle_spiky'),
+      this.addGameSpriteCircle(0, 0, 10, getRandomColorInCat(getColorCategory(playersBeing.color)), 'flower'),
+      this.addGameSpriteCircle(getCanvasWidth(), 0, 15, getRandomColorInCat(getColorCategory(playersBeing.color)), 'flower'),
+      this.addGameSpriteCircle(getCanvasWidth(), getCanvasHeight(), 20, getRandomColorInCat(getColorCategory(playersBeing.color)), 'flower'),
+      this.addGameSpriteCircle(getCanvasWidth(), getCanvasHeight()+5, 20, getRandomColorInCat(getColorCategory(playersBeing.color)), 'flower'),
+      this.addGameSpriteCircle(getCanvasWidth()+5, getCanvasHeight()+5, 20, getRandomColorInCat(getColorCategory(playersBeing.color)), 'flower'),
+      this.addGameSpriteCircle(0, getCanvasHeight(), 25, getRandomColorInCat(getColorCategory(playersBeing.color)), 'circle_spiky'),
     ];
     
+    FOOD = new Phaser.GameObjects.Group(this, foodsInitial)
+
+    console.log(FOOD)
+
     for(var i = 0; i < 5; i++) {
       let rand = (Math.random()+0.2)*10
       let c = getRandomColorInCat();
       
-      this.food.push(this.addGameSpriteCircle(20+c.color%(rand*10), c.color%(rand*10), 5*rand, c.color, 'flower'));
+      FOOD.add(this.addGameSpriteCircle(20+c.color%(rand*10), c.color%(rand*10), 5*rand, c, 'flower'));
       
       // let s = new Slug(this, slug_x+i*10*rand, slug_y+i*10*rand, (slug_r+20)*rand/10)
       // this.slugs.push(s);
     }
-    foodIndicesValid = [...this.food.keys()]
-    
-    
     
     // RENDER TERMINAL ON TOP OF PHASER
     // const ph_terminal_container = this.add.dom(0.8*document.getElementById("phaser_container").clientWidth, 0.9*document.getElementById("phaser_container").clientHeight/2, terminal_container)
@@ -119,56 +126,6 @@ class Scene2 extends Phaser.Scene {
       this.processCommand(e.detail.value);
     });
 
-    // EATING THE FOOD
-    this.food.forEach((f, f_index) => {
-      // this.slugs.forEach
-      [this.playersBeing].forEach(s => { 
-        f.setOnCollideWith(s.heady, pair => {
-          if(f.targeted) {
-            if(f.radius <= s.heady.radius*s.heady.scaleX) {
-              let output = ``
-              if(sameColorCategory(f.color, s.color) && f.textureType == s.texture && f.shape == s.shape) {
-                output += `the being enjoyed this snack😋<br>`
-                if(s.alpha < 1) {
-                  s.setAlpha(1);
-                  output += `it feels healthy again!➕<br>`
-                } else {
-                  s.setScale(0.3+s.scaleX);
-                  output += `your being was able to grow!🥰<br>`
-                }
-              } else {
-                //console.log(sameColorCategory(f.color, s.color), f.textureType == s.texture, f.shape == s.shape)
-                output = `oh no, the being did not like what it ate!🤢<br>`
-                s.setAlpha(0.5);
-                if(!sameColorCategory(f.color, s.color)) {
-                  output += `perhaps it did not like its color 🤕...<br>`
-                }
-                if(!(f.textureType == s.texture)) {
-                  output += `perhaps it did not like its texture 🤕...<br>`
-                  console.log('what')
-                }
-                if(!(f.shape == s.shape)) {
-                  output += `perhaps it did not like its shape 🤕...<br>`
-                }
-              }
-              f.targeted = false;
-              f.destroy();
-              this.food[f_index] = null;
-              foodIndicesValid.splice(foodIndicesValid.indexOf(f_index), 1);
-              s.eating = false;
-              // this.food.splice(f_index);
-              logOutput(output)
-            } else {
-              logOutput(`the being can't eat anything bigger than its head :0`)
-              s.eating = false;
-            }
-            f.targeted = false;
-          }
-          
-        })
-      })
-    }); 
-    console.log(foodIndicesValid)
     let controlConfig = {
       camera: this.cameras.main,
       left: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT),
@@ -184,6 +141,21 @@ class Scene2 extends Phaser.Scene {
     this.controls = new Phaser.Cameras.Controls.SmoothedKeyControl(controlConfig);
     this.input.keyboard.preventDefault = false;
 
+    timerEvents.push(
+      this.time.addEvent({ delay: Phaser.Math.Between(1000, 8000),
+          loop: true, callbackScope: this, callback: function() {
+            FOOD_HEALTHY = getHealthyFood(playersBeing);
+            if(FOOD_HEALTHY.length < FOOD_MINIMUM) {
+              let newFood = this.addGameSpriteCircle(
+                playersBeing.x+Phaser.Math.Between(-500, 500), playersBeing.y+Phaser.Math.Between(-500, 500), 
+                Phaser.Math.Between(playersBeing.heady.radius, playersBeing.heady.radius * playersBeing.scale), 
+                getRandomColorInCat(getColorCategory(playersBeing.color)), 'flower');
+              console.log(`spawning new food near being at ${newFood.x}, ${newFood.y}`, newFood)
+              FOOD.add(newFood);
+              FOOD_HEALTHY.push(newFood);
+            }
+          }})
+    );
     // NARRATION
     narration_intro();
 
@@ -191,6 +163,54 @@ class Scene2 extends Phaser.Scene {
 
 
   update(time, delta) {
+    // EATING THE FOOD
+    FOOD.getMatching('active', true).forEach((f, f_index) => {
+      // this.slugs.forEach
+      [this.playersBeing].forEach(s => { 
+        f.setOnCollideWith(s.heady, pair => {
+          if(f.targeted) {
+            if(f.radius <= s.heady.radius*s.heady.scaleX) {
+              let output = ``
+              if(sameColorCategory(f.color, s.color) && f.txtr == s.txtr && f.shape == s.shape) {
+                output += `the being enjoyed this snack😋<br>`
+                if(s.alpha < 1) {
+                  s.setAlpha(1);
+                  output += `it feels healthy again!➕<br>`
+                } else {
+                  s.setScale(0.3+s.scaleX);
+                  output += `your being was able to grow!🥰<br>`
+                }
+              } else {
+                //console.log(sameColorCategory(f.color, s.color), f.txtr == s.txtr, f.shape == s.shape)
+                output = `oh no, the being did not like what it ate!🤢<br>`
+                s.setAlpha(0.5);
+                if(!sameColorCategory(f.color, s.color)) {
+                  output += `perhaps it did not like its color 🤕...<br>`
+                }
+                if(!(f.txtr == s.txtr)) {
+                  output += `perhaps it did not like its texture 🤕...<br>`
+                  console.log('what')
+                }
+                if(!(f.shape == s.shape)) {
+                  output += `perhaps it did not like its shape 🤕...<br>`
+                }
+              }
+              f.targeted = false;
+              FOOD.kill(f);
+              f.destroy();
+              s.eating = false;
+              // FOOD.splice(f_index);
+              logOutput(output)
+            } else {
+              logOutput(`the being can't eat anything bigger than its head :0`)
+              s.eating = false;
+            }
+            f.targeted = false;
+          }
+          
+        })
+      })
+    }); 
     let constraints = [ ]
     this.slugs.forEach(e => {
       // SHOW THE SKELETONS OF THE SLUGS
@@ -340,7 +360,7 @@ class Scene2 extends Phaser.Scene {
             } else if(e=='color') {
               logOutput(`your being tells you its ${wrapCmd(e)} is ${wrapCmd(COLORCATS_HR[getColorCategory(this.playersBeing.color)])}.`); 
             } else if(e=='texture') {
-              logOutput(`your being says its ${wrapCmd(e)} feels ${wrapCmd(this.playersBeing.texture)}.`); 
+              logOutput(`your being says its ${wrapCmd(e)} feels ${wrapCmd(this.playersBeing.txtr)}.`); 
             } else if(e=='shape') {
               logOutput(`because your being is made of circles, it thinks its ${wrapCmd(e)} is ${wrapCmd(this.playersBeing.shape)}.`); 
             }
@@ -455,21 +475,21 @@ class Scene2 extends Phaser.Scene {
   }
 
   addGameCircle(x, y, radius, color) {
-    let circle = this.add.circle(x, y, radius, color);
+    let circle = this.add.circle(x, y, radius, color.color);
     let matterCircle = this.matter.add.circle(x, y, radius);
     let o = this.matter.add.gameObject(
            circle,
       matterCircle
     )
     o.radius = radius;
-    o.color = Phaser.Display.Color.IntegerToColor(color);
+    o.color = color;
     return o
   }
-  addGameSpriteCircle(x, y, radius, color = getRandomColorInCat().color, texture = 'circle') {
+  addGameSpriteCircle(x, y, radius, color = getRandomColorInCat(), texture = 'circle') {
     let img = new Phaser.GameObjects.Sprite(this, 0, 0, texture);
     img.displayWidth = radius*2;
     img.displayHeight = radius*2;
-    img.setTint(color);
+    img.setTint(color.color);
 
     let rt = this.add.renderTexture(x, y, radius*2, radius*2);
     rt.draw(img, radius, radius);
@@ -478,35 +498,35 @@ class Scene2 extends Phaser.Scene {
     let o = this.matter.add.gameObject(
            rt,
       matterCircle
-    ) 
+    )
     o.radius = radius;
-    o.color = Phaser.Display.Color.IntegerToColor(color);
-    o.textureType= texture.includes('spiky') ? 'spiky':'smooth';
+    o.color = color;
+    o.txtr= texture.includes('spiky') ? 'spiky':'smooth';
     // o.shape = texture.includes('circle') ? 'round':'edgy'
     o.shape = 'round'
     return o;
   }
 
-  addGameCircleTextured(x, y, radius, color =getRandomColorInCat().color, texture = 'circle_leopard') {
+  addGameCircleTextured(x, y, radius, color =getRandomColorInCat(), texture = 'circle_leopard') {
     
     let g = this.add.graphics()
 
-    let crcl= this.add.circle(0, 0, radius, color)
-    crcl.fillColor=color;
+    let crcl= this.add.circle(0, 0, radius, color.color)
+    crcl.fillColor=color.color;
     crcl.removeFromDisplayList()
     
-    let txtr = new Phaser.GameObjects.Sprite(this, 0, 0, texture);
-    // txtr.displayWidth = 2*radius;
-    // txtr.displayHeight = 2*radius;
+    let patternSprite = new Phaser.GameObjects.Sprite(this, 0, 0, texture);
+    // patternSprite.displayWidth = 2*radius;
+    // patternSprite.displayHeight = 2*radius;
     
     let mask = new Phaser.Display.Masks.GeometryMask(this, crcl);
-    // txtr.setMask(mask);
+    // patternSprite.setMask(mask);
     
     let rt = this.add.renderTexture(x, y, radius*2, radius*2);
     rt.draw(crcl, radius, radius);
-    rt.draw(txtr, radius, radius);
+    rt.draw(patternSprite, radius, radius);
     rt.setMask(mask);
-    // let c = this.add.container(x, y, [crcl, txtr, ]);
+    // let c = this.add.container(x, y, [crcl, patternSprite, ]);
     
     let matterCircle = this.matter.add.circle(x, y, radius);
 
@@ -518,8 +538,8 @@ class Scene2 extends Phaser.Scene {
     o.radius = radius;
     o.arc=crcl;
     o.radius = radius;
-    o.color = Phaser.Display.Color.IntegerToColor(color);
-    o.textureType= texture.includes('spiky') ? 'spiky':'smooth';
+    o.color = color;
+    o.txtr= texture.includes('spiky') ? 'spiky':'smooth';
     // o.shape = texture.includes('circle') ? 'round':'edgy'
     o.shape = 'round'
   
@@ -530,8 +550,6 @@ class Scene2 extends Phaser.Scene {
 
     return o;
   }
-
-
 
   renderConstraint(constraints, lineColor, lineOpacity, lineThickness, pinSize, anchorColor, anchorSize) {
     if (!this.graphics) {
@@ -580,8 +598,25 @@ class gameSpriteCircle extends Phaser.GameObjects.GameObject {
     // this = scene.matter.add.gameObject( rt, matterCircle ) 
     this.radius = radius;
     this.color = Phaser.Display.Color.IntegerToColor(color);
-    this.textureType = texture.includes('spiky') ? 'spiky':'smooth';
-    this.shape = texture.includes('circle') ? 'round':'edgy'
+    this.txtr = texture.includes('spiky') ? 'spiky':'smooth';
     this.shape = 'round'
   }
+}
+
+function getHealthyFood(being) {
+  let healthy = []
+  FOOD.getMatching('active', true).forEach(f => {
+    console.log(f, )
+      /*console.log(being.txtr == f.txtr, being.shape == f.shape, sameColorCategory(being.color, f.color), being.scale*being.heady.radius <= f.radius)
+      console.log(being.txtr, f.txtr) 
+      console.log(being.shape, f.shape) 
+      console.log(getColorCategory(being.color), getColorCategory(f.color)) 
+      console.log(being.scale*being.heady.radius, f.radius)
+      console.log(being.heady)
+      */
+      if(being.txtr == f.txtr && being.shape == f.shape && sameColorCategory(being.color, f.color) && being.scale*being.heady.radius <= f.radius) {
+        healthy.push(f);
+      }
+  })
+  return healthy;
 }

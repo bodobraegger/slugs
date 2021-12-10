@@ -23,8 +23,8 @@ function sameColorCategory(color1, color2) { // color blindness: https://coloror
     }
     let colorDiff = Math.min(Math.abs(color1.h - color2.h), Math.abs(COLORCATS[cat1] - color2.h), Math.abs(COLORCATS[cat2] - color1.h));
     let similarityBound = 0.2 * (color1.h + color2.h)/2
-    console.log('color.h:', color1.h, color2.h,'| dff:', colorDiff, 'similarityBound:', similarityBound)
-    console.log('cat:', COLORCATS_HR[cat1], COLORCATS_HR[cat2])
+    // console.log('color.h:', color1.h, color2.h,'| dff:', colorDiff, 'similarityBound:', similarityBound)
+    // console.log('cat:', COLORCATS_HR[cat1], COLORCATS_HR[cat2])
   
     if(cat1 == cat2 || colorDiff <= similarityBound) {
       return true;
@@ -62,7 +62,7 @@ function getRandomColorInCat(cat=-1) {
     r.setTo(r.red, r.green, r.blue, r.alpha, true);
     
     // console.log(rangeEnd - rangeStart, chosenCatIndex == 0)
-    console.log(rangeStart, rangeEnd, cat, r.h, getColorCategory(r), COLORCATS_HR[getColorCategory(r)])
+    // console.log(rangeStart, rangeEnd, cat, r.h, getColorCategory(r), COLORCATS_HR[getColorCategory(r)])
     // console.log(rangeStart, hue, rangeEnd, COLORCATS_HR[getColorClass(r)], r)
     return r;
 }

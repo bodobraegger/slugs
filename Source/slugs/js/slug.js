@@ -1,10 +1,10 @@
 class Slug extends Phaser.GameObjects.Container {
-    constructor(scene=Scene2, x=0, y=0, radius=20, color=getRandomColorInCat().color) {
+    constructor(scene=Scene2, x=0, y=0, radius=20, color=getRandomColorInCat()) {
       super(scene, x, y);
       this.setDataEnabled();
       this.data.values.color = color;
       this.color = color
-      this.texture = 'smooth';
+      this.txtr = 'smooth';
       this.shape = 'round';
       let headyColor = this.color.clone().lighten((Math.min(0.2+Math.random(), 0.8))*50);
       let tailColor = this.color.clone().lighten((Math.min(0.1+Math.random(), 0.8))*30);
@@ -13,10 +13,10 @@ class Slug extends Phaser.GameObjects.Container {
       let tail0Radius = radius/1.3
       let tail1Radius = radius/2
   
-      this.heady   = this.scene.addGameCircle(x, y, headyRadius, headyColor.color);
-      this.torso   = this.scene.addGameCircleTextured(x-radius-headyRadius, y, radius, this.color.color);
-      this.tail0 = this.scene.addGameCircle(x-radius-headyRadius-tail0Radius, y, tail0Radius, tailColor.color);
-      this.tail1 = this.scene.addGameCircle(x-radius-headyRadius-tail0Radius-tail1Radius, y, tail1Radius, tailColor.color);
+      this.heady   = this.scene.addGameCircle(x, y, headyRadius, headyColor);
+      this.torso   = this.scene.addGameCircleTextured(x-radius-headyRadius, y, radius, this.color);
+      this.tail0 = this.scene.addGameCircle(x-radius-headyRadius-tail0Radius, y, tail0Radius, tailColor);
+      this.tail1 = this.scene.addGameCircle(x-radius-headyRadius-tail0Radius-tail1Radius, y, tail1Radius, tailColor);
   
   
       this.headyjoint  = this.scene.matter.add.joint(
@@ -189,7 +189,7 @@ class Slug extends Phaser.GameObjects.Container {
       
       let rulesFood = [];
       
-      this.foodMatching = [ ];
+      FOOD_MATCHING = [ ];
       
       for(let i = 0; i < RULES.length; i++) {
         let ifColor = false;
@@ -234,10 +234,10 @@ class Slug extends Phaser.GameObjects.Container {
   
       if(rulesFood.length) {
         logOutput(`it remembers the following food ${wrapCmd('rules')}:`)
-        let foodIndicesSelected = foodIndicesValid;
+        let foodSelected = FOOD.getMatching('active', true);
         
         for(let i = 0; i < rulesFood.length; i++) {
-          let foodIndicesCurrentlySelected = [ ];
+          let foodCurrentlySelected = [ ];
           let r = rulesFood[i]; 
           let booleanExpr = r.booleanExpr;
           let booleanString = booleanExpr.join(' '); // .splice(1, 0, '(').push(')')
@@ -256,8 +256,8 @@ class Slug extends Phaser.GameObjects.Container {
             })
           }
   
-          for(let i = 0; i < foodIndicesSelected.length; i++) {
-            let f = this.scene.food[ foodIndicesSelected[i] ];
+          for(let i = 0; i < foodSelected.length; i++) {
+            let f = foodSelected[i];
             // VARIABLE NAME NEEDS TO BE SAME AS INPUT!!
             let food = '';
             if(r.ifColor) {
@@ -272,35 +272,31 @@ class Slug extends Phaser.GameObjects.Container {
               }
             }
             if(r.ifTexture) {
-              food = f.textureType;
+              food = f.txtr;
             }
             console.log(booleanString, 'food var:', food);
             let evaluation = eval(booleanString);
             console.log(evaluation);
             if(evaluation && !r.avoid) {
-              foodIndicesCurrentlySelected.push(foodIndicesSelected[i]);
+              foodCurrentlySelected.push(foodSelected[i]);
             }
           }
-          console.log(foodIndicesCurrentlySelected);
-          foodIndicesSelected = foodIndicesCurrentlySelected;
+          console.log(foodCurrentlySelected);
+          foodSelected = foodCurrentlySelected;
         }
-        for(let i = 0; i < foodIndicesSelected.length; i++) {
-          this.foodMatching.push(this.scene.food[foodIndicesSelected[i]])
-        }
-      }
-      else {
+        FOOD_MATCHING = foodSelected;
+      } else {
         logOutput(`none of the ${wrapCmd('rules')} tell your being what to eat, so it will try to eat anything!`)
-        for(let i=0;i<foodIndicesValid.length;i++) {
-          this.foodMatching.push(this.scene.food[ foodIndicesValid[i] ]);
-        }
+        FOOD_MATCHING = FOOD.getMatching('active', true);
+        
       }
-      if(!this.foodMatching.length) {
+      if(!FOOD_MATCHING.length) {
         logOutput(`there is no food item which matches your beings ${wrapCmd('rules')} close enough - try ${wrapCmd(editWord)}ing your ${wrapCmd('rules')} or moving your being closer :)`)
         this.eating = false;
         return
       }
       // having found our food stuff, move to it until you're close!
-      this.closestMatch = findClosest(this.heady, this.foodMatching);
+      this.closestMatch = findClosest(this.heady, FOOD_MATCHING);
       this.closestMatch.targeted = true;
       let rotationDirection = 0;
      
@@ -310,9 +306,8 @@ class Slug extends Phaser.GameObjects.Container {
   
       this.timer = 0;
       this.scene.events.on('update', function(time, delta) {
-        if(this.eating && this.foodMatching && this.heady.x && this.heady.y){
-          //console.log('inside update', foodIndicesValid, this.foodMatching, this.scene.food);
-          let closestMatchNew = findClosest(this.heady, this.foodMatching);
+        if(this.eating && FOOD_MATCHING && this.heady.x && this.heady.y){
+          let closestMatchNew = findClosest(this.heady, FOOD_MATCHING);
           // console.log(this.closestMatch)
           
           let target = velocityToTarget(this.heady, this.closestMatch);
@@ -361,7 +356,7 @@ class Slug extends Phaser.GameObjects.Container {
             }
           }
           else if(rotationDirection == -1 && (angleSlugTarget > 50 || angleSlugTarget < -50)) {
-            console.log('counter clockwise')
+            // console.log('counter clockwise')
             
             let torsoVec = headyVec.clone().setLength(0.25*speed);
             this.torso.setVelocity(torsoVec.x, torsoVec.y);
@@ -372,7 +367,7 @@ class Slug extends Phaser.GameObjects.Container {
             this.tail0.setVelocity(tail0Vec.x, tail0Vec.y);
           }
           else if(rotationDirection == 1 && (angleSlugTarget > 50 || angleSlugTarget < -50)) {
-            console.log('clockwise (right)')
+            // console.log('clockwise (right)')
             
             let torsoVec = headyVec.clone().setLength(0.25*speed);
             this.torso.setVelocity(torsoVec.x, torsoVec.y);
@@ -399,12 +394,13 @@ class Slug extends Phaser.GameObjects.Container {
           }
           this.timer += delta;
           while(this.timer > 600) {
+            // console.log('slugtimer')
             waveIndex = (waveIndex+1) % swimStates.length;
             this.timer -= 600;
           }
-          this.foodMatching.forEach((e, i) => {
+          FOOD_MATCHING.forEach((e, i) => {
             if(!e.active) {
-              this.foodMatching.splice(i, 1)
+              FOOD_MATCHING.splice(i, 1)
             }
           })
         }
@@ -422,5 +418,5 @@ class Slug extends Phaser.GameObjects.Container {
       }
   
     }
-  
-  }
+
+}
