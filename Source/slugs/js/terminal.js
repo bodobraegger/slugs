@@ -1,5 +1,5 @@
 const ifWord = 'if',
-    forWord = 'for',
+    loopWord = 'while',
     equalWord = 'is',
     thenWord = 'then',
     andWord = 'and',
@@ -11,7 +11,7 @@ const ifWord = 'if',
 
 let wordsAction = ['eat', 'avoid', stopWord]
 
-const wordsFirst = wordsAction.concat([ifWord, forWord, showWord, editWord, deleteWord, 'help', 'clear'])
+const wordsFirst = wordsAction.concat([ifWord, loopWord, showWord, editWord, deleteWord, 'help', 'clear'])
 const wordsForCmdString = [].concat(wordsFirst.slice(0, 2));
 let wordsIfConditionLeft = [].concat(ENTITY_TYPES);
 let wordsIfConditionRight = [].concat(SIZES, COLORCATS_HR, TEXTURES);

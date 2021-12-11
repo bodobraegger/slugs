@@ -37,7 +37,7 @@ let playersBeing = new Object
 
 let massMultiplierConstant = 2.2860618138362114;
 const ifExample = 'if food is red then eat';
-const forExample = 'while there is food eat';
+const loopExample = 'while there is food on plant do eat';
 const editExample = `replace rule 1 with ${ifExample}`;
 const deleteExample = 'forget rule 1'
 
@@ -294,9 +294,9 @@ class Scene2 extends Phaser.Scene {
         logInput(output);
         return;
       }
-      case forWord: {
+      case loopWord: {
         if(cmd.length < 5 || !wordsAction.includes(cmd.at(-1))) { 
-          logOutput(`uh oh, a for routine needs to be of the form ${wrapCmd('for <i>condition</i> <i>action</i>')}, for example: ${wrapCmd(forExample)}!`);
+          logOutput(`uh oh, a routine needs to be of the form ${wrapCmd(loopWord + ' <i>condition</i> then <i>action</i>')}, for example: ${wrapCmd(loopExample)}!`);
           return;
         }
         return;
@@ -440,7 +440,7 @@ class Scene2 extends Phaser.Scene {
             case ifWord:
               output += `with the ${wrapCmd('if')} keyword you can give rules to your being! your being will use these rules to figure out what to ${wrapCmd('eat')} and what to ${wrapCmd('avoid')} :). An if rule needs to be of the form ${wrapCmd('if <i>condition</i> then <i>action</i>')}, for example: ${wrapCmd(ifExample)}!`;
               break;
-            case forWord:
+            case loopWord:
               output += `TODO`
               break;
             case stopWord:
