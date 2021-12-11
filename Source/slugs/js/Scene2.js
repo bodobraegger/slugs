@@ -106,6 +106,8 @@ class Scene2 extends Phaser.Scene {
     FOOD = new Phaser.GameObjects.Group(this, foodsInitial)
     FOOD_HEALTHY = new Phaser.GameObjects.Group(this, foodsInitial)
 
+    console.log(FOOD_HEALTHY)
+
     console.log(FOOD)
 
     for(var i = 0; i < 5; i++) {
@@ -143,15 +145,18 @@ class Scene2 extends Phaser.Scene {
     this.input.keyboard.preventDefault = false;
 
     timerEvents.push(
-      this.time.addEvent({ delay: Phaser.Math.Between(1000, 8000),
+      this.time.addEvent({ delay: Phaser.Math.Between(2000, 8000),
           loop: true, callbackScope: this, callback: function() {
             updateHealthyFood();
-            console.log(FOOD_HEALTHY)
+            // console.log(FOOD_HEALTHY)
             if(FOOD_HEALTHY.getMatching('active', true).length < FOOD_MINIMUM) {
+              let distx = playersBeing.x+(Math.random()<0.5 ? Phaser.Math.Between(-3000*playersBeing.scale, -1000*playersBeing.scale):Phaser.Math.Between(1000*playersBeing.scale, 3000*playersBeing.scale))
+              let disty = playersBeing.y+(Math.random()<0.5 ? Phaser.Math.Between(-3000*playersBeing.scale, -1000*playersBeing.scale):Phaser.Math.Between(1000*playersBeing.scale, 3000*playersBeing.scale))
+              let texture = Math.random()<0.5 ? 'flower':'circle_spiky'
               let newFood = this.addGameSpriteCircle(
-                playersBeing.x+Phaser.Math.Between(-2000, 2000), playersBeing.y+Phaser.Math.Between(-2000, 2000), 
+                distx, disty, 
                 Phaser.Math.Between(playersBeing.heady.radius, playersBeing.heady.radius * playersBeing.scale), 
-                getRandomColorInCat(getColorCategory(playersBeing.color)), 'flower');
+                getRandomColorInCat(getColorCategory(playersBeing.color)), texture);
               console.log(`spawning new food near being at ${newFood.x}, ${newFood.y}`, newFood)
               console.log(FOOD.getChildren().length, FOOD_HEALTHY.getChildren().length)
               FOOD.add(newFood);
@@ -608,11 +613,14 @@ class gameSpriteCircle extends Phaser.GameObjects.GameObject {
 }
 
 function updateHealthyFood() {
+  console.log(FOOD_HEALTHY.getMatching('active', true).length)
   FOOD.getMatching('active', true).forEach(f => {
       if( !(playersBeing.txtr == f.txtr && playersBeing.shape == f.shape && sameColorCategory(playersBeing.color, f.color) && playersBeing.scale*playersBeing.heady.radius <= f.radius) ) {
         FOOD_HEALTHY.remove(f);
-      } else if(!FOOD_HEALTHY.getChildren().includes(f)) {
-        FOOD_HEALTHY.add(f);
+      }
+      else {
+        console.log('aready in it', FOOD_HEALTHY.getChildren().includes(f))
       }
   })
+  console.log(FOOD_HEALTHY.getMatching('active', true).length)
 }

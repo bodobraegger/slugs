@@ -276,14 +276,14 @@ class Slug extends Phaser.GameObjects.Container {
             if(r.ifTexture) {
               food = f.txtr;
             }
-            console.log(booleanString, 'food var:', food);
+            // console.log(booleanString, 'food var:', food);
             let evaluation = eval(booleanString);
-            console.log(evaluation);
+            // console.log(evaluation);
             if(evaluation && !r.avoid) {
               foodCurrentlySelected.push(foodSelected[i]);
             }
           }
-          console.log(foodCurrentlySelected);
+          // console.log(foodCurrentlySelected);
           foodSelected = foodCurrentlySelected;
         }
         FOOD_MATCHING = foodSelected;
