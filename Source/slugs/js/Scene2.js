@@ -33,15 +33,21 @@ let FOOD_MATCHING = []
 let FOOD_HEALTHY = {}
 let FOOD_MINIMUM = 3;
 
+let PLANTS = {}
+
 let playersBeing = new Object
 
 let massMultiplierConstant = 2.2860618138362114;
 const ifExample = 'if food is red then eat';
-const loopExample = 'while there is food on plant do eat';
+const loopExample = 'while food on plant eat';
 const editExample = `replace rule 1 with ${ifExample}`;
 const deleteExample = 'forget rule 1'
 
 let timerEvents = [ ]
+
+let SCENE;
+
+
 
 class Scene2 extends Phaser.Scene {
   constructor() {
@@ -49,12 +55,12 @@ class Scene2 extends Phaser.Scene {
   }
 
   create() {
+    SCENE = this;
     // this.matter.world.setBounds();
     this.matter.add.mouseSpring();
     // this.matter.enableAttractorPlugin();  
     // this.cursors = this.input.keyboard.createCursorKeys()
-    
-    
+    /*
     let circle = this.add.circle(1, 1, 10, 0xFFF000);
     let arc = this.add.arc(100, 100, 50, 1, 180, false, 0xFFF000)
     let rectangle = this.matter.add.gameObject(this.add.rectangle(400, 200, 20, 10, 0x9966ff), this.matter.add.rectangle(400, 200, 20, 10))
@@ -67,15 +73,15 @@ class Scene2 extends Phaser.Scene {
     let polygon = this.matter.add.gameObject(this.add.polygon(200, 400, antenna_vertices, 0xFF22FF),  { shape: { type: 'fromVerts', verts: antenna_vertices, flagInternal: true } });
     // polygon = this.matter.add.gameObject(polygon, m_polygon);
     // polygon.setScale(0.2, 0.2);
-
+    
     // let svg = this.add.image(250, 400, 'antennae').setScale(0.05);
     
     let group = this.add.group([circle, arc, rectangle, polygon]);
     group.setAlpha(0.5)
     
-
-    let matterArc = this.matter.add.trapezoid(1, 1, 10, 20, 0.5);
     
+    let matterArc = this.matter.add.trapezoid(1, 1, 10, 20, 0.5);
+    */
     let slug_r = 20;
     let slug_x = getCanvasWidth()/2;
     let slug_y = getCanvasHeight()/2;
@@ -105,17 +111,30 @@ class Scene2 extends Phaser.Scene {
     
     FOOD = new Phaser.GameObjects.Group(this, foodsInitial)
     FOOD_HEALTHY = new Phaser.GameObjects.Group(this, foodsInitial)
-
-    console.log(FOOD_HEALTHY)
+    let planty = new Plant(this, 800, 300, getRandomColorInCat(6), 400, 20, 10);
+    PLANTS = new Phaser.GameObjects.Group(this, [planty])
+    PLANTS.add(new Plant(this, 300, 300, getRandomColorInCat(getColorCategory(playersBeingColor)), 400, 20, 10, true))
 
     console.log(FOOD)
-
+    console.log(PLANTS)
+    
     for(var i = 0; i < 5; i++) {
-      let rand = (Math.random()+0.2)*10
+      let yesOrNo = Phaser.Math.Between(0, 1)
+      let randFN = Phaser.Math.Between(10, 30) 
+      let randFS = Phaser.Math.Between(10, 30)
+      let randSize = Phaser.Math.Between(randFN*randFS, randFN*randFS+100)
+      let distx = playersBeing.x+(Math.random()<0.5 ? Phaser.Math.Between(-3000*playersBeing.scale, -1000*playersBeing.scale):Phaser.Math.Between(1000*playersBeing.scale, 3000*playersBeing.scale))
+      let disty = playersBeing.y+(Math.random()<0.5 ? Phaser.Math.Between(-3000*playersBeing.scale, -1000*playersBeing.scale):Phaser.Math.Between(1000*playersBeing.scale, 3000*playersBeing.scale))
       let c = getRandomColorInCat();
       
-      FOOD.add(this.addGameSpriteCircle(20+c.color%(rand*10), c.color%(rand*10), 5*rand, c, 'flower'));
-      
+      // FOOD.add(this.addGameSpriteCircle(20+c.color%(rand*10), c.color%(rand*10), 5*rand, c, 'flower'));
+      let plant; 
+      if(yesOrNo) {
+        plant = new Plant(this, distx, disty, c, randSize, randFS, randFN)
+      } else {
+        plant = new Plant(this, distx, disty, c, randSize, randFS, randFN, true)
+      }
+      PLANTS.add(plant)
       // let s = new Slug(this, slug_x+i*10*rand, slug_y+i*10*rand, (slug_r+20)*rand/10)
       // this.slugs.push(s);
     }
@@ -178,7 +197,7 @@ class Scene2 extends Phaser.Scene {
       [this.playersBeing].forEach(s => { 
         f.setOnCollideWith(s.heady, pair => {
           if(f.targeted) {
-            if(f.radius <= s.heady.radius*s.heady.scaleX) {
+            if(f.displayWidth <= s.heady.displayWidth) {
               let output = ``
               if(sameColorCategory(f.color, s.color) && f.txtr == s.txtr && f.shape == s.shape) {
                 output += `the being enjoyed this snack😋<br>`
@@ -226,6 +245,11 @@ class Scene2 extends Phaser.Scene {
       constraints = constraints.concat(e.jointsBody);
     })
     this.renderConstraint(constraints, 0xF9F6EE, 1, 1, 1, 0xF9F6EE, 1);
+    constraints = [ ]
+    PLANTS.getChildren().forEach(e => {
+      constraints = constraints.concat(e.joints);
+    })
+    this.renderConstraint(constraints, 0x006400, 0.8, 3, 1, 0x006400, 4, false);
 
     if(this.playersBeing.scale > this.stage+1) {
       this.stage++;
@@ -296,9 +320,12 @@ class Scene2 extends Phaser.Scene {
       }
       case loopWord: {
         if(cmd.length < 5 || !wordsAction.includes(cmd.at(-1))) { 
-          logOutput(`uh oh, a routine needs to be of the form ${wrapCmd(loopWord + ' <i>condition</i> then <i>action</i>')}, for example: ${wrapCmd(loopExample)}!`);
+          logOutput(`uh oh, a routine needs to be of the form ${wrapCmd(loopWord + ' <i>condition</i> <i>action</i>')}, for example: ${wrapCmd(loopExample)}!`);
           return;
         }
+
+        
+
         return;
       }
       case 'abracadabra': {
@@ -560,12 +587,13 @@ class Scene2 extends Phaser.Scene {
     return o;
   }
 
-  renderConstraint(constraints, lineColor, lineOpacity, lineThickness, pinSize, anchorColor, anchorSize) {
+  renderConstraint(constraints, lineColor, lineOpacity, lineThickness, pinSize, anchorColor, anchorSize, clear = true) {
     if (!this.graphics) {
       this.graphics = this.add.graphics();
     }
-  
-    this.graphics.clear();
+    if(clear) {
+      this.graphics.clear();
+    }
     for(var i=0, n=constraints.length; i<n; i++) {
       this.matter.world.renderConstraint(constraints[i], this.graphics, lineColor, lineOpacity, lineThickness, pinSize, anchorColor, anchorSize);
     }
@@ -615,12 +643,58 @@ class gameSpriteCircle extends Phaser.GameObjects.GameObject {
 function updateHealthyFood() {
   console.log(FOOD_HEALTHY.getMatching('active', true).length)
   FOOD.getMatching('active', true).forEach(f => {
-      if( !(playersBeing.txtr == f.txtr && playersBeing.shape == f.shape && sameColorCategory(playersBeing.color, f.color) && playersBeing.scale*playersBeing.heady.radius <= f.radius) ) {
+      if( !(playersBeing.txtr == f.txtr && playersBeing.shape == f.shape && sameColorCategory(playersBeing.color, f.color) && playersBeing.displayWidth <= f.displayWidth) ) {
         FOOD_HEALTHY.remove(f);
       }
       else {
-        console.log('aready in it', FOOD_HEALTHY.getChildren().includes(f))
+        if(FOOD_HEALTHY.contains(f)) {
+          console.log('already in it', FOOD_HEALTHY.getChildren().includes(f))
+        }
+        else {
+          FOOD_HEALTHY.add(f);
+        }
       }
   })
   console.log(FOOD_HEALTHY.getMatching('active', true).length)
+}
+
+
+class Plant extends Phaser.GameObjects.Group {
+  constructor(scene, x=0, y=0, color=new Phaser.Display.Color().random(), width = 40, fruitsRadius = 10, fruitsNumber = 8, circle = false) {
+    super(scene, 0, 0, []);
+    this.color = color
+    this.width = width;
+    this.fruitsRadius = fruitsRadius;
+    this.fruitsNumber = fruitsNumber;
+    this.joints = [];
+    let angle = Phaser.Math.DegToRad(Phaser.Math.Between(0, 360));
+
+    for(let i = 0; i<fruitsNumber; i++) {
+      let colorCat = getColorCategory(color);
+      if(Math.random() < 0.2) { colorCat = (colorCat+Phaser.Math.Between(-1, 1)) % COLORCATS.length }
+      let texture = 'flower'
+      if(Math.random() < 0.2) { texture = 'circle_spiky' }
+
+      let p;
+      if(!circle) {
+        p = pointOnCircle(x, y, i*width/fruitsNumber*2, angle)
+      } else {
+        p = pointOnCircle(x, y, width/2, Phaser.Math.DegToRad(360/fruitsNumber * i));
+      }
+      let f = scene.addGameSpriteCircle(p.x, p.y, Phaser.Math.Between(fruitsRadius-5, fruitsRadius+5), getRandomColorInCat(colorCat), texture);
+      FOOD.add(f);
+      this.add(f)
+    }
+    for(let i = 0; i<fruitsNumber-1; i++) {
+      let f0 = this.getChildren()[i];
+      let f1 = this.getChildren()[i+1];
+      this.joints.push(this.scene.matter.add.joint(f0, f1, Phaser.Math.Distance.BetweenPoints(f0, f1), 0.5, ))
+    }
+    if(circle) {
+      let f0 =this.getChildren().at(-1)
+      let f1 = this.getChildren()[0]
+      this.joints.push(this.scene.matter.add.joint(f0, f1, Phaser.Math.Distance.BetweenPoints(f0, f1), 0.5, ))
+    }
+    scene.add.existing(this);
+  }
 }

@@ -22,7 +22,7 @@ let wordsToShow = EDITABLE.concat(ATTRIBUTES);
 
 let wordsAll = wordsFirst.concat(wordsIfConditionLeft, wordsIfConditionRight, equalWord, wordsBoolean, wordsAction, wordsToShow);
 
-let wordsFilter = ['the', 'a', 'my', 'me']
+let wordsFilter = ['the', 'a', 'my', 'me', 'there']
 
 let wordsAllArrays = [wordsAction, wordsFirst, wordsIfConditionLeft, wordsIfConditionRight, wordsBoolean, wordsToShow];
 let wordsAllArraysStrings = ['wordsAction', 'wordsFirst', 'wordsIfConditionLeft', 'wordsIfConditionRight', 'wordsBoolean', 'wordsToShow'];

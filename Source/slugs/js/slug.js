@@ -135,8 +135,6 @@ class Slug extends Phaser.GameObjects.Container {
           rt.clearMask(true);
           crcl.setScale(sX, sY);
           let mask = new Phaser.Display.Masks.GeometryMask(this, crcl);
-          // rt.draw(crcl, radius, radius);
-          // rt.draw(txtr, radius, radius);
           rt.setMask(mask);
         }
       });
@@ -180,7 +178,7 @@ class Slug extends Phaser.GameObjects.Container {
     }
   
     moveRandomly() {
-      this.scene.matter.applyForce(this.heady, {x: getRandomInclusive(-0.2, 0.2), y: getRandomInclusive(-0.2, 0.2)})
+      this.scene.matter.applyForce(this.heady, {x: Phaser.Math.FloatBetween(-0.2, 0.2), y: Phaser.Math.FloatBetween(-0.2, 0.2)})
     }
   
     eat(foodType='any') {
@@ -268,9 +266,9 @@ class Slug extends Phaser.GameObjects.Container {
             if(r.ifSize) {
               if(booleanString.includes('beings size')) {
                 booleanString.replaceAll('beings size', `'beings size'`);
-                food = (this.heady.radius*this.scale > f.radius - 5*this.scale || this.heady.radius*this.heady.scaleX < f.radius - 5*this.scale ? "beings size":"not same size" );
+                food = (this.heady.displayWidth > f.displayWidth - 5*this.scale || this.heady.displayWidth < f.displayWidth - 5*this.scale ? "beings size":"not same size" );
               } else{
-                food = (this.heady.radius*this.heady.scaleX < f.radius ? 'bigger':'smaller' )
+                food = (this.heady.displayWidth < f.displayWidth ? 'bigger':'smaller' )
               }
             }
             if(r.ifTexture) {
