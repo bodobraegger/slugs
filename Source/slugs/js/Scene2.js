@@ -683,18 +683,22 @@ class Plant extends Phaser.GameObjects.Group {
       }
       let f = scene.addGameSpriteCircle(p.x, p.y, Phaser.Math.Between(fruitsRadius-5, fruitsRadius+5), getRandomColorInCat(colorCat), texture);
       FOOD.add(f);
+      f.group = this;
       this.add(f)
     }
-    for(let i = 0; i<fruitsNumber-1; i++) {
-      let f0 = this.getChildren()[i];
-      let f1 = this.getChildren()[i+1];
-      this.joints.push(this.scene.matter.add.joint(f0, f1, Phaser.Math.Distance.BetweenPoints(f0, f1), 0.5, ))
-    }
-    if(circle) {
-      let f0 =this.getChildren().at(-1)
-      let f1 = this.getChildren()[0]
-      this.joints.push(this.scene.matter.add.joint(f0, f1, Phaser.Math.Distance.BetweenPoints(f0, f1), 0.5, ))
-    }
+
+    //else {
+      for(let i = 0; i<fruitsNumber; i++) {
+        let f0 = this.getChildren()[i];
+        let f1 = this.getChildren()[(i+1)%fruitsNumber];
+        let f2 = this.getChildren()[(i+2)%fruitsNumber];
+        this.joints.push(this.scene.matter.add.joint(f0, f1, Phaser.Math.Distance.BetweenPoints(f0, f1), 0.5, ))
+        if(circle) {
+          this.joints.push(this.scene.matter.add.joint(f0, f2, Phaser.Math.Distance.BetweenPoints(f0, f2), 0.5, ))
+        }
+
+      }
+    //}
     scene.add.existing(this);
   }
 }
