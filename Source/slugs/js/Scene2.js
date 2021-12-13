@@ -294,7 +294,7 @@ class Scene2 extends Phaser.Scene {
       url: "node_modules/phaser3-rex-plugins/dist/rexuiplugin.min.js",
       sceneKey: 'rexUI'
     });
-    this.load.setBaseURL(''); 
+    this.load.setBaseURL('/Source/slugs/'); 
     this.load.image('circle', 'assets/circle.png');
     this.load.image('circle_spiky', 'assets/circle_spiky.png');
     this.load.image('flower', 'assets/flower.png');
