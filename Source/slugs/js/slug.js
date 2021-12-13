@@ -187,9 +187,8 @@ class Slug extends Phaser.GameObjects.Container {
         logOutput(`first, the being thinks of the ${wrapCmd('rules')} you gave it.`)
       }
       
-      let rulesFood = [];
-      
-      FOOD_MATCHING = [ ];
+      let rulesFood = [ ];
+      FOOD_MATCHING = new Phaser.GameObjects.Group(this.scene);
       
       for(let i = 0; i < RULES.length; i++) {
         let ifColor = false;
@@ -284,20 +283,60 @@ class Slug extends Phaser.GameObjects.Container {
           // console.log(foodCurrentlySelected);
           foodSelected = foodCurrentlySelected;
         }
-        FOOD_MATCHING = foodSelected;
+        // FOOD_MATCHING = foodSelected;
+        FOOD_MATCHING.clear()
+        FOOD_MATCHING.addMultiple(foodSelected);
       } else {
         logOutput(`none of the ${wrapCmd('rules')} tell your being what to eat, so it will try to eat anything!`)
-        FOOD_MATCHING = FOOD.getMatching('active', true);
+        // FOOD_MATCHING = FOOD.getMatching('active', true);
+        FOOD_MATCHING.clear()
+        FOOD_MATCHING.addMultiple(FOOD.getMatching('active', true));
         
       }
-      if(!FOOD_MATCHING.length) {
+      if(!FOOD_MATCHING.countActive()) {
         logOutput(`there is no food item which matches your beings ${wrapCmd('rules')} close enough - try ${wrapCmd(editWord)}ing your ${wrapCmd('rules')} or moving your being closer :)`)
         this.eating = false;
         return
       }
+      if(ROUTINES.length) {
+        logOutput(`then, the being thinks of the ${wrapCmd('routines')} you gave it.`)
+      }
+  
+      this.foodRoutines = []
+      ROUTINES.forEach(r => {
+        r = r.split(' ')
+        if(r.at(-1)=='eat') {
+          let routine = r;
+          if(r.includes('plant')) {
+            this.foodRoutines.push({
+              routine,
+              plant: true,
+            });
+          }
+          else if(r.includes('close')) {
+            this.foodRoutines.push({
+              routine,
+              proximity: true,
+            });
+          }
+        }  
+      })
+      if(this.foodRoutines.length) {
+        logOutput(`it remembers the following food ${wrapCmd('routines')}:`) 
+      }
+      this.foodRoutines.forEach((r, i) => {
+        logOutput(`${i+1}. ${wrapCmd(r.routine.join(' '))} ${i<this.foodRoutines.length-1 ? 'and' : ''}`)
+        if(r.plant) {
+          this.plantLoop = true;
+        }
+        if(r.proximity) {
+          this.proximityLoop = true;
+        }
+      })
       // having found our food stuff, move to it until you're close!
-      this.closestMatch = findClosest(this.heady, FOOD_MATCHING);
+      this.closestMatch = findClosest(this.heady, FOOD_MATCHING.getMatching('active', true));
       this.closestMatch.targeted = true;
+      let plant = this.closestMatch.group;
       let rotationDirection = 0;
      
       let swimStates = [-20, 0, 20, 0];
@@ -306,8 +345,21 @@ class Slug extends Phaser.GameObjects.Container {
   
       this.timer = 0;
       this.scene.events.on('update', function(time, delta) {
-        if(this.eating && FOOD_MATCHING && this.heady.x && this.heady.y){
-          let closestMatchNew = findClosest(this.heady, FOOD_MATCHING);
+        if(this.eating && FOOD_MATCHING.countActive()){
+          FOOD_MATCHING.getMatching('active', true).forEach((e, i) => {
+            if(!e.active) {
+              FOOD_MATCHING.remove(e);
+            }
+            if(plant && e.group != plant) {
+              FOOD_MATCHING.remove(e);
+            }
+          })
+          let closestMatchNew = findClosest(this.heady, FOOD_MATCHING.getMatching('active', true));
+          if(!this.closestMatch.active) {
+            this.closestMatch.targeted = false;
+            this.closestMatch = closestMatchNew;
+            this.closestMatch.targeted = true;
+          }
           // console.log(this.closestMatch)
           
           let target = velocityToTarget(this.heady, this.closestMatch);
@@ -379,7 +431,7 @@ class Slug extends Phaser.GameObjects.Container {
           }
           
           
-          if(this.closestMatch != closestMatchNew) {
+          if(closestMatchNew && this.closestMatch != closestMatchNew) {
             let closer = Phaser.Math.Distance.BetweenPoints(this.heady, closestMatchNew) - distanceToFood;
             if( closer > 20){
               
@@ -392,17 +444,13 @@ class Slug extends Phaser.GameObjects.Container {
               this.chosenFood = this.closestMatch;
             } 
           }
+          plant = this.closestMatch.plant;
           this.timer += delta;
           while(this.timer > 600) {
             // console.log('slugtimer')
             waveIndex = (waveIndex+1) % swimStates.length;
             this.timer -= 600;
           }
-          FOOD_MATCHING.forEach((e, i) => {
-            if(!e.active) {
-              FOOD_MATCHING.splice(i, 1)
-            }
-          })
         }
         else {
           rotationDirection = 0

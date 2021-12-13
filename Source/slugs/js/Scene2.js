@@ -92,7 +92,7 @@ class Scene2 extends Phaser.Scene {
     playersBeing = this.playersBeing;
     
     // let s1 = new Slug(this, slug_x-280, slug_y-5, 10);
-    this.cameras.main.startFollow(this.playersBeing.torso, true, 0.008, 0.008);
+    this.cameras.main.startFollow(this.playersBeing.torso, true, 0.08, 0.08);
     this.stage = 1;
     this.slugs = [this.playersBeing];
     
@@ -176,8 +176,8 @@ class Scene2 extends Phaser.Scene {
                 distx, disty, 
                 Phaser.Math.Between(playersBeing.heady.radius, playersBeing.heady.radius * playersBeing.scale), 
                 getRandomColorInCat(getColorCategory(playersBeing.color)), texture);
-              console.log(`spawning new food near being at ${newFood.x}, ${newFood.y}`, newFood)
-              console.log(FOOD.getChildren().length, FOOD_HEALTHY.getChildren().length)
+              // console.log(`spawning new food near being at ${newFood.x}, ${newFood.y}`, newFood)
+              // console.log(FOOD.getChildren().length, FOOD_HEALTHY.getChildren().length)
               FOOD.add(newFood);
               FOOD_HEALTHY.add(newFood);
               console.log(FOOD.getChildren().length, FOOD_HEALTHY.getChildren().length)
@@ -208,30 +208,50 @@ class Scene2 extends Phaser.Scene {
                   s.setScale(0.3+s.scaleX);
                   output += `your being was able to grow!🥰<br>`
                 }
+                if(s.plantLoop && f.group) {
+                  if(f.group.countActive()) { 
+                    output += `it will look for more food now!<br>`
+                    s.eating = true; 
+                  }
+                } else {
+                  output += `it is done eating now...`
+                  if(s.plantLoop && f.group) {
+                      if(f.group.countActive()) { logOutput(`no more fruits on this plant match the beings rules`) }
+                      else { logOutput(`your being ate all of the fruit on this plant!🌴`) }
+                  }
+                    s.eating = false;
+                }
               } else {
                 //console.log(sameColorCategory(f.color, s.color), f.txtr == s.txtr, f.shape == s.shape)
                 output = `oh no, the being did not like what it ate!🤢<br>`
                 s.setAlpha(0.5);
                 if(!sameColorCategory(f.color, s.color)) {
-                  output += `perhaps it did not like its color 🤕...<br>`
+                  output += `perhaps it did not like its color 🍎🍏...<br>`
                 }
                 if(!(f.txtr == s.txtr)) {
-                  output += `perhaps it did not like its texture 🤕...<br>`
+                  output += `perhaps it did not like its texture 🌸🌵...<br>`
                   console.log('what')
                 }
                 if(!(f.shape == s.shape)) {
-                  output += `perhaps it did not like its shape 🤕...<br>`
+                  output += `perhaps it did not like its shape ⚪⬜...<br>`
                 }
+                s.eating = false;
               }
               f.targeted = false;
               FOOD.kill(f);
               f.destroy();
-              s.eating = false;
               // FOOD.splice(f_index);
               logOutput(output)
             } else {
               logOutput(`the being can't eat anything bigger than its head :0`)
-              s.eating = false;
+              /* if(s.plantLoop && f.group) {
+                if(f.group.countActive()) {
+                  s.eating = true;
+                }
+              }
+              else { */
+                s.eating = false;
+              // }
             }
             f.targeted = false;
           }
@@ -323,9 +343,15 @@ class Scene2 extends Phaser.Scene {
           logOutput(`uh oh, a routine needs to be of the form ${wrapCmd(loopWord + ' <i>condition</i> <i>action</i>')}, for example: ${wrapCmd(loopExample)}!`);
           return;
         }
-
-        
-
+        let routineString = cmd.join(' ')
+        if(ROUTINES.includes(routineString)) {
+          output += `your being already knows that routine :)`
+        }
+        else {
+          ROUTINES.push(routineString);
+          output += `your being learned the new routine!`
+        }
+        logInput(output);
         return;
       }
       case 'abracadabra': {
@@ -641,21 +667,22 @@ class gameSpriteCircle extends Phaser.GameObjects.GameObject {
 }
 
 function updateHealthyFood() {
-  console.log(FOOD_HEALTHY.getMatching('active', true).length)
+  // TODO: does this work correctly?
+  // console.log(FOOD_HEALTHY.getMatching('active', true).length)
   FOOD.getMatching('active', true).forEach(f => {
       if( !(playersBeing.txtr == f.txtr && playersBeing.shape == f.shape && sameColorCategory(playersBeing.color, f.color) && playersBeing.displayWidth <= f.displayWidth) ) {
         FOOD_HEALTHY.remove(f);
       }
       else {
         if(FOOD_HEALTHY.contains(f)) {
-          console.log('already in it', FOOD_HEALTHY.getChildren().includes(f))
+          // console.log('already in it', FOOD_HEALTHY.getChildren().includes(f))
         }
         else {
           FOOD_HEALTHY.add(f);
         }
       }
   })
-  console.log(FOOD_HEALTHY.getMatching('active', true).length)
+  // console.log(FOOD_HEALTHY.getMatching('active', true).length)
 }
 
 
@@ -692,7 +719,7 @@ class Plant extends Phaser.GameObjects.Group {
         let f0 = this.getChildren()[i];
         let f1 = this.getChildren()[(i+1)%fruitsNumber];
         let f2 = this.getChildren()[(i+2)%fruitsNumber];
-        this.joints.push(this.scene.matter.add.joint(f0, f1, Phaser.Math.Distance.BetweenPoints(f0, f1), 0.5, ))
+        this.joints.push(this.scene.matter.add.joint(f0, f1, Phaser.Math.Distance.BetweenPoints(f0, f1), 0.3, ))
         if(circle) {
           this.joints.push(this.scene.matter.add.joint(f0, f2, Phaser.Math.Distance.BetweenPoints(f0, f2), 0.5, ))
         }

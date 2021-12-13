@@ -9,4 +9,5 @@ showcase designing for girls and game build up
 ## game
 1. [x] natural movement
 1. [x] editing and viewing rules
-2. parsing for loop
+2. [x] parsing loop
+

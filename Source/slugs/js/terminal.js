@@ -17,10 +17,15 @@ let wordsIfConditionLeft = [].concat(ENTITY_TYPES);
 let wordsIfConditionRight = [].concat(SIZES, COLORCATS_HR, TEXTURES);
 const wordsBoolean = [thenWord, andWord, orWord, equalWord];
 
+let wordsLoop1 = ['food'];
+let wordsLoop2 = [equalWord];
+let wordsLoop3 = ['on', 'close']
+let wordsLoop4 = ['plant']
+
 
 let wordsToShow = EDITABLE.concat(ATTRIBUTES);
 
-let wordsAll = wordsFirst.concat(wordsIfConditionLeft, wordsIfConditionRight, equalWord, wordsBoolean, wordsAction, wordsToShow);
+let wordsAll = wordsFirst.concat(wordsIfConditionLeft, wordsIfConditionRight, equalWord, wordsBoolean, wordsAction, wordsToShow, wordsLoop1, wordsLoop2, wordsLoop3, wordsLoop4);
 
 let wordsFilter = ['the', 'a', 'my', 'me', 'there']
 
@@ -214,6 +219,37 @@ terminal_input.addEventListener('keyup', (e) => {
       }
       if(i>1) {
         return;
+      }
+    } else if(wordsOfInterest[0] == loopWord) {
+      wordsToCompare = wordsLoop1;
+      checkAgainst = wordsOfInterest.at(-1);
+      let i = 1
+      for( ; i < wordsOfInterest.length; i++) {
+        if(!wordsAll.includes(wordsOfInterest[i])) {
+          console.log(wordsOfInterest[i], 'not in list of all words!')
+          wordsOfInterest = wordsOfInterest.slice(0, i);
+          current_word = wordsOfInterest[i-1];
+          break
+        }
+      }
+      if(i == wordsInput.length) {
+        checkAgainst = '';
+      }
+      // parse condition
+      if(wordsOfInterest.length > 1) {
+        if(wordsLoop1.includes(current_word)) {
+          wordsToCompare = wordsLoop2;
+        }
+        else if(wordsLoop2.includes(current_word)) {
+          wordsToCompare = wordsLoop3
+        } else if(current_word == 'on') {
+          wordsToCompare = wordsLoop4;
+        } else if(wordsLoop4.includes(current_word) || current_word == 'close') {
+          wordsToCompare = wordsAction;
+        }
+        if(current_word == 'eat') {
+          return;
+        }
       }
     }
     // console.log(input, wordsOfInterest, current_word);
