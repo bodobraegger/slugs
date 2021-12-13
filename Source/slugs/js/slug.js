@@ -368,7 +368,7 @@ class Slug extends Phaser.GameObjects.Container {
           let vecTorsoHeady = velocityToTarget(this.torso, this.heady)
           let angleSlugTarget = Phaser.Math.Angle.ShortestBetween(Phaser.Math.RadToDeg(vecTorsoHeady.angle()), Phaser.Math.RadToDeg(target.angle()));
           
-          let speed = 4;
+          let speed = 4*this.scale;
     
           let tail1Vec = velocityFacing(this.tail1, speed/2); 
           let tail0Vec = velocityFacing(this.tail0, speed/2); 
@@ -433,7 +433,7 @@ class Slug extends Phaser.GameObjects.Container {
           
           if(closestMatchNew && this.closestMatch != closestMatchNew) {
             let closer = Phaser.Math.Distance.BetweenPoints(this.heady, closestMatchNew) - distanceToFood;
-            if( closer > 20){
+            if( closer > 5){
               
               console.log(closestMatchNew)
               closestMatchNew.targeted = true;
@@ -445,6 +445,9 @@ class Slug extends Phaser.GameObjects.Container {
             } 
           }
           plant = this.closestMatch.plant;
+          if(!closestMatchNew && plant) {
+            FOOD_MATCHING.addMultiple(plant.getMatching('visible', true));
+          }
           this.timer += delta;
           while(this.timer > 600) {
             // console.log('slugtimer')

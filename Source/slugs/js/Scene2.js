@@ -111,20 +111,20 @@ class Scene2 extends Phaser.Scene {
     FOOD = new Phaser.GameObjects.Group(this, foodsInitial);
     // FOOD.maxSize = 15;
     FOOD_HEALTHY = new Phaser.GameObjects.Group(this, foodsInitial)
-    let planty = new Plant(this, 800, 300, getRandomColorInCat(6), 400, 20, 10);
+    let planty = new Plant(this, 800, 40, getRandomColorInCat(4), 400, 15, 5);
     PLANTS = new Phaser.GameObjects.Group(this, [planty])
-    PLANTS.add(new Plant(this, 300, 300, getRandomColorInCat(getColorCategory(playersBeingColor)), 400, 20, 10, true))
+    PLANTS.add(new Plant(this, 300, 300, getRandomColorInCat(5), 400, 24, 10, true))
+    PLANTS.add(new Plant(this, getCanvasWidth(), 300, getRandomColorInCat(getColorCategory(playersBeingColor)), 300, 15, 5, false))
+    PLANTS.add(new Plant(this, getCanvasWidth(), getCanvasHeight(), getRandomColorInCat(getColorCategory(playersBeingColor)), 600, 19, 20, true))
 
-    console.log(FOOD)
-    console.log(PLANTS)
-    
     for(var i = 0; i < 15; i++) {
       let yesOrNo = Phaser.Math.Between(0, 1)
-      let randFN = Phaser.Math.Between(5+i, 30) 
-      let randFS = Phaser.Math.Between(5+i, 30)
+      let randFN = Phaser.Math.Between(3+i, 25) 
+      let randFS = Phaser.Math.Between(3+i, 100)
       let randSize = Phaser.Math.Between(randFN*randFS+10+i, randFN*randFS+100+i)
-      let distx = playersBeing.x+(Math.random()<0.5 ? Phaser.Math.Between(-2000*playersBeing.scale, -800*playersBeing.scale):Phaser.Math.Between(800*playersBeing.scale, 2000*playersBeing.scale))
-      let disty = playersBeing.y+(Math.random()<0.5 ? Phaser.Math.Between(-2000*playersBeing.scale, -800*playersBeing.scale):Phaser.Math.Between(800*playersBeing.scale, 2000*playersBeing.scale))
+      let distx = playersBeing.x+(Math.random()<0.5 ? Phaser.Math.Between(-3000*playersBeing.scale, -800*playersBeing.scale):Phaser.Math.Between(800*playersBeing.scale, 3000*playersBeing.scale))
+      let disty = playersBeing.y+(Math.random()<0.5 ? Phaser.Math.Between(-3000*playersBeing.scale, -800*playersBeing.scale):Phaser.Math.Between(800*playersBeing.scale, 3000*playersBeing.scale))
+      console.log(distx, disty)
       let c = getRandomColorInCat();
       
       // FOOD.add(this.addFood(20+c.color%(rand*10), c.color%(rand*10), 5*rand, c, 'flower'));
@@ -194,13 +194,17 @@ class Scene2 extends Phaser.Scene {
     let constraints = [ ]
     PLANTS.getChildren().forEach(p => {
       let someFVisible = false;
-      p.getChildren().forEach((f, i) => {
+      p.getChildren().some((f, i) => {
+        if(!p.countActive()) {
+          p.constraints = [];
+        }
         let c = this.cameras.main;
         let mp = c.midPoint;
         let viewRec = new Phaser.Geom.Rectangle(mp.x-c.displayWidth/2, mp.y-c.displayHeight/2, c.displayWidth, c.displayHeight);
         // console.log(viewRec)
         if(Phaser.Geom.Rectangle.Overlaps(viewRec,f.getBounds())) {
           someFVisible = true;
+          return someFVisible;
           // f.setActive(true);
         } else {
          // f.setActive(false); 
@@ -213,7 +217,7 @@ class Scene2 extends Phaser.Scene {
         // p.destroy();  
       }
     })
-    console.log(constraints)
+    // console.log(constraints)
     this.renderConstraint(constraints, 0x006400, 0.8, 3, 1, 0x006400, 4, true);
     constraints = [ ]
     this.slugs.forEach(e => {
@@ -558,8 +562,6 @@ class Scene2 extends Phaser.Scene {
             s.eating = false;
           }
           o.targeted = false;
-          if(o.group) { o.group.kill(o) }
-          FOOD.kill(o);
           o.destroy();
           // FOOD.splice(f_index);
           logOutput(output)
