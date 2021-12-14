@@ -55,6 +55,7 @@ class Scene2 extends Phaser.Scene {
 
   create() {
     SCENE = this;
+    this.graphics = this.add.graphics();
     // this.matter.world.setBounds();
     this.matter.add.mouseSpring();
     // this.matter.enableAttractorPlugin();  
@@ -117,10 +118,10 @@ class Scene2 extends Phaser.Scene {
     PLANTS.add(new Plant(this, getCanvasWidth(), 300, getRandomColorInCat(getColorCategory(playersBeingColor)), 300, 15, 5, false))
     PLANTS.add(new Plant(this, getCanvasWidth(), getCanvasHeight(), getRandomColorInCat(getColorCategory(playersBeingColor)), 600, 19, 20, true))
 
-    for(var i = 0; i < 15; i++) {
+    for(var i = 0; i < 25; i++) {
       let yesOrNo = Phaser.Math.Between(0, 1)
-      let randFN = Phaser.Math.Between(3+i, 25) 
-      let randFS = Phaser.Math.Between(3+i, 100)
+      let randFN = Phaser.Math.Between(3, 15) 
+      let randFS = Phaser.Math.Between(3+i, 150)
       let randSize = Phaser.Math.Between(randFN*randFS+10+i, randFN*randFS+100+i)
       let distx = playersBeing.x+(Math.random()<0.5 ? Phaser.Math.Between(-3000*playersBeing.scale, -800*playersBeing.scale):Phaser.Math.Between(800*playersBeing.scale, 3000*playersBeing.scale))
       let disty = playersBeing.y+(Math.random()<0.5 ? Phaser.Math.Between(-3000*playersBeing.scale, -800*playersBeing.scale):Phaser.Math.Between(800*playersBeing.scale, 3000*playersBeing.scale))
@@ -191,7 +192,14 @@ class Scene2 extends Phaser.Scene {
 
 
   update(time, delta) {
+    // console.log(constraints)
     let constraints = [ ]
+    this.slugs.forEach(e => {
+      // SHOW THE SKELETONS OF THE SLUGS
+      constraints = constraints.concat(e.jointsBody);
+    })
+    this.renderConstraint(constraints, 0xF9F6EE, 1*playersBeing.scale, 1*playersBeing.scale, 1*playersBeing.scale, 0xF9F6EE, 1*playersBeing.scale, true);
+    constraints = [ ]
     PLANTS.getChildren().forEach(p => {
       let someFVisible = false;
       p.getChildren().some((f, i) => {
@@ -210,21 +218,13 @@ class Scene2 extends Phaser.Scene {
          // f.setActive(false); 
         }
       })
-      if(someFVisible) {
-        constraints = constraints.concat(p.joints);
+      if( someFVisible && (playersBeing.scale <= 10 || (p.circle && (p.fruitsNumber < 16 || p.fruitsRadius > playersBeing.heady.displayWidth/2-50))) ) { //  && constraints.length < 80
+        this.renderConstraint(p.joints, 0x006400, 0.8, 3, 1, 0x006400, 4, false);
       }
       else {
         // p.destroy();  
       }
     })
-    // console.log(constraints)
-    this.renderConstraint(constraints, 0x006400, 0.8, 3, 1, 0x006400, 4, true);
-    constraints = [ ]
-    this.slugs.forEach(e => {
-      // SHOW THE SKELETONS OF THE SLUGS
-      constraints = constraints.concat(e.jointsBody);
-    })
-    this.renderConstraint(constraints, 0xF9F6EE, 1*playersBeing.scale, 1*playersBeing.scale, 1*playersBeing.scale, 0xF9F6EE, 1*playersBeing.scale, false);
     
     if(this.playersBeing.scale > this.stage+1) {
       this.stage++;
@@ -634,9 +634,6 @@ class Scene2 extends Phaser.Scene {
   }
 
   renderConstraint(constraints, lineColor, lineOpacity, lineThickness, pinSize, anchorColor, anchorSize, clear = true) {
-    if (!this.graphics) {
-      this.graphics = this.add.graphics();
-    }
     if(clear) {
       this.graphics.clear();
     }
@@ -709,6 +706,7 @@ function updateHealthyFood() {
 class Plant extends Phaser.GameObjects.Group {
   constructor(scene, x=0, y=0, color=new Phaser.Display.Color().random(), width = 40, fruitsRadius = 10, fruitsNumber = 8, circle = false) {
     super(scene, 0, 0, []);
+    this.circle = circle;
     this.color = color
     this.width = width;
     this.fruitsRadius = fruitsRadius;
@@ -736,10 +734,14 @@ class Plant extends Phaser.GameObjects.Group {
 
     //else {
       for(let i = 0; i<fruitsNumber; i++) {
+        
         let f0 = this.getChildren()[i];
         let f1 = this.getChildren()[(i+1)%fruitsNumber];
         let f2 = this.getChildren()[(i+2)%fruitsNumber];
-        this.joints.push(this.scene.matter.add.joint(f0, f1, Phaser.Math.Distance.BetweenPoints(f0, f1), 0.3, ))
+        let j = this.scene.matter.add.joint(f0, f1, Phaser.Math.Distance.BetweenPoints(f0, f1), 0.3, );
+        if(!circle) {
+          this.joints.push(j)
+        }
         if(circle) {
           this.joints.push(this.scene.matter.add.joint(f0, f2, Phaser.Math.Distance.BetweenPoints(f0, f2), 0.5, ))
         }
