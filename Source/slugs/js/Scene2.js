@@ -46,7 +46,8 @@ let timerEvents = [ ]
 
 let SCENE;
 
-
+const flowerTextures = ['flower_1', 'flower_2']
+const spikyTextures = ['circle_spiky_1','circle_spiky_2', 'circle_spiky_3']
 
 class Scene2 extends Phaser.Scene {
   constructor() {
@@ -97,10 +98,6 @@ class Scene2 extends Phaser.Scene {
     this.slugs = [this.playersBeing];
     
     let foodsInitial = [ 
-      // new gameSpriteCircle(this, 0, 0, 10, playersBeingColor.color, 'flower'),
-      // new gameSpriteCircle(this, getCanvasWidth(), 0, 15, playersBeingColor.color, 'flower'),
-      // new gameSpriteCircle(this, getCanvasWidth(), getCanvasHeight(), 20, playersBeingColor.color, 'flower'),
-      // new gameSpriteCircle(this, 0, getCanvasHeight(), 25, playersBeingColor.color, 'circle_spiky'),
       this.addFood(0, 0, 10, getRandomColorInCat(getColorCategory(playersBeing.color)), 'flower'),
       this.addFood(getCanvasWidth(), 0, 15, getRandomColorInCat(getColorCategory(playersBeing.color)), 'flower'),
       this.addFood(getCanvasWidth(), getCanvasHeight(), 20, getRandomColorInCat(getColorCategory(playersBeing.color)), 'flower'),
@@ -201,6 +198,13 @@ class Scene2 extends Phaser.Scene {
     this.renderConstraint(constraints, 0xF9F6EE, 1*playersBeing.scale, 1*playersBeing.scale, 1*playersBeing.scale, 0xF9F6EE, 1*playersBeing.scale, true);
     constraints = [ ]
     PLANTS.getChildren().forEach(p => {
+      if(p.circle && p.width < playersBeing.torso.displayWidth) {
+        let f = this.addFood(p.getFirstAlive().x, p.getFirstAlive().y, p.width/2, p.color, 'flower');
+        console.log('replacing',p,'with',f)
+        FOOD.add(f)
+        p.destroy(true, true);
+        return;
+      }
       let someFVisible = false;
       p.getChildren().some((f, i) => {
         if(!p.countActive()) {
@@ -254,8 +258,12 @@ class Scene2 extends Phaser.Scene {
 
     this.load.setBaseURL(document.getElementById('phaser_container').getAttribute('data-assets-baseURL')); 
     this.load.image('circle', 'assets/circle.png');
-    this.load.image('circle_spiky', 'assets/circle_spiky.png');
-    this.load.image('flower', 'assets/flower.png');
+    this.load.image('circle_spiky_1', 'assets/circle_spiky_1.png');
+    this.load.image('circle_spiky_2', 'assets/circle_spiky_2.png');
+    this.load.image('circle_spiky_3', 'assets/circle_spiky_3.png');
+    this.load.image('flower_1', 'assets/flower_1.png');
+    this.load.image('flower_2', 'assets/flower_2.png');
+    
     this.load.image('square_rounded', 'assets/square_rounded.png');
     this.load.image('circle_leopard', 'assets/circle_leopard.png');
 
@@ -506,6 +514,11 @@ class Scene2 extends Phaser.Scene {
     return o
   }
   addFood(x, y, radius, color = getRandomColorInCat(), texture = 'circle') {
+    if(texture == 'flower') {
+      texture = randomElement(flowerTextures);
+    } else if(texture.includes('spiky')) {
+      texture = randomElement(spikyTextures);
+    }
     let img = new Phaser.GameObjects.Sprite(this, 0, 0, texture);
     img.displayWidth = radius*2;
     img.displayHeight = radius*2;
@@ -739,9 +752,9 @@ class Plant extends Phaser.GameObjects.Group {
         let f1 = this.getChildren()[(i+1)%fruitsNumber];
         let f2 = this.getChildren()[(i+2)%fruitsNumber];
         let j = this.scene.matter.add.joint(f0, f1, Phaser.Math.Distance.BetweenPoints(f0, f1), 0.3, );
-        if(!circle) {
+        // if(!circle) {
           this.joints.push(j)
-        }
+        // }
         if(circle) {
           this.joints.push(this.scene.matter.add.joint(f0, f2, Phaser.Math.Distance.BetweenPoints(f0, f2), 0.5, ))
         }
@@ -750,4 +763,9 @@ class Plant extends Phaser.GameObjects.Group {
     //}
     scene.add.existing(this);
   }
+  destroy(clearChildren = false, destroyChildren=false) {
+    this.scene.matter.world.removeConstraint(this.joints, true);
+    super.destroy(clearChildren, destroyChildren);
+  }
 }
+
