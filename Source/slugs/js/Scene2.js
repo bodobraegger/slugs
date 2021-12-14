@@ -29,7 +29,6 @@ let ROUTINES = [ ];
 
 let FOOD = {}
 let FOOD_MATCHING = []
-let FOOD_HEALTHY = {}
 let FOOD_MINIMUM = 3;
 
 let PLANTS;
@@ -109,7 +108,6 @@ class Scene2 extends Phaser.Scene {
     
     FOOD = new Phaser.GameObjects.Group(this, foodsInitial);
     // FOOD.maxSize = 15;
-    FOOD_HEALTHY = new Phaser.GameObjects.Group(this, foodsInitial)
     let planty = new Plant(this, 800, 40, getRandomColorInCat(4), 400, 15, 5);
     PLANTS = new Phaser.GameObjects.Group(this, [planty])
     PLANTS.add(new Plant(this, 300, 300, getRandomColorInCat(5), 400, 24, 10, true))
@@ -185,7 +183,7 @@ class Scene2 extends Phaser.Scene {
     this.controls = new Phaser.Cameras.Controls.SmoothedKeyControl(controlConfig);
     this.input.keyboard.preventDefault = false;
 
-    timerEvents.push(
+    /*timerEvents.push(
       this.time.addEvent({ delay: Phaser.Math.Between(2000, 8000),
           loop: true, callbackScope: this, callback: function() {
             // updateHealthyFood();
@@ -205,7 +203,7 @@ class Scene2 extends Phaser.Scene {
               console.log(FOOD.getChildren().length, FOOD_HEALTHY.getChildren().length)
             }
           }})
-    );
+    );*/
     // NARRATION
     narration_intro();
 
@@ -222,7 +220,7 @@ class Scene2 extends Phaser.Scene {
     this.renderConstraint(constraints, 0xF9F6EE, 1*playersBeing.scale, 1*playersBeing.scale, 1*playersBeing.scale, 0xF9F6EE, 1*playersBeing.scale, true);
     constraints = [ ]
     PLANTS.getChildren().forEach(p => {
-      if(p.circle && p.width < playersBeing.torso.displayWidth) {
+      if(p.circle && p.width < playersBeing.torso.displayWidth*1.5) {
         let f = this.addFood(p.getFirstAlive().x, p.getFirstAlive().y, p.width/2, p.color, 'flower');
         console.log('replacing',p,'with',f)
         FOOD.add(f)
@@ -240,7 +238,7 @@ class Scene2 extends Phaser.Scene {
         // console.log(viewRec)
         if(Phaser.Geom.Rectangle.Overlaps(viewRec,f.getBounds())) {
           someFVisible = true;
-          return someFVisible;
+          // return someFVisible;
           // f.setActive(true);
         } else {
          // f.setActive(false); 
@@ -269,6 +267,37 @@ class Scene2 extends Phaser.Scene {
       this.cameras.main.scrollY = this.pb.torso.y - document.getElementById("phaser_container").clientHeight/2;
     }*/
     // this.slugs.forEach(element => { element.moveRandomly() });
+    
+    let healthyCount = 0;
+    FOOD.getChildren().forEach(f => {
+      if(sameColorCategory(f.color, f.color) && f.txtr == this.pb.txtr && f.shape == this.pb.shape && f.radius < this.pb.heady.displayWidth/2) {
+        healthyCount++;
+      }
+      /*if(f.displayWidth*15 < this.pb.heady.displayWidth/2 && !f.group) {
+          let newFood = this.addFood(
+            playersBeing.x+(Math.random()<0.5 ? Phaser.Math.Between(-3000*playersBeing.scale, -1000*playersBeing.scale):Phaser.Math.Between(1000*playersBeing.scale, 3000*playersBeing.scale)), 
+            playersBeing.y+(Math.random()<0.5 ? Phaser.Math.Between(-3000*playersBeing.scale, -1000*playersBeing.scale):Phaser.Math.Between(1000*playersBeing.scale, 3000*playersBeing.scale)),
+            playersBeing.displayWidth/2-5,
+            f.color,
+            f.txtr  
+          )
+          console.log('replacing', f, 'with', newFood);
+          FOOD.add(newFood)
+          f.destroy();
+      }*/
+    })
+    
+    // console.log(healthyCount)
+    if(healthyCount<FOOD_MINIMUM) {
+      console.log('new food because not enough eatable!')
+      FOOD.add(this.addFood(
+        playersBeing.x+(Math.random()<0.5 ? Phaser.Math.Between(-3000*playersBeing.scale, -1000*playersBeing.scale):Phaser.Math.Between(1000*playersBeing.scale, 3000*playersBeing.scale)), 
+        playersBeing.y+(Math.random()<0.5 ? Phaser.Math.Between(-3000*playersBeing.scale, -1000*playersBeing.scale):Phaser.Math.Between(1000*playersBeing.scale, 3000*playersBeing.scale)),
+        playersBeing.displayWidth/2-5,
+        getRandomColorInCat(this.pb.color),
+        'flower'  
+      ))
+    }
   }
 
   preload() {
@@ -346,9 +375,8 @@ class Scene2 extends Phaser.Scene {
       }
       case 'abracadabra': {
         this.pb.moveRandomly();
-        this.pb.joints.forEach(e=>{
-          this.matter.world.removeConstraint(e);
-        }); 
+        this.matter.world.removeConstraint(this.pb.joints, true);
+
         output = `oh no! that was a bad magic trick.`
         break;
       }
@@ -576,7 +604,7 @@ class Scene2 extends Phaser.Scene {
               output += `your being was able to grow!🥰<br>`
             }
             if(s.plantLoop && o.group) {
-              if(o.group.countActive() && FOOD_MATCHING.countActive()) { 
+              if(o.group.countActive() && FOOD_MATCHING.getMatching('group', o.group).length) { 
                 output += `it will look for more food now!<br>`
                 s.eating = true; 
               } else if(o.group.countActive()) { logOutput(`no more fruits on this plant match the beings rules`) } 
@@ -602,6 +630,14 @@ class Scene2 extends Phaser.Scene {
             s.eating = false;
           }
           o.targeted = false;
+          if(o.joints) {
+            if(o.group) {
+              o.joints.forEach(j => {
+                o.group.joints.splice(o.group.joints.indexOf(j), 1);
+              })
+            }
+            this.matter.world.removeConstraint(o.joints, true);
+          }
           o.destroy();
           // FOOD.splice(f_index);
           logOutput(output)
@@ -720,26 +756,6 @@ class gameSpriteCircle extends Phaser.GameObjects.GameObject {
   }
 }
 
-function updateHealthyFood() {
-  // TODO: does this work correctly?
-  // console.log(FOOD_HEALTHY.getMatching('active', true).length)
-  FOOD.getMatching('active', true).forEach(f => {
-      if( !(playersBeing.txtr == f.txtr && playersBeing.shape == f.shape && sameColorCategory(playersBeing.color, f.color) && playersBeing.displayWidth <= f.displayWidth) ) {
-        FOOD_HEALTHY.remove(f);
-      }
-      else {
-        if(FOOD_HEALTHY.contains(f)) {
-          // console.log('already in it', FOOD_HEALTHY.getChildren().includes(f))
-        }
-        else {
-          FOOD_HEALTHY.add(f);
-        }
-      }
-  })
-  // console.log(FOOD_HEALTHY.getMatching('active', true).length)
-}
-
-
 class Plant extends Phaser.GameObjects.Group {
   constructor(scene, x=0, y=0, color=new Phaser.Display.Color().random(), width = 40, fruitsRadius = 10, fruitsNumber = 8, circle = false) {
     super(scene, 0, 0, []);
@@ -775,12 +791,22 @@ class Plant extends Phaser.GameObjects.Group {
         let f0 = this.getChildren()[i];
         let f1 = this.getChildren()[(i+1)%fruitsNumber];
         let f2 = this.getChildren()[(i+2)%fruitsNumber];
-        let j = this.scene.matter.add.joint(f0, f1, Phaser.Math.Distance.BetweenPoints(f0, f1), 0.3, );
-        // if(!circle) {
+        if(!f0.joints) f0.joints = []
+        if(!f1.joints) f1.joints = []
+        if(!f2.joints) f2.joints = []
+        if(i+1<fruitsNumber || circle) {
+          let j = this.scene.matter.add.joint(f0, f1, Phaser.Math.Distance.BetweenPoints(f0, f1), 0.3, );
+          // if(!circle) {
+            // }
           this.joints.push(j)
-        // }
+          f0.joints.push(j);
+          f1.joints.push(j);
+        }
         if(circle) {
-          this.joints.push(this.scene.matter.add.joint(f0, f2, Phaser.Math.Distance.BetweenPoints(f0, f2), 0.5, ))
+          let j = this.scene.matter.add.joint(f0, f2, Phaser.Math.Distance.BetweenPoints(f0, f2), 0.5, )
+          this.joints.push(j)
+          f0.joints.push(j);
+          f2.joints.push(j);
         }
 
       }
