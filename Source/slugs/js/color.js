@@ -12,7 +12,7 @@ function getColorCategory(color) {
 
 function sameColorCategory(color1, color2) { // color blindness: https://colororacle.org/?
     let cat1=-1; let cat2 = -1;
-    let i = 0;
+    /*let i = 0;
     for(i = 0; i < COLORCATS.length; i++) {
       if(color1.h - COLORCATS[i] >= 0) {
         cat1 = i//+1;
@@ -25,8 +25,10 @@ function sameColorCategory(color1, color2) { // color blindness: https://coloror
     let similarityBound = 0.2 * (color1.h + color2.h)/2
     // console.log('color.h:', color1.h, color2.h,'| dff:', colorDiff, 'similarityBound:', similarityBound)
     // console.log('cat:', COLORCATS_HR[cat1], COLORCATS_HR[cat2])
-  
-    if(cat1 == cat2 || colorDiff <= similarityBound) {
+    */
+    cat1 = getColorCategory(color1); 
+    cat2 = getColorCategory(color2);
+    if(cat1 == cat2) { // || colorDiff <= similarityBound
       return true;
     }
     else {

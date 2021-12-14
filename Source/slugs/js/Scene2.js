@@ -1,7 +1,6 @@
 /* 
 ** GLOBALS **
 */
-
 // 6 categories of hues, hue of 0 and 1 both correspond to red, so cats need to be shifted by half a value
 let COLORCATS_HR  = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink','red']
 let COLORCATS_360 = [0, 15, 45, 75, 165, 240, 285, 330]
@@ -33,7 +32,7 @@ let FOOD_MATCHING = []
 let FOOD_HEALTHY = {}
 let FOOD_MINIMUM = 3;
 
-let PLANTS = {}
+let PLANTS;
 
 let playersBeing = new Object
 
@@ -101,33 +100,34 @@ class Scene2 extends Phaser.Scene {
       // new gameSpriteCircle(this, getCanvasWidth(), 0, 15, playersBeingColor.color, 'flower'),
       // new gameSpriteCircle(this, getCanvasWidth(), getCanvasHeight(), 20, playersBeingColor.color, 'flower'),
       // new gameSpriteCircle(this, 0, getCanvasHeight(), 25, playersBeingColor.color, 'circle_spiky'),
-      this.addGameSpriteCircle(0, 0, 10, getRandomColorInCat(getColorCategory(playersBeing.color)), 'flower'),
-      this.addGameSpriteCircle(getCanvasWidth(), 0, 15, getRandomColorInCat(getColorCategory(playersBeing.color)), 'flower'),
-      this.addGameSpriteCircle(getCanvasWidth(), getCanvasHeight(), 20, getRandomColorInCat(getColorCategory(playersBeing.color)), 'flower'),
-      this.addGameSpriteCircle(getCanvasWidth(), getCanvasHeight()+5, 20, getRandomColorInCat(getColorCategory(playersBeing.color)), 'flower'),
-      this.addGameSpriteCircle(getCanvasWidth()+5, getCanvasHeight()+5, 20, getRandomColorInCat(getColorCategory(playersBeing.color)), 'flower'),
-      this.addGameSpriteCircle(0, getCanvasHeight(), 25, getRandomColorInCat(getColorCategory(playersBeing.color)), 'circle_spiky'),
+      this.addFood(0, 0, 10, getRandomColorInCat(getColorCategory(playersBeing.color)), 'flower'),
+      this.addFood(getCanvasWidth(), 0, 15, getRandomColorInCat(getColorCategory(playersBeing.color)), 'flower'),
+      this.addFood(getCanvasWidth(), getCanvasHeight(), 20, getRandomColorInCat(getColorCategory(playersBeing.color)), 'flower'),
+      this.addFood(getCanvasWidth(), getCanvasHeight()+5, 20, getRandomColorInCat(getColorCategory(playersBeing.color)), 'flower'),
+      this.addFood(getCanvasWidth()+5, getCanvasHeight()+5, 20, getRandomColorInCat(getColorCategory(playersBeing.color)), 'flower'),
+      this.addFood(0, getCanvasHeight(), 25, getRandomColorInCat(getColorCategory(playersBeing.color)), 'circle_spiky'),
     ];
     
-    FOOD = new Phaser.GameObjects.Group(this, foodsInitial)
+    FOOD = new Phaser.GameObjects.Group(this, foodsInitial);
+    // FOOD.maxSize = 15;
     FOOD_HEALTHY = new Phaser.GameObjects.Group(this, foodsInitial)
-    let planty = new Plant(this, 800, 300, getRandomColorInCat(6), 400, 20, 10);
+    let planty = new Plant(this, 800, 40, getRandomColorInCat(4), 400, 15, 5);
     PLANTS = new Phaser.GameObjects.Group(this, [planty])
-    PLANTS.add(new Plant(this, 300, 300, getRandomColorInCat(getColorCategory(playersBeingColor)), 400, 20, 10, true))
+    PLANTS.add(new Plant(this, 300, 300, getRandomColorInCat(5), 400, 24, 10, true))
+    PLANTS.add(new Plant(this, getCanvasWidth(), 300, getRandomColorInCat(getColorCategory(playersBeingColor)), 300, 15, 5, false))
+    PLANTS.add(new Plant(this, getCanvasWidth(), getCanvasHeight(), getRandomColorInCat(getColorCategory(playersBeingColor)), 600, 19, 20, true))
 
-    console.log(FOOD)
-    console.log(PLANTS)
-    
-    for(var i = 0; i < 5; i++) {
+    for(var i = 0; i < 15; i++) {
       let yesOrNo = Phaser.Math.Between(0, 1)
-      let randFN = Phaser.Math.Between(10, 30) 
-      let randFS = Phaser.Math.Between(10, 30)
-      let randSize = Phaser.Math.Between(randFN*randFS, randFN*randFS+100)
-      let distx = playersBeing.x+(Math.random()<0.5 ? Phaser.Math.Between(-3000*playersBeing.scale, -1000*playersBeing.scale):Phaser.Math.Between(1000*playersBeing.scale, 3000*playersBeing.scale))
-      let disty = playersBeing.y+(Math.random()<0.5 ? Phaser.Math.Between(-3000*playersBeing.scale, -1000*playersBeing.scale):Phaser.Math.Between(1000*playersBeing.scale, 3000*playersBeing.scale))
+      let randFN = Phaser.Math.Between(3+i, 25) 
+      let randFS = Phaser.Math.Between(3+i, 100)
+      let randSize = Phaser.Math.Between(randFN*randFS+10+i, randFN*randFS+100+i)
+      let distx = playersBeing.x+(Math.random()<0.5 ? Phaser.Math.Between(-3000*playersBeing.scale, -800*playersBeing.scale):Phaser.Math.Between(800*playersBeing.scale, 3000*playersBeing.scale))
+      let disty = playersBeing.y+(Math.random()<0.5 ? Phaser.Math.Between(-3000*playersBeing.scale, -800*playersBeing.scale):Phaser.Math.Between(800*playersBeing.scale, 3000*playersBeing.scale))
+      console.log(distx, disty)
       let c = getRandomColorInCat();
       
-      // FOOD.add(this.addGameSpriteCircle(20+c.color%(rand*10), c.color%(rand*10), 5*rand, c, 'flower'));
+      // FOOD.add(this.addFood(20+c.color%(rand*10), c.color%(rand*10), 5*rand, c, 'flower'));
       let plant; 
       if(yesOrNo) {
         plant = new Plant(this, distx, disty, c, randSize, randFS, randFN)
@@ -166,13 +166,13 @@ class Scene2 extends Phaser.Scene {
     timerEvents.push(
       this.time.addEvent({ delay: Phaser.Math.Between(2000, 8000),
           loop: true, callbackScope: this, callback: function() {
-            updateHealthyFood();
+            // updateHealthyFood();
             // console.log(FOOD_HEALTHY)
             if(FOOD_HEALTHY.getMatching('active', true).length < FOOD_MINIMUM) {
               let distx = playersBeing.x+(Math.random()<0.5 ? Phaser.Math.Between(-3000*playersBeing.scale, -1000*playersBeing.scale):Phaser.Math.Between(1000*playersBeing.scale, 3000*playersBeing.scale))
               let disty = playersBeing.y+(Math.random()<0.5 ? Phaser.Math.Between(-3000*playersBeing.scale, -1000*playersBeing.scale):Phaser.Math.Between(1000*playersBeing.scale, 3000*playersBeing.scale))
               let texture = Math.random()<0.5 ? 'flower':'circle_spiky'
-              let newFood = this.addGameSpriteCircle(
+              let newFood = this.addFood(
                 distx, disty, 
                 Phaser.Math.Between(playersBeing.heady.radius, playersBeing.heady.radius * playersBeing.scale), 
                 getRandomColorInCat(getColorCategory(playersBeing.color)), texture);
@@ -191,86 +191,41 @@ class Scene2 extends Phaser.Scene {
 
 
   update(time, delta) {
-    // EATING THE FOOD
-    FOOD.getMatching('active', true).forEach((f, f_index) => {
-      // this.slugs.forEach
-      [this.playersBeing].forEach(s => { 
-        f.setOnCollideWith(s.heady, pair => {
-          if(f.targeted) {
-            if(f.displayWidth <= s.heady.displayWidth) {
-              let output = ``
-              if(sameColorCategory(f.color, s.color) && f.txtr == s.txtr && f.shape == s.shape) {
-                output += `the being enjoyed this snack😋<br>`
-                if(s.alpha < 1) {
-                  s.setAlpha(1);
-                  output += `it feels healthy again!➕<br>`
-                } else {
-                  s.setScale(0.3+s.scaleX);
-                  output += `your being was able to grow!🥰<br>`
-                }
-                if(s.plantLoop && f.group) {
-                  if(f.group.countActive()) { 
-                    output += `it will look for more food now!<br>`
-                    s.eating = true; 
-                  }
-                } else {
-                  output += `it is done eating now...`
-                  if(s.plantLoop && f.group) {
-                      if(f.group.countActive()) { logOutput(`no more fruits on this plant match the beings rules`) }
-                      else { logOutput(`your being ate all of the fruit on this plant!🌴`) }
-                  }
-                    s.eating = false;
-                }
-              } else {
-                //console.log(sameColorCategory(f.color, s.color), f.txtr == s.txtr, f.shape == s.shape)
-                output = `oh no, the being did not like what it ate!🤢<br>`
-                s.setAlpha(0.5);
-                if(!sameColorCategory(f.color, s.color)) {
-                  output += `perhaps it did not like its color 🍎🍏...<br>`
-                }
-                if(!(f.txtr == s.txtr)) {
-                  output += `perhaps it did not like its texture 🌸🌵...<br>`
-                  console.log('what')
-                }
-                if(!(f.shape == s.shape)) {
-                  output += `perhaps it did not like its shape ⚪⬜...<br>`
-                }
-                s.eating = false;
-              }
-              f.targeted = false;
-              FOOD.kill(f);
-              f.destroy();
-              // FOOD.splice(f_index);
-              logOutput(output)
-            } else {
-              logOutput(`the being can't eat anything bigger than its head :0`)
-              /* if(s.plantLoop && f.group) {
-                if(f.group.countActive()) {
-                  s.eating = true;
-                }
-              }
-              else { */
-                s.eating = false;
-              // }
-            }
-            f.targeted = false;
-          }
-          
-        })
-      })
-    }); 
     let constraints = [ ]
+    PLANTS.getChildren().forEach(p => {
+      let someFVisible = false;
+      p.getChildren().some((f, i) => {
+        if(!p.countActive()) {
+          p.constraints = [];
+        }
+        let c = this.cameras.main;
+        let mp = c.midPoint;
+        let viewRec = new Phaser.Geom.Rectangle(mp.x-c.displayWidth/2, mp.y-c.displayHeight/2, c.displayWidth, c.displayHeight);
+        // console.log(viewRec)
+        if(Phaser.Geom.Rectangle.Overlaps(viewRec,f.getBounds())) {
+          someFVisible = true;
+          return someFVisible;
+          // f.setActive(true);
+        } else {
+         // f.setActive(false); 
+        }
+      })
+      if(someFVisible) {
+        constraints = constraints.concat(p.joints);
+      }
+      else {
+        // p.destroy();  
+      }
+    })
+    // console.log(constraints)
+    this.renderConstraint(constraints, 0x006400, 0.8, 3, 1, 0x006400, 4, true);
+    constraints = [ ]
     this.slugs.forEach(e => {
       // SHOW THE SKELETONS OF THE SLUGS
       constraints = constraints.concat(e.jointsBody);
     })
-    this.renderConstraint(constraints, 0xF9F6EE, 1, 1, 1, 0xF9F6EE, 1);
-    constraints = [ ]
-    PLANTS.getChildren().forEach(e => {
-      constraints = constraints.concat(e.joints);
-    })
-    this.renderConstraint(constraints, 0x006400, 0.8, 3, 1, 0x006400, 4, false);
-
+    this.renderConstraint(constraints, 0xF9F6EE, 1*playersBeing.scale, 1*playersBeing.scale, 1*playersBeing.scale, 0xF9F6EE, 1*playersBeing.scale, false);
+    
     if(this.playersBeing.scale > this.stage+1) {
       this.stage++;
       this.cameras.main.zoomTo(1/this.stage, 2000, 'Sine.easeInOut');
@@ -289,11 +244,14 @@ class Scene2 extends Phaser.Scene {
   }
 
   preload() {
-    this.load.scenePlugin({
+    /*this.load.scenePlugin({
       key: 'rexuiplugin',
       url: "node_modules/phaser3-rex-plugins/dist/rexuiplugin.min.js",
       sceneKey: 'rexUI'
-    });
+    });*/
+    
+
+
     this.load.setBaseURL('/Source/slugs/'); 
     this.load.image('circle', 'assets/circle.png');
     this.load.image('circle_spiky', 'assets/circle_spiky.png');
@@ -547,7 +505,7 @@ class Scene2 extends Phaser.Scene {
     o.color = color;
     return o
   }
-  addGameSpriteCircle(x, y, radius, color = getRandomColorInCat(), texture = 'circle') {
+  addFood(x, y, radius, color = getRandomColorInCat(), texture = 'circle') {
     let img = new Phaser.GameObjects.Sprite(this, 0, 0, texture);
     img.displayWidth = radius*2;
     img.displayHeight = radius*2;
@@ -566,6 +524,68 @@ class Scene2 extends Phaser.Scene {
     o.txtr= texture.includes('spiky') ? 'spiky':'smooth';
     // o.shape = texture.includes('circle') ? 'round':'edgy'
     o.shape = 'round'
+    let s = playersBeing;
+    o.setOnCollideWith(s.heady, pair => {
+      if(o.targeted) {
+        if(o.displayWidth <= s.heady.displayWidth) {
+          let output = ``
+          if(sameColorCategory(o.color, s.color) && o.txtr == s.txtr && o.shape == s.shape) {
+            output += `the being enjoyed this snack😋<br>`
+            if(s.alpha < 1) {
+              s.setAlpha(1);
+              output += `it feels healthy again!➕<br>`
+            } else {
+              s.setScale(0.3+s.scaleX);
+              output += `your being was able to grow!🥰<br>`
+            }
+            if(s.plantLoop && o.group) {
+              if(o.group.countActive() && FOOD_MATCHING.countActive()) { 
+                output += `it will look for more food now!<br>`
+                s.eating = true; 
+              } else if(o.group.countActive()) { logOutput(`no more fruits on this plant match the beings rules`) } 
+              else { logOutput(`your being ate all of the fruit on this plant!🌴`) }
+            } else {
+              output += `it is done eating now...`
+              s.eating = false;
+            }
+          } else {
+            //console.log(sameColorCategory(o.color, s.color), o.txtr == s.txtr, o.shape == s.shape)
+            output = `oh no, the being did not like what it ate 🤢! it has turned see-through`
+            s.setAlpha(0.5);
+            if(!sameColorCategory(o.color, s.color)) {
+              output += `<br>perhaps it did not like its color 🍎🍏`
+            }
+            if(!(o.txtr == s.txtr)) {
+              output += `<br>perhaps it did not like its texture 🌸🌵`
+            }
+            if(!(o.shape == s.shape)) {
+              output += `<br>perhaps it did not like its shape ⚪⬜`
+            }
+            output +='...<br>'
+            s.eating = false;
+          }
+          o.targeted = false;
+          o.destroy();
+          // FOOD.splice(f_index);
+          logOutput(output)
+        } else {
+          let output = `the being can't eat anything bigger than its head :0<br>`
+          if(s.plantLoop && o.group) {
+            if(o.group.countActive() && FOOD_MATCHING.countActive()) {
+              output += `the being takes a look at the other fruits on this plant :)`
+              FOOD_MATCHING.kill(o);
+            } else {
+              output += `there is no more matching food on this plant`
+              s.eating = false;
+            }
+          } else {
+            s.eating = false;
+          }
+          logOutput(output)
+        }
+        o.targeted = false;
+      }
+    })
     return o;
   }
 
@@ -708,7 +728,7 @@ class Plant extends Phaser.GameObjects.Group {
       } else {
         p = pointOnCircle(x, y, width/2, Phaser.Math.DegToRad(360/fruitsNumber * i));
       }
-      let f = scene.addGameSpriteCircle(p.x, p.y, Phaser.Math.Between(fruitsRadius-5, fruitsRadius+5), getRandomColorInCat(colorCat), texture);
+      let f = scene.addFood(p.x, p.y, Phaser.Math.Between(fruitsRadius-5, fruitsRadius+5), getRandomColorInCat(colorCat), texture);
       FOOD.add(f);
       f.group = this;
       this.add(f)
