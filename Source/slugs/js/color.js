@@ -7,7 +7,7 @@ function getColorCategory(color) {
       } 
       // console.log(color.h - COLORCATS[i])
     }
-    return cat1;
+    return (cat1==7? 0:cat1);
 }
 
 function sameColorCategory(color1, color2) { // color blindness: https://colororacle.org/?
