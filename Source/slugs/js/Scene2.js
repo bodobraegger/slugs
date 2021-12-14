@@ -269,7 +269,7 @@ class Scene2 extends Phaser.Scene {
     // this.slugs.forEach(element => { element.moveRandomly() });
     
     let healthyCount = 0;
-    FOOD.getChildren().forEach(f => {
+    FOOD.getMatching('active', true).forEach(f => {
       if(sameColorCategory(f.color, f.color) && f.txtr == this.pb.txtr && f.shape == this.pb.shape && f.radius < this.pb.heady.displayWidth/2) {
         healthyCount++;
       }
@@ -289,14 +289,16 @@ class Scene2 extends Phaser.Scene {
     
     // console.log(healthyCount)
     if(healthyCount<FOOD_MINIMUM) {
-      console.log('new food because not enough eatable!')
-      FOOD.add(this.addFood(
-        playersBeing.x+(Math.random()<0.5 ? Phaser.Math.Between(-3000*playersBeing.scale, -1000*playersBeing.scale):Phaser.Math.Between(1000*playersBeing.scale, 3000*playersBeing.scale)), 
-        playersBeing.y+(Math.random()<0.5 ? Phaser.Math.Between(-3000*playersBeing.scale, -1000*playersBeing.scale):Phaser.Math.Between(1000*playersBeing.scale, 3000*playersBeing.scale)),
+      let x = playersBeing.x+(Math.random()<0.5 ? Phaser.Math.Between(-1000*playersBeing.scale, -500*playersBeing.scale):Phaser.Math.Between(500*playersBeing.scale, 1000*playersBeing.scale)), 
+      y = playersBeing.y+(Math.random()<0.5 ? Phaser.Math.Between(-1000*playersBeing.scale, -500*playersBeing.scale):Phaser.Math.Between(500*playersBeing.scale, 1000*playersBeing.scale));
+      let f = this.addFood(
+        x, y,
         playersBeing.displayWidth/2-5,
         getRandomColorInCat(this.pb.color),
         'flower'  
-      ))
+      )
+      FOOD.add(f)
+      console.log('new food because not enough eatable! at', x, y, f)
     }
   }
 
