@@ -14,7 +14,7 @@ let EDITABLE_withSingular = ['rule', 'routine'].concat(EDITABLE)
 for(let i = 0; i < COLORCATS_360.length; i++) {
   COLORCATS[i] = COLORCATS_360[i]/360;
 }
-console.log(COLORCATS)
+// console.log(COLORCATS)
 
 let ENTITY_TYPES = ['food', 'others']
 
@@ -89,21 +89,22 @@ class Scene2 extends Phaser.Scene {
     
     
     let playersBeingColor = getRandomColorInCat();
-    this.playersBeing = new Slug(this, slug_x, slug_y, slug_r, playersBeingColor);
-    playersBeing = this.playersBeing;
+    this.pb = new Slug(this, slug_x, slug_y, slug_r, playersBeingColor);
+    playersBeing = this.pb;
+    let pbColorCat = getRandomColorInCat(playersBeingColor)
     
     // let s1 = new Slug(this, slug_x-280, slug_y-5, 10);
-    this.cameras.main.startFollow(this.playersBeing.torso, true, 0.08, 0.08);
+    this.cameras.main.startFollow(this.pb.torso, true, 0.08, 0.08);
     this.stage = 1;
-    this.slugs = [this.playersBeing];
+    this.slugs = [this.pb];
     
     let foodsInitial = [ 
-      this.addFood(0, 0, 10, getRandomColorInCat(getColorCategory(playersBeing.color)), 'flower'),
-      this.addFood(getCanvasWidth(), 0, 15, getRandomColorInCat(getColorCategory(playersBeing.color)), 'flower'),
-      this.addFood(getCanvasWidth(), getCanvasHeight(), 20, getRandomColorInCat(getColorCategory(playersBeing.color)), 'flower'),
-      this.addFood(getCanvasWidth(), getCanvasHeight()+5, 20, getRandomColorInCat(getColorCategory(playersBeing.color)), 'flower'),
-      this.addFood(getCanvasWidth()+5, getCanvasHeight()+5, 20, getRandomColorInCat(getColorCategory(playersBeing.color)), 'flower'),
-      this.addFood(0, getCanvasHeight(), 25, getRandomColorInCat(getColorCategory(playersBeing.color)), 'circle_spiky'),
+      this.addFood(0, 0, 10, pbColorCat, 'flower'),
+      this.addFood(getCanvasWidth(), 0, 15, pbColorCat, 'flower'),
+      this.addFood(getCanvasWidth(), getCanvasHeight(), 20, pbColorCat, 'flower'),
+      this.addFood(getCanvasWidth(), getCanvasHeight()+5, 20, pbColorCat, 'flower'),
+      this.addFood(getCanvasWidth()+5, getCanvasHeight()+5, 20, pbColorCat, 'flower'),
+      this.addFood(0, getCanvasHeight(), 25, pbColorCat, 'circle_spiky'),
     ];
     
     FOOD = new Phaser.GameObjects.Group(this, foodsInitial);
@@ -115,22 +116,45 @@ class Scene2 extends Phaser.Scene {
     PLANTS.add(new Plant(this, getCanvasWidth(), 300, getRandomColorInCat(getColorCategory(playersBeingColor)), 300, 15, 5, false))
     PLANTS.add(new Plant(this, getCanvasWidth(), getCanvasHeight(), getRandomColorInCat(getColorCategory(playersBeingColor)), 600, 19, 20, true))
 
+    let coordinates = [ ]
+
+    PLANTS.getChildren().forEach(e=>{
+      let x = (e.getChildren()[0].x+e.getChildren().at(-1).x)/2;
+      let y = (e.getChildren()[0].y+e.getChildren().at(-1).y)/2;
+      coordinates.push({x, y})
+    })
+
     for(var i = 0; i < 25; i++) {
-      let yesOrNo = Phaser.Math.Between(0, 1)
+      let yesOrNo = Phaser.Math.Between(0, 3)
       let randFN = Phaser.Math.Between(3, 15) 
-      let randFS = Phaser.Math.Between(3+i, 150)
-      let randSize = Phaser.Math.Between(randFN*randFS+10+i, randFN*randFS+100+i)
-      let distx = playersBeing.x+(Math.random()<0.5 ? Phaser.Math.Between(-3000*playersBeing.scale, -800*playersBeing.scale):Phaser.Math.Between(800*playersBeing.scale, 3000*playersBeing.scale))
-      let disty = playersBeing.y+(Math.random()<0.5 ? Phaser.Math.Between(-3000*playersBeing.scale, -800*playersBeing.scale):Phaser.Math.Between(800*playersBeing.scale, 3000*playersBeing.scale))
-      console.log(distx, disty)
+      let randFS = Phaser.Math.Between(15, 150)
+      let randSize = Phaser.Math.Between(randFN*randFS+10, randFN*randFS+10)
+      let tooClose = false;
+      let distx, disty;
+      do {
+        distx = playersBeing.x+(Math.random()<0.5 ? Phaser.Math.Between(-4000*playersBeing.scale, -400*playersBeing.scale):Phaser.Math.Between(400*playersBeing.scale, 4000*playersBeing.scale))
+        disty = playersBeing.y+(Math.random()<0.5 ? Phaser.Math.Between(-4000*playersBeing.scale, -400*playersBeing.scale):Phaser.Math.Between(400*playersBeing.scale, 4000*playersBeing.scale))
+        if(coordinates.length) {
+          coordinates.forEach(p=> {
+            tooClose = Math.abs(p.x-distx)+Math.abs(p.y-disty) < Math.max(randSize*3, 4000) || Math.abs(p.x-distx) < Math.max(randSize, 1000) || Math.abs(p.y-disty) < Math.max(randSize, 1000);
+            console.log(Math.abs(p.x-distx)+Math.abs(p.y-disty),randSize*3)
+            if(tooClose) {
+              return tooClose;
+            }
+          })
+        }
+      } while(tooClose);
+      
+      coordinates.push({x: distx, y: disty});
+
       let c = getRandomColorInCat();
       
       // FOOD.add(this.addFood(20+c.color%(rand*10), c.color%(rand*10), 5*rand, c, 'flower'));
       let plant; 
       if(yesOrNo) {
-        plant = new Plant(this, distx, disty, c, randSize, randFS, randFN)
-      } else {
         plant = new Plant(this, distx, disty, c, randSize, randFS, randFN, true)
+      } else {
+        plant = new Plant(this, distx, disty, c, randSize, randFS, Math.floor(randFN/3))
       }
       PLANTS.add(plant)
       // let s = new Slug(this, slug_x+i*10*rand, slug_y+i*10*rand, (slug_r+20)*rand/10)
@@ -173,7 +197,7 @@ class Scene2 extends Phaser.Scene {
               let newFood = this.addFood(
                 distx, disty, 
                 Phaser.Math.Between(playersBeing.heady.radius, playersBeing.heady.radius * playersBeing.scale), 
-                getRandomColorInCat(getColorCategory(playersBeing.color)), texture);
+                pbColorCat, texture);
               // console.log(`spawning new food near being at ${newFood.x}, ${newFood.y}`, newFood)
               // console.log(FOOD.getChildren().length, FOOD_HEALTHY.getChildren().length)
               FOOD.add(newFood);
@@ -230,19 +254,19 @@ class Scene2 extends Phaser.Scene {
       }
     })
     
-    if(this.playersBeing.scale > this.stage+1) {
+    if(this.pb.scale > this.stage+1) {
       this.stage++;
       this.cameras.main.zoomTo(1/this.stage, 2000, 'Sine.easeInOut');
     }
     this.controls.update(delta)
     
-    let vecTorsoHeady = velocityToTarget(this.playersBeing.torso, this.playersBeing.heady);
-    if(Phaser.Math.Angle.ShortestBetween(Phaser.Math.RadToDeg(vecTorsoHeady.angle()), this.playersBeing.heady.angle) > 40)
-    this.playersBeing.heady.setAngle(Phaser.Math.RadToDeg(vecTorsoHeady.angle()))
+    let vecTorsoHeady = velocityToTarget(this.pb.torso, this.pb.heady);
+    if(Phaser.Math.Angle.ShortestBetween(Phaser.Math.RadToDeg(vecTorsoHeady.angle()), this.pb.heady.angle) > 40)
+    this.pb.heady.setAngle(Phaser.Math.RadToDeg(vecTorsoHeady.angle()))
     /*
     if(this.follow = true) {
-      this.cameras.main.scrollX = this.playersBeing.torso.x - document.getElementById("phaser_container").clientWidth/2;
-      this.cameras.main.scrollY = this.playersBeing.torso.y - document.getElementById("phaser_container").clientHeight/2;
+      this.cameras.main.scrollX = this.pb.torso.x - document.getElementById("phaser_container").clientWidth/2;
+      this.cameras.main.scrollY = this.pb.torso.y - document.getElementById("phaser_container").clientHeight/2;
     }*/
     // this.slugs.forEach(element => { element.moveRandomly() });
   }
@@ -321,26 +345,26 @@ class Scene2 extends Phaser.Scene {
         return;
       }
       case 'abracadabra': {
-        this.playersBeing.moveRandomly();
-        this.playersBeing.joints.forEach(e=>{
+        this.pb.moveRandomly();
+        this.pb.joints.forEach(e=>{
           this.matter.world.removeConstraint(e);
         }); 
         output = `oh no! that was a bad magic trick.`
         break;
       }
       case 'move': {
-        this.playersBeing.moveRandomly();
+        this.pb.moveRandomly();
         output = `moving your being around :).`
         break;
       }
       case 'eat': {
         output += `you tell your being to eat.`
         logInput(output)
-        this.playersBeing.eat();
+        this.pb.eat();
         return;
       }
       case stopWord: {
-        this.playersBeing.stop();
+        this.pb.stop();
         output = `your being stops trying to complete the last action :)`
         break;
       }
@@ -386,11 +410,11 @@ class Scene2 extends Phaser.Scene {
                 logOutput(`your being does not know any ${wrapCmd(e)} yet. try giving it one by typing ${wrapCmd(ifExample)}!<br>`);
               }
             } else if(e=='color') {
-              logOutput(`your being tells you its ${wrapCmd(e)} is ${wrapCmd(COLORCATS_HR[getColorCategory(this.playersBeing.color)])}.`); 
+              logOutput(`your being tells you its ${wrapCmd(e)} is ${wrapCmd(COLORCATS_HR[getColorCategory(this.pb.color)])}.`); 
             } else if(e=='texture') {
-              logOutput(`your being says its ${wrapCmd(e)} feels ${wrapCmd(this.playersBeing.txtr)}.`); 
+              logOutput(`your being says its ${wrapCmd(e)} feels ${wrapCmd(this.pb.txtr)}.`); 
             } else if(e=='shape') {
-              logOutput(`because your being is made of circles, it thinks its ${wrapCmd(e)} is ${wrapCmd(this.playersBeing.shape)}.`); 
+              logOutput(`because your being is made of circles, it thinks its ${wrapCmd(e)} is ${wrapCmd(this.pb.shape)}.`); 
             }
           } else {
             logError(`${wrapCmd(e)}: is not something your being could know!<br>`);
