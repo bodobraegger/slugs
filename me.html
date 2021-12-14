@@ -5,11 +5,11 @@
     <head>
         <!-- phaser3 and plugins -->
         <script src="Source/slugs/js/lib/phaser/phaser.min.js"></script>
-        <script src="Source/slugs/js/lib/phaser/rexuiplugin.min.js"></script>
         
         <!--
-        <script src="node_modules/phaser/dist/phaser.js"></script>
-        <script src="node_modules/phaser3-rex-plugins/dist/rexuiplugin.min.js"></script>
+            <script src="Source/slugs/js/lib/phaser/rexuiplugin.min.js"></script>
+            <script src="node_modules/phaser/dist/phaser.js"></script>
+            <script src="node_modules/phaser3-rex-plugins/dist/rexuiplugin.min.js"></script>
         -->
         <!-- terminal emulation 
         <link rel="stylesheet" href="node_modules/xterm/Source/slugs/css/xterm.css" />
@@ -34,7 +34,7 @@
 <title>slugs</title>
 <body>
     
-    <div id="phaser_container" style="max-width: 80%; float: left;"></div>
+    <div id="phaser_container" data-assets-baseURL="./Source/slugs/" style="max-width: 80%; float: left;"></div>
     
     <div class='terminal' id="terminal_container">
         <div id="terminal_log"></div>
