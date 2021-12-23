@@ -161,8 +161,8 @@ class Scene2 extends Phaser.Scene {
       let tooClose = false;
       let distx, disty;
       do {
-        distx = playersBeing.x+(Math.random()<0.5 ? Between(-4000*playersBeing.scale, -400*playersBeing.scale):Between(400*playersBeing.scale, 4000*playersBeing.scale))
-        disty = playersBeing.y+(Math.random()<0.5 ? Between(-4000*playersBeing.scale, -400*playersBeing.scale):Between(400*playersBeing.scale, 4000*playersBeing.scale))
+        distx = this.pb.x+(Math.random()<0.5 ? Between(-4000*this.pb.scale, -400*this.pb.scale):Between(400*this.pb.scale, 4000*this.pb.scale))
+        disty = this.pb.y+(Math.random()<0.5 ? Between(-4000*this.pb.scale, -400*this.pb.scale):Between(400*this.pb.scale, 4000*this.pb.scale))
         if(coordinates.length) {
           coordinates.forEach(p=> {
             tooClose = Math.abs(p.x-distx)+Math.abs(p.y-disty) < Math.max(randSize*3, 4000) || Math.abs(p.x-distx) < Math.max(randSize, 1000) || Math.abs(p.y-disty) < Math.max(randSize, 1000);
@@ -221,12 +221,12 @@ class Scene2 extends Phaser.Scene {
             // updateHealthyFood();
             // console.log(FOOD_HEALTHY)
             if(FOOD_HEALTHY.getMatching('active', true).length < FOOD_MINIMUM) {
-              let distx = playersBeing.x+(Math.random()<0.5 ? Between(-3000*playersBeing.scale, -1000*playersBeing.scale):Between(1000*playersBeing.scale, 3000*playersBeing.scale))
-              let disty = playersBeing.y+(Math.random()<0.5 ? Between(-3000*playersBeing.scale, -1000*playersBeing.scale):Between(1000*playersBeing.scale, 3000*playersBeing.scale))
+              let distx = this.pb.x+(Math.random()<0.5 ? Between(-3000*this.pb.scale, -1000*this.pb.scale):Between(1000*this.pb.scale, 3000*this.pb.scale))
+              let disty = this.pb.y+(Math.random()<0.5 ? Between(-3000*this.pb.scale, -1000*this.pb.scale):Between(1000*this.pb.scale, 3000*this.pb.scale))
               let texture = Math.random()<0.5 ? 'flower':'circle_spiky'
               let newFood = this.addFood(
                 distx, disty, 
-                Between(playersBeing.heady.radius, playersBeing.heady.radius * playersBeing.scale), 
+                Between(this.pb.heady.radius, this.pb.heady.radius * this.pb.scale), 
                 pbColorCat, texture);
               // console.log(`spawning new food near being at ${newFood.x}, ${newFood.y}`, newFood)
               // console.log(FOOD.getChildren().length, FOOD_HEALTHY.getChildren().length)
@@ -250,10 +250,10 @@ class Scene2 extends Phaser.Scene {
       // SHOW THE SKELETONS OF THE SLUGS
       constraints = constraints.concat(e.jointsBody);
     })
-    this.renderConstraint(constraints, 0xF9F6EE, 1*playersBeing.scale, 1*playersBeing.scale, 1*playersBeing.scale, 0xF9F6EE, 1*playersBeing.scale);
+    this.renderConstraint(constraints, 0xF9F6EE, 1*this.pb.scale, 1*this.pb.scale, 1*this.pb.scale, 0xF9F6EE, 1*this.pb.scale);
     constraints = [ ]
     PLANTS.getChildren().forEach(p => {
-      if(p.circle && p.width < playersBeing.torso.displayWidth*1.5) {
+      if(p.circle && p.width < this.pb.torso.displayWidth*1.5) {
         let f = this.addFood(p.getFirstAlive().x, p.getFirstAlive().y, p.width/2, p.color, 'flower');
         console.log('replacing',p,'with',f)
         FOOD.add(f)
@@ -277,7 +277,7 @@ class Scene2 extends Phaser.Scene {
          // f.setActive(false); 
         }
       })
-      if( someFVisible && (playersBeing.scale <= 10 || (p.circle && (p.fruitsNumber < 16 || p.fruitsRadius > playersBeing.heady.displayWidth/2-50))) ) { //  && constraints.length < 80
+      if( someFVisible && (this.pb.scale <= 10 || (p.circle && (p.fruitsNumber < 16 || p.fruitsRadius > this.pb.heady.displayWidth/2-50))) ) { //  && constraints.length < 80
        this.renderConstraint(p.joints, 0x006400, 0.8, 3, 1, 0x006400, 4);
       }
       else {
@@ -302,9 +302,9 @@ class Scene2 extends Phaser.Scene {
       }
       /*if(f.displayWidth*15 < this.pb.heady.displayWidth/2 && !f.group) {
           let newFood = this.addFood(
-            playersBeing.x+(Math.random()<0.5 ? Between(-3000*playersBeing.scale, -1000*playersBeing.scale):Between(1000*playersBeing.scale, 3000*playersBeing.scale)), 
-            playersBeing.y+(Math.random()<0.5 ? Between(-3000*playersBeing.scale, -1000*playersBeing.scale):Between(1000*playersBeing.scale, 3000*playersBeing.scale)),
-            playersBeing.displayWidth/2-5,
+            this.pb.x+(Math.random()<0.5 ? Between(-3000*this.pb.scale, -1000*this.pb.scale):Between(1000*this.pb.scale, 3000*this.pb.scale)), 
+            this.pb.y+(Math.random()<0.5 ? Between(-3000*this.pb.scale, -1000*this.pb.scale):Between(1000*this.pb.scale, 3000*this.pb.scale)),
+            this.pb.displayWidth/2-5,
             f.color,
             f.txtr  
           )
@@ -322,7 +322,7 @@ class Scene2 extends Phaser.Scene {
       
       for(let i = 0; i < RULES.length; i++) {
         let foodCurrentlySelected = [ ];
-        let r = playersBeing.rulesFood[i]; 
+        let r = this.pb.rulesFood[i]; 
         console.log('adapting matching food! -> rule', r)
         let booleanExpr = r.booleanExpr;
         let booleanString = booleanExpr.join(' '); // .splice(1, 0, '(').push(')')
@@ -350,9 +350,9 @@ class Scene2 extends Phaser.Scene {
           if(r.ifSize) {
             if(booleanString.includes('beings size')) {
               booleanString.replaceAll('beings size', `'beings size'`);
-              food = (playersBeing.heady.displayWidth > f.displayWidth - 5*playersBeing.scale || playersBeing.heady.displayWidth < f.displayWidth - 5*playersBeing.scale ? "beings size":"not same size" );
+              food = (this.pb.heady.displayWidth > f.displayWidth - 5*this.pb.scale || this.pb.heady.displayWidth < f.displayWidth - 5*this.pb.scale ? "beings size":"not same size" );
             } else{
-              food = (playersBeing.heady.displayWidth < f.displayWidth ? 'bigger':'smaller' )
+              food = (this.pb.heady.displayWidth < f.displayWidth ? 'bigger':'smaller' )
             }
           }
           if(r.ifTexture) {
@@ -374,20 +374,21 @@ class Scene2 extends Phaser.Scene {
       this.activeFoodlength = FOOD.getMatching('active', true).length
     }   
 
-    FOOD_MATCHING.getMatching('active', true).forEach(f => {
-      let headyToTarget = new Vector2(f).subtract(playersBeing.heady);
+    FOOD_MATCHING.getMatching('visible', true).forEach(f => {
+      let headyToTarget = new Vector2(f).subtract(this.pb.heady);
       let len = headyToTarget.length();
-      if(!f.targeted && len < (playersBeing.scale*100+f.displayWidth)*4) {
-        drawVec(headyToTarget, playersBeing.heady, playersBeing.color.color, playersBeing.scale*1.5, (playersBeing.scale*100+f.displayWidth)/len)
+      if(!f.targeted && len < (this.pb.scale*100+f.displayWidth)*4) {
+        let alpha =(this.pb.heady.displayWidth+f.displayWidth)*3/len;
+        drawVec(headyToTarget, this.pb.heady, this.pb.color.color, Math.min(this.pb.heady.displayWidth/2.5, (this.pb.heady.displayWidth+f.displayWidth)*10/len), Math.min(alpha, 0.5))
       }
     })
     // console.log(healthyCount)
     if(healthyCount<FOOD_MINIMUM) {
-      let x = playersBeing.x+(Math.random()<0.5 ? Between(-1000*playersBeing.scale, -500*playersBeing.scale):Between(500*playersBeing.scale, 1000*playersBeing.scale)), 
-      y = playersBeing.y+(Math.random()<0.5 ? Between(-1000*playersBeing.scale, -500*playersBeing.scale):Between(500*playersBeing.scale, 1000*playersBeing.scale));
+      let x = this.pb.x+(Math.random()<0.5 ? Between(-1000*this.pb.scale, -500*this.pb.scale):Between(500*this.pb.scale, 1000*this.pb.scale)), 
+      y = this.pb.y+(Math.random()<0.5 ? Between(-1000*this.pb.scale, -500*this.pb.scale):Between(500*this.pb.scale, 1000*this.pb.scale));
       let f = this.addFood(
         x, y,
-        playersBeing.displayWidth/2-5,
+        this.pb.displayWidth/2-5,
         getRandomColorInCat(this.pb.color),
         'flower'  
       )
@@ -406,9 +407,9 @@ class Scene2 extends Phaser.Scene {
       else {
         this.companion.play('jelly_move', true)
       }
-      this.companion.setRotation(playersBeing.torso.rotation+DegToRad(90));
-      // this.companion.x = playersBeing.torso.x+30*playersBeing.scale;
-      // this.companion.y = playersBeing.torso.y+30*playersBeing.scale;      
+      this.companion.setRotation(this.pb.torso.rotation+DegToRad(90));
+      // this.companion.x = this.pb.torso.x+30*this.pb.scale;
+      // this.companion.y = this.pb.torso.y+30*this.pb.scale;      
     }
   }
   processCommand(input = [], newSegment=true) {
@@ -471,7 +472,7 @@ class Scene2 extends Phaser.Scene {
                 ifSize = true;
               }
             });
-            playersBeing.rulesFood.push({
+            this.pb.rulesFood.push({
               booleanExpr,
               ifColor,
               ifTexture,

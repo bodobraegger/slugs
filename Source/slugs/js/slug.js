@@ -236,8 +236,8 @@ class Slug extends Phaser.GameObjects.Container {
             this.closestMatch.targeted = true;
           }
           let headyToTarget = new Vector2(this.closestMatch).subtract(this.heady);
-          drawVec(headyToTarget, this.heady, this.color.color, this.scale*3)
-
+          let len = headyToTarget.length()
+          drawVec(headyToTarget, this.heady, this.color.color, Math.min(this.heady.displayWidth, (this.heady.displayWidth+this.closestMatch.displayWidth)*30/len))
           // console.log(this.closestMatch)
           
           let target = velocityToTarget(this.heady, this.closestMatch);
