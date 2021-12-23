@@ -236,7 +236,7 @@ class Slug extends Phaser.GameObjects.Container {
             this.closestMatch.targeted = true;
           }
           let headyToTarget = new Vector2(this.closestMatch).subtract(this.heady);
-          drawVec(headyToTarget, this.heady, this.color.color, this.scale)
+          drawVec(headyToTarget, this.heady, this.color.color, this.scale*3)
 
           // console.log(this.closestMatch)
           

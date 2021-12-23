@@ -115,6 +115,8 @@ class Scene2 extends Phaser.Scene {
     
     
     let playersBeingColor = getRandomColorInCat();
+    changeStylesheetRule(document.styleSheets[0], '.beingscolor', `background-color`, `#${playersBeingColor.color.toString(16)}`)
+    changeStylesheetRule(document.styleSheets[0], `.${COLORCATS_HR[getColorCategory(playersBeingColor)]}`, `color`, `#${playersBeingColor.color.toString(16)}`)
     this.pb = new Slug(this, slug_x, slug_y, slug_r, playersBeingColor);
     playersBeing = this.pb;
     this.rulesLength = 0;
@@ -376,7 +378,7 @@ class Scene2 extends Phaser.Scene {
       let headyToTarget = new Vector2(f).subtract(playersBeing.heady);
       let len = headyToTarget.length();
       if(!f.targeted && len < (playersBeing.scale*100+f.displayWidth)*4) {
-        drawVec(headyToTarget, playersBeing.heady, playersBeing.color.color, playersBeing.scale/2, playersBeing.scale*100/len)
+        drawVec(headyToTarget, playersBeing.heady, playersBeing.color.color, playersBeing.scale*1.5, (playersBeing.scale*100+f.displayWidth)/len)
       }
     })
     // console.log(healthyCount)
