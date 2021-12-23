@@ -178,7 +178,7 @@ class Slug extends Phaser.GameObjects.Container {
     }
   
     moveRandomly() {
-      this.scene.matter.applyForce(this.heady, {x: Phaser.Math.FloatBetween(-0.2, 0.2), y: Phaser.Math.FloatBetween(-0.2, 0.2)})
+      this.scene.matter.applyForce(this.heady, {x: FloatBetween(-0.2, 0.2), y: FloatBetween(-0.2, 0.2)})
     }
   
     eat(foodType='any') {
@@ -340,7 +340,7 @@ class Slug extends Phaser.GameObjects.Container {
       let rotationDirection = 0;
      
       let swimStates = [-20, 0, 20, 0];
-      swimStates.forEach((e, i) => {swimStates[i] = Phaser.Math.DegToRad(e)})
+      swimStates.forEach((e, i) => {swimStates[i] = DegToRad(e)})
       let waveIndex = 0;
   
       this.timer = 0;
@@ -364,10 +364,10 @@ class Slug extends Phaser.GameObjects.Container {
           // console.log(this.closestMatch)
           
           let target = velocityToTarget(this.heady, this.closestMatch);
-          let distanceToFood = Phaser.Math.Distance.BetweenPoints(this.heady, this.closestMatch)
+          let distanceToFood = Distance.BetweenPoints(this.heady, this.closestMatch)
   
           let vecTorsoHeady = velocityToTarget(this.torso, this.heady)
-          let angleSlugTarget = Phaser.Math.Angle.ShortestBetween(Phaser.Math.RadToDeg(vecTorsoHeady.angle()), Phaser.Math.RadToDeg(target.angle()));
+          let angleSlugTarget = Angle.ShortestBetween(RadToDeg(vecTorsoHeady.angle()), RadToDeg(target.angle()));
           
           let speed = 4*this.scale;
     
@@ -391,7 +391,7 @@ class Slug extends Phaser.GameObjects.Container {
             }
           }
   
-          let correctionAngle = Phaser.Math.DegToRad(40);
+          let correctionAngle = DegToRad(40);
           // console.log(Math.round(angleSlugTarget), rotationDirection)
           
           if((angleSlugTarget > 0 && angleSlugTarget < 70)||(angleSlugTarget < 0 && angleSlugTarget > -70)){
@@ -399,7 +399,7 @@ class Slug extends Phaser.GameObjects.Container {
             this.torso.setVelocity(headyVec.x, headyVec.y);
             this.heady.setVelocity(headyVec.x, headyVec.y);
             // this.heady.applyForce(this.heady, this.heady, headyVec);
-            this.heady.setAngle(Phaser.Math.RadToDeg(headyVec.angle()))
+            this.heady.setAngle(RadToDeg(headyVec.angle()))
             
             
             if(distanceToFood > 50) {
@@ -433,7 +433,7 @@ class Slug extends Phaser.GameObjects.Container {
           
           
           if(closestMatchNew && this.closestMatch != closestMatchNew) {
-            let closer = Phaser.Math.Distance.BetweenPoints(this.heady, closestMatchNew) - distanceToFood;
+            let closer = Distance.BetweenPoints(this.heady, closestMatchNew) - distanceToFood;
             if( closer > 5){
               
               console.log(closestMatchNew)
