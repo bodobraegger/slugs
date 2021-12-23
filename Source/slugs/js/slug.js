@@ -9,9 +9,9 @@ class Slug extends Phaser.GameObjects.Container {
       let headyColor = this.color.clone().lighten((Math.min(0.2+Math.random(), 0.8))*50);
       let tailColor = this.color.clone().lighten((Math.min(0.1+Math.random(), 0.8))*30);
   
-      let headyRadius = radius/1.5
-      let tail0Radius = radius/1.3
-      let tail1Radius = radius/2
+      let headyRadius = radius/1.4
+      let tail0Radius = radius/1.7
+      let tail1Radius = radius/2.4
   
       this.heady   = this.scene.addGameCircle(x, y, headyRadius, headyColor);
       this.torso   = this.scene.addGameCircleTextured(x-radius-headyRadius, y, radius, this.color);
@@ -49,6 +49,7 @@ class Slug extends Phaser.GameObjects.Container {
       this.joints = [...this.jointsBody]
   
       
+      /*
       let antennaeColor = this.heady.fillColor; 
       let antennaLength = this.heady.radius;
       let a1 = this.scene.matter.add.gameObject(
@@ -59,7 +60,6 @@ class Slug extends Phaser.GameObjects.Container {
           this.scene.add.rectangle(x-this.heady.radius*2, y, antennaLength, antennaLength/4, antennaeColor),
           this.scene.matter.add.rectangle(x-this.heady.radius*2, y, antennaLength, antennaLength/4)
           )
-        /*
           this.antennaeJoints = [
         // this.scene.matter.add.joint(a1, a2, antennaLength/2, 0.5, {pointA: {x: antennaLength/2, y: 0}, pointB: {x: antennaLength/2, y: 0}}),
         this.scene.matter.add.joint(this.heady, a1, 0, 0.5, {damping:0.05,pointA: {x: this.heady.radius, y: -this.heady.radius/4}, pointB: {x: antennaLength/2, y: 0}}),
@@ -360,6 +360,7 @@ class Slug extends Phaser.GameObjects.Container {
             this.closestMatch = closestMatchNew;
             this.closestMatch.targeted = true;
           }
+          let headTarget = this.closestMatch
           // console.log(this.closestMatch)
           
           let target = velocityToTarget(this.heady, this.closestMatch);

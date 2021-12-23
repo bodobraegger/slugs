@@ -12,7 +12,7 @@ const debug_array = {
   showAngleIndicator: true,
   angleColor: 0xe81153,
 
-  showBroadphase: false,
+  showBroadphase: true,
   broadphaseColor: 0xffb400,
 
   showBounds: false,
@@ -77,6 +77,7 @@ const config = {
     type: Phaser.AUTO,
     width: 800,
     height: 600,
+    pixelArt: true,
     scale: {
       mode: Phaser.Scale.RESIZE,
       autoCenter: Phaser.Scale.CENTER_BOTH,

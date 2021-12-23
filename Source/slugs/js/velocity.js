@@ -18,3 +18,13 @@ function velocityRight(obj, speed = 1) {
     return new Phaser.Math.Vector2(Phaser.Math.Vector2.ONE).setAngle(obj.rotation+Phaser.Math.DegToRad(90)).setLength(speed);
 }
 
+function draw(vector, start, color) {
+    graphics
+      .lineStyle(1, color)
+      .lineBetween(
+        start.x,
+        start.y,
+        start.x + vector.x,
+        start.y + vector.y
+      );
+  }
