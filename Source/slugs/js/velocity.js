@@ -18,9 +18,9 @@ function velocityRight(obj, speed = 1) {
     return new Vector2(Vector2.ONE).setAngle(obj.rotation+DegToRad(90)).setLength(speed);
 }
 
-function drawVec(vector, start, color, weight) {
+function drawVec(vector, start, color, weight, alpha=1) {
     SCENE.graphics
-      .lineStyle(weight, color)
+      .lineStyle(weight, color, alpha)
       .lineBetween(
         start.x,
         start.y,
