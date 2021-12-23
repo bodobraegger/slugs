@@ -43,23 +43,23 @@ function getRandomColorInCat(cat=-1) {
     let padding = 0.03
     let rangeStart = COLORCATS.at(chosenCatIndex-1)+padding;
     let rangeEnd = COLORCATS.at(chosenCatIndex)-padding;
-    hue = Phaser.Math.FloatBetween(rangeStart, rangeEnd)
+    hue = FloatBetween(rangeStart, rangeEnd)
     
     if(chosenCatIndex == 0 || chosenCatIndex == COLORCATS.length) {
       padding = 0.003
       if(Math.random() <= 2/3) {
         rangeStart = COLORCATS.at(-1)+padding
         rangeEnd = 1;
-        hue = Phaser.Math.FloatBetween(rangeStart, rangeEnd)
+        hue = FloatBetween(rangeStart, rangeEnd)
       } else {
         rangeStart = 0;
         rangeEnd = COLORCATS[0]-padding
-        hue = Phaser.Math.FloatBetween(rangeStart, rangeEnd)
+        hue = FloatBetween(rangeStart, rangeEnd)
       }
     }
     // console.log(chosenCatIndex, COLORCATS_HR[chosenCatIndex])
     let r = new Phaser.Display.Color();
-    r.setFromHSV(hue, Phaser.Math.FloatBetween(0.85, 0.95), Phaser.Math.FloatBetween(0.8, 0.9))
+    r.setFromHSV(hue, FloatBetween(0.85, 0.95), FloatBetween(0.8, 0.9))
     // hack to make hue saved on it...
     r.setTo(r.red, r.green, r.blue, r.alpha, true);
     
