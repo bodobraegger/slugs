@@ -832,15 +832,15 @@ class Plant extends Phaser.GameObjects.Group {
           let j = this.scene.matter.add.joint(f0, f1, Distance.BetweenPoints(f0, f1), 0.3, );
           // if(!circle) {
             // }
-          if(f0.joints.length < 2) { f0.joints.push(j); }
-          if(f1.joints.length < 2) { f1.joints.push(j); }
-          if(f0.joints.length < 2 || f1.joints.length < 2)  { this.joints.push(j) }
+          if(f0.joints.length < 3 || f1.joints.length < 3)  { this.joints.push(j) }
+          if(f0.joints.length < 3) { f0.joints.push(j); }
+          if(f1.joints.length < 3) { f1.joints.push(j); }
         }
         if(circle) {
           let j = this.scene.matter.add.joint(f0, f2, Distance.BetweenPoints(f0, f2), 0.5, )
+          if(f0.joints.length < 4 || f1.joints.length < 4)  { this.joints.push(j) }
           if(f0.joints.length < 4) { f0.joints.push(j); }
           if(f1.joints.length < 4) { f1.joints.push(j); }
-          if(f0.joints.length < 4 || f1.joints.length < 4)  { this.joints.push(j) }
         }
 
       }
