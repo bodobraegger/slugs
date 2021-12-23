@@ -664,7 +664,10 @@ class Scene2 extends Phaser.Scene {
           if(o.joints) {
             if(o.group) {
               o.joints.forEach(j => {
-                o.group.joints.splice(o.group.joints.indexOf(j), 1);
+                let i = o.group.joints.indexOf(j);
+                if(i !== -1) {
+                  o.group.joints.splice(i, 1);
+                }
               })
             }
             this.matter.world.removeConstraint(o.joints, true);
@@ -829,15 +832,15 @@ class Plant extends Phaser.GameObjects.Group {
           let j = this.scene.matter.add.joint(f0, f1, Distance.BetweenPoints(f0, f1), 0.3, );
           // if(!circle) {
             // }
-          this.joints.push(j)
-          f0.joints.push(j);
-          f1.joints.push(j);
+          if(f0.joints.length < 2) { f0.joints.push(j); }
+          if(f1.joints.length < 2) { f1.joints.push(j); }
+          if(f0.joints.length < 2 || f1.joints.length < 2)  { this.joints.push(j) }
         }
         if(circle) {
           let j = this.scene.matter.add.joint(f0, f2, Distance.BetweenPoints(f0, f2), 0.5, )
-          this.joints.push(j)
-          f0.joints.push(j);
-          f2.joints.push(j);
+          if(f0.joints.length < 4) { f0.joints.push(j); }
+          if(f1.joints.length < 4) { f1.joints.push(j); }
+          if(f0.joints.length < 4 || f1.joints.length < 4)  { this.joints.push(j) }
         }
 
       }
