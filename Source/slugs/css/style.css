@@ -1,8 +1,6 @@
 body {
   width: 100%;
   height: 100vh;
-  background-image: 
-  radial-gradient(circle at top right, rgb(142, 216, 250), transparent), 
-  radial-gradient(circle at 20%   80%, rgb(87, 154, 255), transparent);
+  background-image: radial-gradient(circle at right top, rgb(5, 82, 117), rgba(0, 0, 0, 0)), radial-gradient(circle at 20% 80%, rgb(0, 61, 152), rgba(0, 0, 0, 0));
   overflow: hidden;
 }
