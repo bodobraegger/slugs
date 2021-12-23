@@ -344,7 +344,7 @@ class Slug extends Phaser.GameObjects.Container {
       let waveIndex = 0;
   
       this.timer = 0;
-      this.scene.events.on('update', function(time, delta) {
+      this.scene.events.on('postupdate', function(time, delta) {
         if(this.eating && FOOD_MATCHING.countActive()){
           FOOD_MATCHING.getMatching('active', true).forEach((e, i) => {
             if(!e.active) {
@@ -360,7 +360,9 @@ class Slug extends Phaser.GameObjects.Container {
             this.closestMatch = closestMatchNew;
             this.closestMatch.targeted = true;
           }
-          let headTarget = this.closestMatch
+          let headyToTarget = new Vector2(this.closestMatch).subtract(new Vector2(this.heady));
+          drawVec(headyToTarget, this.heady, this.color.color, this.scale)
+
           // console.log(this.closestMatch)
           
           let target = velocityToTarget(this.heady, this.closestMatch);

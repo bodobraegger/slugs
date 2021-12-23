@@ -238,13 +238,14 @@ class Scene2 extends Phaser.Scene {
 
 
   update(time, delta) {
+    this.graphics.clear()
     // console.log(constraints)
     let constraints = [ ]
     this.slugs.forEach(e => {
       // SHOW THE SKELETONS OF THE SLUGS
       constraints = constraints.concat(e.jointsBody);
     })
-    this.renderConstraint(constraints, 0xF9F6EE, 1*playersBeing.scale, 1*playersBeing.scale, 1*playersBeing.scale, 0xF9F6EE, 1*playersBeing.scale, true);
+    this.renderConstraint(constraints, 0xF9F6EE, 1*playersBeing.scale, 1*playersBeing.scale, 1*playersBeing.scale, 0xF9F6EE, 1*playersBeing.scale);
     constraints = [ ]
     PLANTS.getChildren().forEach(p => {
       if(p.circle && p.width < playersBeing.torso.displayWidth*1.5) {
@@ -272,7 +273,7 @@ class Scene2 extends Phaser.Scene {
         }
       })
       if( someFVisible && (playersBeing.scale <= 10 || (p.circle && (p.fruitsNumber < 16 || p.fruitsRadius > playersBeing.heady.displayWidth/2-50))) ) { //  && constraints.length < 80
-        this.renderConstraint(p.joints, 0x006400, 0.8, 3, 1, 0x006400, 4, false);
+       this.renderConstraint(p.joints, 0x006400, 0.8, 3, 1, 0x006400, 4);
       }
       else {
         // p.destroy();  
@@ -740,7 +741,7 @@ class Scene2 extends Phaser.Scene {
     return o;
   }
 
-  renderConstraint(constraints, lineColor, lineOpacity, lineThickness, pinSize, anchorColor, anchorSize, clear = true) {
+  renderConstraint(constraints, lineColor, lineOpacity, lineThickness, pinSize, anchorColor, anchorSize, clear = false) {
     if(clear) {
       this.graphics.clear();
     }
@@ -830,8 +831,6 @@ class Plant extends Phaser.GameObjects.Group {
         if(!f2.joints) f2.joints = []
         if(i+1<fruitsNumber || circle) {
           let j = this.scene.matter.add.joint(f0, f1, Distance.BetweenPoints(f0, f1), 0.3, );
-          // if(!circle) {
-            // }
           if(f0.joints.length < 3 || f1.joints.length < 3)  { this.joints.push(j) }
           if(f0.joints.length < 3) { f0.joints.push(j); }
           if(f1.joints.length < 3) { f1.joints.push(j); }
