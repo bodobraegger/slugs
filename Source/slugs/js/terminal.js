@@ -360,12 +360,13 @@ function addToLog(output) {
   else {
     terminal_log.appendChild(div);
     logCount++;
-  }
+  }/*
   while(getTotalChildrenHeights(terminal_container) > getCanvasHeight() && logCount > 0 && terminal_container.children.length) {
     terminal_log.firstChild.remove();
     // console.log('trimming log to make room! bigger than canvas currently')
     logCount--;
-  }
+  }*/
+  gotoBottom(terminal_container.id);
 }
 
 function logOutput(output) {
@@ -489,4 +490,9 @@ function startNewLogSegment() {
   for(let i = 0; i < terminal_log.children.length; i++) {
       terminal_log.children[i].classList.add('old');
   }
+}
+
+function gotoBottom(id){
+  var element = document.getElementById(id);
+  element.scrollTop = element.scrollHeight - element.clientHeight;
 }
