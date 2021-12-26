@@ -15,7 +15,7 @@ const wordsFirst = wordsAction.concat([ifWord, loopWord, showWord, editWord, del
 const wordsForCmdString = [].concat(wordsFirst.slice(0, 2));
 let wordsIfConditionLeft = [].concat(ENTITY_TYPES);
 let wordsIfConditionRight = [].concat(SIZES, COLORCATS_HR, TEXTURES);
-const wordsBoolean = [thenWord, andWord, orWord, equalWord];
+const wordsBoolean = [thenWord, andWord, equalWord] //orWord, ;
 
 let wordsLoop1 = ['food'];
 let wordsLoop2 = [equalWord];
