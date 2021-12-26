@@ -77,7 +77,7 @@ const config = {
     type: Phaser.AUTO,
     width: 800,
     height: 600,
-    pixelArt: true,
+    pixelArt: false,
     scale: {
       mode: Phaser.Scale.RESIZE,
       autoCenter: Phaser.Scale.CENTER_BOTH,
