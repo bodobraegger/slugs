@@ -37,7 +37,7 @@ function sameColorCategory(color1, color2) { // color blindness: https://coloror
 }  
 
 function getRandomColorInCat(cat=-1) {
-    let chosenCatIndex = Math.floor(Math.random()*COLORCATS.length)
+    let chosenCatIndex = Math.floor(Math.random()*(COLORCATS.length-1))
     if(cat != -1) { chosenCatIndex = cat+1}
     let hue = -1;
     let padding = 0.03
@@ -48,7 +48,7 @@ function getRandomColorInCat(cat=-1) {
     if(chosenCatIndex == 0 || chosenCatIndex == COLORCATS.length) {
       padding = 0.003
       if(Math.random() <= 2/3) {
-        rangeStart = COLORCATS.at(-1)+padding
+        rangeStart = COLORCATS.at(-1)+padding < 1 ? COLORCATS.at(-1)+padding : COLORCATS.at(-1)
         rangeEnd = 1;
         hue = FloatBetween(rangeStart, rangeEnd)
       } else {
