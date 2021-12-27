@@ -952,13 +952,13 @@ class Plant extends Phaser.GameObjects.Group {
         if(!f1.joints) f1.joints = []
         if(!f2.joints) f2.joints = []
         if(i+1<fruitsNumber || circle) {
-          let j = this.scene.matter.add.joint(f0, f1, Distance.BetweenPoints(f0, f1), 0.3, );
+          let j = this.scene.matter.add.joint(f0, f1, undefined, 0.1, );
           if(f0.joints.length < 3 || f1.joints.length < 3)  { this.joints.push(j) }
           if(f0.joints.length < 3) { f0.joints.push(j); }
           if(f1.joints.length < 3) { f1.joints.push(j); }
         }
         if(circle) {
-          let j = this.scene.matter.add.joint(f0, f2, Distance.BetweenPoints(f0, f2), 0.5, )
+          let j = this.scene.matter.add.joint(f0, f2, undefined, 0.05, )
           if(f0.joints.length < 4 || f1.joints.length < 4)  { this.joints.push(j) }
           if(f0.joints.length < 4) { f0.joints.push(j); }
           if(f1.joints.length < 4) { f1.joints.push(j); }
