@@ -22,7 +22,7 @@ class Slug extends Phaser.GameObjects.Container {
   
       this.headyjoint  = this.scene.matter.add.joint(
         this.heady, this.torso, 
-        2+(this.heady.radius+this.torso.radius)/2, 1, 
+        2+(this.heady.radius+this.torso.radius)/2, 0.5, 
         {
           pointA: {x: -this.heady.radius/2, y: 0}, 
           pointB: {x: this.torso.radius/2, y: 0} }
@@ -30,13 +30,13 @@ class Slug extends Phaser.GameObjects.Container {
   
       this.torsojoint  = this.scene.matter.add.joint(
         this.torso, this.tail0, 
-        2+(this.torso.radius+this.tail0.radius)/2, 1,
+        2+(this.torso.radius+this.tail0.radius)/2, 0.5,
         { pointA: {x: -this.torso.radius/2, y: 0}, 
           pointB: {x: this.tail0.radius/2, y: 0} }
       );
       this.tailjoint  = this.scene.matter.add.joint(
         this.tail0, this.tail1, 
-        2+(this.tail0.radius+this.tail1.radius)/2, 1,
+        2+(this.tail0.radius+this.tail1.radius)/2, 0.5,
         { pointA: {x: -this.tail0.radius/2, y: 0}, 
         pointB: {x: this.tail1.radius/2, y: 0} }
         );
