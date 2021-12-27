@@ -68,7 +68,7 @@ class Scene2 extends Phaser.Scene {
     this.load.spritesheet('jelly', 'assets/jellyfish_spritesheet.png', {frameWidth: 32, frameHeight: 32})
 
     // this.load.svg('antennae', 'assets/antennae-dotgrid.svg')
-}
+  }
   create() {
     SCENE = this;
     this.graphics = this.add.graphics();
@@ -104,7 +104,7 @@ class Scene2 extends Phaser.Scene {
     */
    
    
-   this.companion = this.add.sprite(300, 300, 'jelly').setScale(10);
+    this.companion = this.add.sprite(300, 300, 'jelly').setScale(10);
 
    
     this.companion = this.matter.add.gameObject(this.companion, this.matter.add.rectangle(0, 0, this.companion.displayWidth/3, this.companion.displayHeight/2))
@@ -121,12 +121,14 @@ class Scene2 extends Phaser.Scene {
     playersBeing = this.pb;
     this.rulesLength = 0;
     let pbColorCat = getRandomColorInCat(playersBeingColor)
-    
+
     // let s1 = new Slug(this, slug_x-280, slug_y-5, 10);
     this.cameras.main.startFollow(this.pb.torso, true, 0.08, 0.08);
     this.stage = 1;
     this.slugs = [this.pb];
-    
+   
+    this.enemySpawned = false;
+
     let foodsInitial = [ 
       this.addFood(0, 0, 10, pbColorCat, 'flower'),
       this.addFood(getCanvasWidth(), 0, 15, pbColorCat, 'flower'),
@@ -288,6 +290,14 @@ class Scene2 extends Phaser.Scene {
     if(this.pb.scale > this.stage+1) {
       this.stage++;
       this.cameras.main.zoomTo(1/this.stage, 2000, 'Sine.easeInOut');
+    }
+    if(this.stage == 4 && !this.enemySpawned) {
+      this.enemySpawned = true;
+      let x = this.pb.torso.x+this.pb.torso.scale*getCanvasWidth()/2;
+      let y = this.pb.torso.y+this.pb.torso.scale*getCanvasHeight()/2
+      this.enemySlug = new Slug(this, x, y, this.pb.torso.displayWidth, getRandomColorInCat());
+      this.enemySlug.name = 'enemy'
+      console.log(`spawned enemy slug at`, this.enemySlug.x, this.enemySlug.y, this.enemySlug,);
     }
     this.controls.update(delta)
     let vecTorsoHeady = velocityToTarget(this.pb.torso, this.pb.heady);
@@ -499,6 +509,9 @@ class Scene2 extends Phaser.Scene {
         else {
           ROUTINES.push(routineString);
           output += `your being learned the new routine!`
+        }
+        if(cmd.includes('plant')) {
+          this.pb.plantLoop = true;
         }
         logInput(output);
         return;
@@ -743,7 +756,8 @@ class Scene2 extends Phaser.Scene {
               output += `your being was able to grow!🥰<br>`
             }
             if(s.plantLoop && o.group) {
-              if(o.group.countActive() && FOOD_MATCHING.getMatching('group', o.group).length) { 
+              let oGroupMatchTemp = new Phaser.GameObjects.Group(this, FOOD_MATCHING.getMatching('group', o.group));
+              if(oGroupMatchTemp.countActive()) { 
                 output += `it will look for more food now!<br>`
                 s.eating = true; 
               } else if(o.group.countActive()) { logOutput(`no more fruits on this plant match the beings rules`) } 
@@ -786,7 +800,8 @@ class Scene2 extends Phaser.Scene {
         } else {
           let output = `the being can't eat anything bigger than its head :0<br>`
           if(s.plantLoop && o.group) {
-            if(o.group.countActive() && FOOD_MATCHING.countActive()) {
+            let oGroupMatchTemp = new Phaser.GameObjects.Group(this, FOOD_MATCHING.getMatching('group', o.group));
+            if(oGroupMatchTemp.countActive()) {
               output += `the being takes a look at the other fruits on this plant :)`
               FOOD_MATCHING.kill(o);
             } else {
