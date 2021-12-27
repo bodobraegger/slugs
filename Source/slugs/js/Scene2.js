@@ -3,7 +3,7 @@
 */
 // 6 categories of hues, hue of 0 and 1 both correspond to red, so cats need to be shifted by half a value
 let COLORCATS_HR  = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink','red']
-let COLORCATS_360 = [0, 15, 45, 75, 165, 240, 285, 330]
+let COLORCATS_360 = [0, 5, 45, 75, 165, 240, 285, 350]
 let COLORCATS     = [ 0 ];
 
 let ATTRIBUTES = ['color', 'texture', 'shape']
@@ -291,11 +291,11 @@ class Scene2 extends Phaser.Scene {
       this.stage++;
       this.cameras.main.zoomTo(1/this.stage, 2000, 'Sine.easeInOut');
     }
-    if(this.stage == 4 && !this.enemySpawned) {
+    if(this.stage == 1 && !this.enemySpawned) {
       this.enemySpawned = true;
       let x = this.pb.torso.x+this.pb.torso.scale*getCanvasWidth()/2;
       let y = this.pb.torso.y+this.pb.torso.scale*getCanvasHeight()/2
-      this.enemySlug = new Slug(this, x, y, this.pb.torso.displayWidth, getRandomColorInCat());
+      this.enemySlug = new Snake(this, x, y, this.pb.torso.displayWidth, getRandomColorInCat());
       this.enemySlug.name = 'enemy'
       console.log(`spawned enemy slug at`, this.enemySlug.x, this.enemySlug.y, this.enemySlug,);
     }
@@ -379,7 +379,8 @@ class Scene2 extends Phaser.Scene {
         foodSelected = foodCurrentlySelected;
       }
       // FOOD_MATCHING = foodSelected;
-      FOOD_MATCHING.addMultiple(foodSelected);
+      FOOD_MATCHING.addMultiple(foodSelected.filter(e => (e.displayWidth > this.pb.heady.displayWidth/4 && e.displayWidth < this.pb.heady.displayWidth*3)));
+
       this.triggerFoodUpdate = false;
       this.activeFoodlength = FOOD.getMatching('active', true).length
     }   
@@ -608,6 +609,9 @@ class Scene2 extends Phaser.Scene {
         }
         RULESorROUTINES.splice(index, 1);
         logOutput(`your being forgot the ${ruleOrRoutine} with the number ${cmd[2]} :)`)
+        if(ruleOrRoutine == 'rule') {
+          this.pb.rulesFood.splice(index, 1);
+        }
         return;
       }
 
@@ -631,6 +635,9 @@ class Scene2 extends Phaser.Scene {
           let newRule = RULESorROUTINES.at(-1);
           RULESorROUTINES[index] = newRule;
           RULESorROUTINES.splice(RULESorROUTINES.length-1, 1)
+        }
+        if(ruleOrRoutine=='rule') {
+          this.pb.foodRules.splice(RULESorROUTINES.length-1, 1)
         }
         logOutput(`your being ${wrapCmd(editWord)}d the ${ruleOrRoutine} with the number ${cmd[2]} :)`)
         return;
@@ -787,9 +794,7 @@ class Scene2 extends Phaser.Scene {
             if(o.group) {
               o.joints.forEach(j => {
                 let i = o.group.joints.indexOf(j);
-                if(i !== -1) {
                   o.group.joints.splice(i, 1);
-                }
               })
             }
             this.matter.world.removeConstraint(o.joints, true);

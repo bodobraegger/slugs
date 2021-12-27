@@ -1,4 +1,4 @@
-class Slug extends Phaser.GameObjects.Container {
+class Snake extends Phaser.GameObjects.Container {
     constructor(scene=Scene2, x=0, y=0, radius=20, color=getRandomColorInCat()) {
       super(scene, x, y);
       this.setDataEnabled();
@@ -7,19 +7,19 @@ class Slug extends Phaser.GameObjects.Container {
       this.txtr = 'smooth';
       this.shape = 'round';
       this.plantLoop = false;
-      let headyColor = this.color.clone().lighten((Math.min(0.2+Math.random(), 0.8))*50);
-      let tailColor = this.color.clone().lighten((Math.min(0.1+Math.random(), 0.8))*30);
+      let headyColor = getRandomColorInCat().lighten((Math.min(0.2+Math.random(), 0.8))*50);
+      let tailColor = getRandomColorInCat().lighten((Math.min(0.1+Math.random(), 0.8))*30);
   
       let headyRadius = radius/1.4
       let tail0Radius = radius/1.7
       let tail1Radius = radius/2.4
   
-      this.heady = this.scene.addGameCircle(x, y, headyRadius, headyColor);
-      this.torso = this.scene.addGameCircle(x-radius-headyRadius, y, radius, this.color);
+      this.heady   = this.scene.addGameCircle(x, y, headyRadius, headyColor);
+      this.torso   = this.scene.addGameCircleTextured(x-radius-headyRadius, y, radius, this.color);
       this.tail0 = this.scene.addGameCircle(x-radius-headyRadius-tail0Radius, y, tail0Radius, tailColor);
       this.tail1 = this.scene.addGameCircle(x-radius-headyRadius-tail0Radius-tail1Radius, y, tail1Radius, tailColor);
-
-      
+  
+  
       this.headyjoint  = this.scene.matter.add.joint(
         this.heady, this.torso, 
         2+(this.heady.radius+this.torso.radius)/2, 0.5, 
@@ -28,6 +28,15 @@ class Slug extends Phaser.GameObjects.Container {
           pointB: {x: this.torso.radius/2, y: 0} }
       ); // , {pointA: {x: this.torso.radius/2, y: 0}}
   
+      playersBeing.bodyparts.forEach(limb => {
+        this.heady.setOnCollideWith(limb, pair => {
+          console.log('snake colliding with', limb, pair)
+          playersBeing.setAlpha(0.2)
+          this.eating = false;
+        });
+
+      });
+
       this.torsojoint  = this.scene.matter.add.joint(
         this.torso, this.tail0, 
         2+(this.torso.radius+this.tail0.radius)/2, 0.5,
@@ -38,7 +47,7 @@ class Slug extends Phaser.GameObjects.Container {
         this.tail0, this.tail1, 
         2+(this.tail0.radius+this.tail1.radius)/2, 0.5,
         { pointA: {x: -this.tail0.radius/2, y: 0}, 
-          pointB: {x: this.tail1.radius/2, y: 0} }
+        pointB: {x: this.tail1.radius/2, y: 0} }
         );
         this.headyjoint.angularStiffness = 0.2;
         
@@ -106,9 +115,6 @@ class Slug extends Phaser.GameObjects.Container {
         let j = this.jointsBody[i];
         let diff = sX-1;
         j.length = (2+j.originalLength)*(1+diff*Math.PI/2);
-        // if(j.length < 2+this.heady.radius*this.scale+this.torso.radius*this.scale)
-        // j.length = 2+(this.bodyparts[i].radius*this.scale+this.bodyparts[i+1].radius*this.scale)/2
-        // j.length = Math.max(2+(j.bodyA.circleRadius+j.bodyB.circleRadius)/2, j.originalLength*(1+diff*Math.PI/2))
       }
   
     }
@@ -120,14 +126,6 @@ class Slug extends Phaser.GameObjects.Container {
       })
       return m;
   
-      // radius-mass-area
-      // 20 2.8833982308888886 2872.873913134808
-      // 40 11.727165065555555 11491.495652539232
-      // 80 46.94205278022222 45965.98261015693
-  
-      // A = Math.PI * (this.radius*this.scaleX)**2
-      // mass multiplier constant: 2.2860618138362114
-      // M = Math.PI * (this.radius*this.scaleX)**2 * 2.2860618138362114
     }
   
     getArea() {
@@ -145,77 +143,9 @@ class Slug extends Phaser.GameObjects.Container {
     }
   
     eat(foodType='any') {
-      this.scene.triggerFoodUpdate = true;
-      this.eating = true;
-      if(RULES.length) {
-        logOutput(`first, the being thinks of the ${wrapCmd('rules')} you gave it.`)
-      }
-      let foodSelected = FOOD.getMatching('active', true);
-
-      if(this.rulesFood.length) {
-          logOutput(`it remembers the following food ${wrapCmd('rules')}:`)
-        
-        for(let i = 0; i < this.rulesFood.length; i++) {
-          let foodCurrentlySelected = [ ];
-          let r = this.rulesFood[i]; 
-          let booleanExpr = r.booleanExpr;
-          let booleanString = booleanExpr.join(' '); // .splice(1, 0, '(').push(')')
-            logOutput(`${i+1}. ${wrapCmd(booleanString.replaceAll("'", ""))} ${i<this.rulesFood.length-1 ? 'and' : ''}`)
-          booleanString = booleanString.replaceAll(equalWord, '==').replaceAll(andWord, '&&').replaceAll(` ${orWord}`, ` ||`);
-          if(booleanString.includes('beings ')) {
-            ATTRIBUTES.forEach( (e,i) => {
-              if(booleanString.includes(`beings ${e}`)) {
-                // console.log(booleanString, e)
-                let replacement = playersBeing[e];
-                if(replacement instanceof Color) {
-                  replacement = COLORCATS_HR[getColorCategory(replacement)];
-                }
-                booleanString = booleanString.replaceAll(`beings ${e}`, `'${replacement}'`)
-              }
-            })
-          }
-  
-          for(let i = 0; i < foodSelected.length; i++) {
-            let f = foodSelected[i];
-            // VARIABLE NAME NEEDS TO BE SAME AS INPUT!!
-            let food = '';
-            if(r.ifColor) {
-              food = COLORCATS_HR[getColorCategory(f.color)];
-            }
-            if(r.ifSize) {
-              if(booleanString.includes('beings size')) {
-                booleanString.replaceAll('beings size', `'beings size'`);
-                food = (this.heady.displayWidth > f.displayWidth - 5*this.scale || this.heady.displayWidth < f.displayWidth - 5*this.scale ? "beings size":"not same size" );
-              } else{
-                food = (this.heady.displayWidth < f.displayWidth ? 'bigger':'smaller' )
-              }
-            }
-            if(r.ifTexture) {
-              food = f.txtr;
-            }
-            // console.log(booleanString, 'food var:', food);
-            let evaluation = eval(booleanString);
-            // console.log(evaluation);
-            if(evaluation && !r.avoid) {
-              foodCurrentlySelected.push(foodSelected[i]);
-            }
-          }
-          // console.log(foodCurrentlySelected);
-          foodSelected = foodCurrentlySelected;
-        }
-        // add to foodmatching outside of condition
-      } else {
-          logOutput(`none of the ${wrapCmd('rules')} tell your being what to eat, so it will try to eat anything!`)
-        // FOOD_MATCHING = FOOD.getMatching('active', true);
-        
-      }
-      FOOD_MATCHING.clear()
-      FOOD_MATCHING.addMultiple(foodSelected.filter(e => (e.displayWidth > this.heady.displayWidth/4 && e.displayWidth < this.heady.displayWidth*3)));
-
       // having found our food stuff, move to it until you're close!
-      this.closestMatch = findClosest(this.heady, FOOD_MATCHING.getMatching('active', true));
-      this.closestMatch.targeted = true;
-      let plant = this.closestMatch.group;
+      this.eating = true
+      playersBeing.torso.targeted = true;
       let rotationDirection = 0;
      
       let swimStates = [-20, 0, 20, 0];
@@ -224,47 +154,15 @@ class Slug extends Phaser.GameObjects.Container {
   
       this.timer = 0;
       this.scene.events.on('postupdate', function(time, delta) {
-        if(this.eating && FOOD_MATCHING.countActive()){
-          FOOD_MATCHING.getMatching('active', true).forEach((e, i) => {
-            if(!e.active) {
-              FOOD_MATCHING.remove(e);
-            }
-            if(this.plantLoop && this.closestMatch.group && e.group != this.closestMatch.group) {
-              FOOD_MATCHING.remove(e);
-            }
-          })
-          if( !FOOD_MATCHING.getMatching('active', true).length) {
-            let output = `your being is done with the food it saw.`
-            if(playersBeing.plantLoop && this.closestMatch.group) {
-              output += `<br>it tried all fruits off the plant which matched its rules!`
-            }
-            logOutput(output);
-            this.stop();
-            return;
-          }
-          let closestMatchNew = findClosest(this.heady, FOOD_MATCHING.getMatching('active', true));
-          if(this.closestMatch.group) {
-            if(this.closestMatch.group.countActive() && FOOD_MATCHING.getMatching('group', this.closestMatch.group).length) {
-              while(closestMatchNew.group != this.closestMatch.group && !closestMatchNew.active) {
-                closestMatchNew = findClosest(this.heady, FOOD_MATCHING.getMatching('group', this.closestMatch.group));
-                console.log(closestMatchNew)
-              }
-            }
-          }
-          
-          if(!this.closestMatch.active) {
-            this.closestMatch.targeted = false;
-            console.log('replacing closest match with', closestMatchNew)
-            this.closestMatch = closestMatchNew;
-            this.closestMatch.targeted = true;
-          }
-          let headyToTarget = new Vector2(this.closestMatch).subtract(this.heady);
+        if(this.eating && playersBeing.alpha == 1 && playersBeing.color.s > 0.5){
+
+          let headyToTarget = new Vector2(playersBeing.torso).subtract(this.heady);
           let len = headyToTarget.length()
-          drawVec(headyToTarget, this.heady, this.color.color, Math.min(this.heady.displayWidth, (this.heady.displayWidth+this.closestMatch.displayWidth)*30/len))
-          // console.log(this.closestMatch)
+          drawVec(headyToTarget, this.heady, this.color.color, Math.min(this.heady.displayWidth, (this.heady.displayWidth+playersBeing.torso.displayWidth)*30/len))
+          // console.log(playersBeing.torso)
           
-          let target = velocityToTarget(this.heady, this.closestMatch);
-          let distanceToFood = Distance.BetweenPoints(this.heady, this.closestMatch)
+          let target = velocityToTarget(this.heady, playersBeing.torso);
+          let distanceToFood = Distance.BetweenPoints(this.heady, playersBeing.torso)
   
           let vecTorsoHeady = velocityToTarget(this.torso, this.heady)
           let angleSlugTarget = Angle.ShortestBetween(RadToDeg(vecTorsoHeady.angle()), RadToDeg(target.angle()));
@@ -284,10 +182,8 @@ class Slug extends Phaser.GameObjects.Container {
           if(! rotationDirection) {
             if(angleSlugTarget > 0 && angleSlugTarget > 50) {
               rotationDirection = -1;
-              console.log('rotating left')
             } else if(angleSlugTarget < 0 && angleSlugTarget < -50) {
               rotationDirection = 1;
-              console.log('rotating right')
             }
           }
   
@@ -331,24 +227,6 @@ class Slug extends Phaser.GameObjects.Container {
             this.tail0.setVelocity(tail0Vec.x, tail0Vec.y);
           }
           
-          
-          if(closestMatchNew && this.closestMatch != closestMatchNew) {
-            let closer = Distance.BetweenPoints(this.heady, closestMatchNew) - distanceToFood;
-            if( closer > 50){
-              
-              console.log(closestMatchNew)
-              closestMatchNew.targeted = true;
-              this.closestMatch.targeted = false;
-              this.closestMatch = closestMatchNew;
-              rotationDirection = 0;
-              console.log('target switched')
-              this.chosenFood = this.closestMatch;
-            } 
-          }
-          plant = this.closestMatch.plant;
-          if(!closestMatchNew && plant && this.plantLoop) {
-            FOOD_MATCHING.addMultiple(plant.getMatching('visible', true));
-          }
           this.timer += delta;
           while(this.timer > 600) {
             // console.log('slugtimer')
@@ -364,14 +242,6 @@ class Slug extends Phaser.GameObjects.Container {
   
     stop() {
       this.eating = false;
-      FOOD.getMatching('active', true).forEach(e=> {
-        e.targeted = false;
-      })
-      if(this.chosenFood) {
-        this.chosenFood.targeted = false;
-        this.chosenFood = null;
-      }
-  
     }
 
 }
