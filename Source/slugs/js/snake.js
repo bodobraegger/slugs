@@ -31,7 +31,12 @@ class Snake extends Phaser.GameObjects.Container {
       playersBeing.bodyparts.forEach(limb => {
         this.heady.setOnCollideWith(limb, pair => {
           console.log('snake colliding with', limb, pair)
-          playersBeing.setAlpha(0.2)
+          if(this.heady.displayWidth > playersBeing.torso.displayWidth) {
+            playersBeing.setAlpha(0.2)
+            playersBeing.saturate(false);
+          } else {
+            console.log(`phew, your being is lucky it is too large to be eaten!`)
+          }
           this.eating = false;
         });
 

@@ -34,6 +34,7 @@ let FOOD_MATCHING;
 let FOOD_MINIMUM = 3;
 
 let PLANTS;
+let ENEMIES;
 
 let playersBeing = new Object
 
@@ -193,6 +194,8 @@ class Scene2 extends Phaser.Scene {
       // this.slugs.push(s);
       this.activeFoodlength = FOOD.getMatching('active', true)
     }
+
+    ENEMIES = new Phaser.GameObjects.Group(this, []);
     
     // RENDER TERMINAL ON TOP OF PHASER
     // const ph_terminal_container = this.add.dom(0.8*document.getElementById("phaser_container").clientWidth, 0.9*document.getElementById("phaser_container").clientHeight/2, terminal_container)
@@ -296,9 +299,10 @@ class Scene2 extends Phaser.Scene {
       this.enemySpawned = true;
       let x = this.pb.torso.x+this.pb.torso.scale*getCanvasWidth()/2;
       let y = this.pb.torso.y+this.pb.torso.scale*getCanvasHeight()/2
-      this.enemySlug = new Snake(this, x, y, this.pb.torso.displayWidth, getRandomColorInCat());
-      this.enemySlug.name = 'enemy'
-      console.log(`spawned enemy slug at`, this.enemySlug.x, this.enemySlug.y, this.enemySlug,);
+      this.enemy = new Snake(this, x, y, this.pb.torso.displayWidth, getRandomColorInCat());
+      this.enemy.name = 'enemy'
+      ENEMIES.add(this.enemy);
+      console.log(`spawned enemy at`, this.enemy.x, this.enemy.y, this.enemy);
     }
     this.controls.update(delta)
     let vecTorsoHeady = velocityToTarget(this.pb.torso, this.pb.heady);
@@ -717,6 +721,21 @@ class Scene2 extends Phaser.Scene {
     return o
   }
 
+  addGameSpriteCircle(x, y, radius, color, texture='circle') {
+    let img = new Phaser.GameObjects.Sprite(this, 0, 0, texture);
+    img.displayWidth = radius*2;
+    img.displayHeight = radius*2;
+    img.setTint(color);
+  
+    let matterCircle = this.matter.add.circle(x, y, radius);
+    // this = this.matter.add.gameObject( rt, matterCircle ) 
+    img.radius = radius;
+    img.color = Color.IntegerToColor(color);
+    img.txtr = texture.includes('spiky') ? 'spiky':'smooth';
+    img.shape = 'round'
+    return this.matter.add.gameObject(img, matterCircle);
+  }
+
   addGameEquiTriangle(x=0, y=0, length=10, color=getRandomColorInCat()) {
     var p0 = new Vector2(x, y+length/2);
     var p1 = new Vector2(x+length*Math.sqrt(2), y)
@@ -757,6 +776,7 @@ class Scene2 extends Phaser.Scene {
           if(sameColorCategory(o.color, s.color) && o.txtr == s.txtr && o.shape == s.shape) {
             output += `the being enjoyed this snack😋<br>`
             if(s.alpha < 1) {
+              s.saturate(1)
               s.setAlpha(1);
               output += `it feels healthy again!➕<br>`
             } else {
@@ -916,6 +936,7 @@ class gameSpriteCircle extends Phaser.GameObjects.GameObject {
     this.color = Color.IntegerToColor(color);
     this.txtr = texture.includes('spiky') ? 'spiky':'smooth';
     this.shape = 'round'
+    return scene.matter.add.gameObject(this, matterCircle);
   }
 }
 

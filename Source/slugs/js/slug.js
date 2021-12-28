@@ -65,6 +65,13 @@ class Slug extends Phaser.GameObjects.Container {
       this.setScale(1);
       this.body = this.torso.body;
       this.rulesFood = [ ];
+
+      // for movement
+      this.swimStates = [-20, 0, 20, 0];
+      this.swimStates.forEach((e, i) => {this.swimStates[i] = DegToRad(e)})
+      this.waveIndex = 0;
+      this.timer = 0;
+  
     }
     
     setAlpha(a) {
@@ -145,6 +152,7 @@ class Slug extends Phaser.GameObjects.Container {
     }
   
     eat(foodType='any') {
+      stop()
       this.scene.triggerFoodUpdate = true;
       this.eating = true;
       if(RULES.length) {
@@ -213,29 +221,24 @@ class Slug extends Phaser.GameObjects.Container {
       FOOD_MATCHING.addMultiple(foodSelected.filter(e => (e.displayWidth > this.heady.displayWidth/4 && e.displayWidth < this.heady.displayWidth*3)));
 
       // having found our food stuff, move to it until you're close!
-      this.closestMatch = findClosest(this.heady, FOOD_MATCHING.getMatching('active', true));
-      this.closestMatch.targeted = true;
-      let plant = this.closestMatch.group;
-      let rotationDirection = 0;
+      this.chosenFood = findClosest(this.heady, FOOD_MATCHING.getMatching('active', true));
+      this.chosenFood.targeted = true;
+      let plant = this.chosenFood.group;
+      this.rotationDirection = 0;
      
-      let swimStates = [-20, 0, 20, 0];
-      swimStates.forEach((e, i) => {swimStates[i] = DegToRad(e)})
-      let waveIndex = 0;
-  
-      this.timer = 0;
       this.scene.events.on('postupdate', function(time, delta) {
         if(this.eating && FOOD_MATCHING.countActive()){
           FOOD_MATCHING.getMatching('active', true).forEach((e, i) => {
             if(!e.active) {
               FOOD_MATCHING.remove(e);
             }
-            if(this.plantLoop && this.closestMatch.group && e.group != this.closestMatch.group) {
+            if(this.plantLoop && this.chosenFood.group && e.group != this.chosenFood.group) {
               FOOD_MATCHING.remove(e);
             }
           })
           if( !FOOD_MATCHING.getMatching('active', true).length) {
             let output = `your being is done with the food it saw.`
-            if(playersBeing.plantLoop && this.closestMatch.group) {
+            if(playersBeing.plantLoop && this.chosenFood.group) {
               output += `<br>it tried all fruits off the plant which matched its rules!`
             }
             logOutput(output);
@@ -243,28 +246,28 @@ class Slug extends Phaser.GameObjects.Container {
             return;
           }
           let closestMatchNew = findClosest(this.heady, FOOD_MATCHING.getMatching('active', true));
-          if(this.closestMatch.group) {
-            if(this.closestMatch.group.countActive() && FOOD_MATCHING.getMatching('group', this.closestMatch.group).length) {
-              while(closestMatchNew.group != this.closestMatch.group && !closestMatchNew.active) {
-                closestMatchNew = findClosest(this.heady, FOOD_MATCHING.getMatching('group', this.closestMatch.group));
+          if(this.chosenFood.group) {
+            if(this.chosenFood.group.countActive() && FOOD_MATCHING.getMatching('group', this.chosenFood.group).length) {
+              while(closestMatchNew.group != this.chosenFood.group && !closestMatchNew.active) {
+                closestMatchNew = findClosest(this.heady, FOOD_MATCHING.getMatching('group', this.chosenFood.group));
                 console.log(closestMatchNew)
               }
             }
           }
           
-          if(!this.closestMatch.active) {
-            this.closestMatch.targeted = false;
+          if(!this.chosenFood.active) {
+            this.chosenFood.targeted = false;
             console.log('replacing closest match with', closestMatchNew)
-            this.closestMatch = closestMatchNew;
-            this.closestMatch.targeted = true;
+            this.chosenFood = closestMatchNew;
+            this.chosenFood.targeted = true;
           }
-          let headyToTarget = new Vector2(this.closestMatch).subtract(this.heady);
-          let len = headyToTarget.length()
-          drawVec(headyToTarget, this.heady, this.color.color, Math.min(this.heady.displayWidth, (this.heady.displayWidth+this.closestMatch.displayWidth)*30/len))
-          // console.log(this.closestMatch)
+          let targetToHeady = new Vector2(this.chosenFood).subtract(this.heady);
+          let len = targetToHeady.length()
+          drawVec(targetToHeady, this.heady, this.color.color, Math.min(this.heady.displayWidth, (this.heady.displayWidth+this.chosenFood.displayWidth)*30/len))
+          // console.log(this.chosenFood)
           
-          let target = velocityToTarget(this.heady, this.closestMatch);
-          let distanceToFood = Distance.BetweenPoints(this.heady, this.closestMatch)
+          let target = velocityToTarget(this.heady, this.chosenFood);
+          let distanceToFood = Distance.BetweenPoints(this.heady, this.chosenFood)
   
           let vecTorsoHeady = velocityToTarget(this.torso, this.heady)
           let angleSlugTarget = Angle.ShortestBetween(RadToDeg(vecTorsoHeady.angle()), RadToDeg(target.angle()));
@@ -281,18 +284,18 @@ class Slug extends Phaser.GameObjects.Container {
           // this.heady.setVelocity(headyVec.x, headyVec.y)
   
           
-          if(! rotationDirection) {
+          if(! this.rotationDirection) {
             if(angleSlugTarget > 0 && angleSlugTarget > 50) {
-              rotationDirection = -1;
+              this.rotationDirection = -1;
               console.log('rotating left')
             } else if(angleSlugTarget < 0 && angleSlugTarget < -50) {
-              rotationDirection = 1;
+              this.rotationDirection = 1;
               console.log('rotating right')
             }
           }
   
           let correctionAngle = DegToRad(40);
-          // console.log(Math.round(angleSlugTarget), rotationDirection)
+          // console.log(Math.round(angleSlugTarget), this.rotationDirection)
           
           if((angleSlugTarget > 0 && angleSlugTarget < 70)||(angleSlugTarget < 0 && angleSlugTarget > -70)){
             headyVec.add(target);
@@ -304,11 +307,11 @@ class Slug extends Phaser.GameObjects.Container {
             
             if(distanceToFood > 50) {
               // this.tail1.setVelocity(headyVec.x, headyVec.y);
-              tail0Vec.rotate(swimStates[waveIndex]); // headyVec.mirror(vecTorsoHeady);
+              tail0Vec.rotate(this.swimStates[this.waveIndex]); // headyVec.mirror(vecTorsoHeady);
               this.tail0.setVelocity(tail0Vec.x, tail0Vec.y);
             }
           }
-          else if(rotationDirection == -1 && (angleSlugTarget > 50 || angleSlugTarget < -50)) {
+          else if(this.rotationDirection == -1 && (angleSlugTarget > 50 || angleSlugTarget < -50)) {
             // console.log('counter clockwise')
             
             let torsoVec = headyVec.clone().setLength(0.25*speed);
@@ -319,7 +322,7 @@ class Slug extends Phaser.GameObjects.Container {
             this.heady.setVelocity(headyVec.x, headyVec.y);
             this.tail0.setVelocity(tail0Vec.x, tail0Vec.y);
           }
-          else if(rotationDirection == 1 && (angleSlugTarget > 50 || angleSlugTarget < -50)) {
+          else if(this.rotationDirection == 1 && (angleSlugTarget > 50 || angleSlugTarget < -50)) {
             // console.log('clockwise (right)')
             
             let torsoVec = headyVec.clone().setLength(0.25*speed);
@@ -332,46 +335,159 @@ class Slug extends Phaser.GameObjects.Container {
           }
           
           
-          if(closestMatchNew && this.closestMatch != closestMatchNew) {
+          if(closestMatchNew && this.chosenFood != closestMatchNew) {
             let closer = Distance.BetweenPoints(this.heady, closestMatchNew) - distanceToFood;
             if( closer > 50){
               
               console.log(closestMatchNew)
               closestMatchNew.targeted = true;
-              this.closestMatch.targeted = false;
-              this.closestMatch = closestMatchNew;
-              rotationDirection = 0;
+              this.chosenFood.targeted = false;
+              this.chosenFood = closestMatchNew;
+              this.rotationDirection = 0;
               console.log('target switched')
-              this.chosenFood = this.closestMatch;
+              this.chosenFood = this.chosenFood;
             } 
           }
-          plant = this.closestMatch.plant;
+          plant = this.chosenFood.group;
           if(!closestMatchNew && plant && this.plantLoop) {
             FOOD_MATCHING.addMultiple(plant.getMatching('visible', true));
           }
           this.timer += delta;
           while(this.timer > 600) {
             // console.log('slugtimer')
-            waveIndex = (waveIndex+1) % swimStates.length;
+            this.waveIndex = (this.waveIndex+1) % this.swimStates.length;
             this.timer -= 600;
           }
-        }
-        else {
-          rotationDirection = 0
         }
       }, this);
     }
   
     stop() {
       this.eating = false;
-      FOOD.getMatching('active', true).forEach(e=> {
-        e.targeted = false;
-      })
+      this.fleeing = false;
+      // FOOD.getMatching('active', true).forEach(e=> {
+      //  e.targeted = false;
+      // })
       if(this.chosenFood) {
         this.chosenFood.targeted = false;
         this.chosenFood = null;
       }
+      if(this.closestEnemy) {
+        this.closestEnemy = null;
+      }
   
+    }
+
+    flee() {
+      stop();
+      this.rotationDirection = 0;  
+      this.timer = 0;
+      this.fleeing = 0;
+      this.closestEnemy = findClosest(this.heady, ENEMIES.getMatching('active', true)).heady;
+      
+      let dist = Distance.BetweenPoints(this.heady, this.closestEnemy)
+      this.fleeing = true
+      this.scene.events.on('postupdate', function(time, delta) {
+        if(this.fleeing && ENEMIES.countActive() && dist < 900 * this.scale){
+          console.log(this.rotationDirection)
+          console.log(this.closestEnemy, dist)
+          dist = Distance.BetweenPoints(this.heady, this.closestEnemy)
+          if( !ENEMIES.getMatching('active', true).length) {
+            let output = `your being does not see any harmful creatures :). it will stop trying to flee!`
+            logOutput(output);
+            this.stop();
+            return;
+          }
+
+          let targetToHeady = new Vector2(this.heady).subtract(this.closestEnemy);
+          let len = targetToHeady.length()
+          drawVec(targetToHeady, this.heady, 0xFFFFFF, Math.min(this.heady.displayWidth, (this.heady.displayWidth+this.closestEnemy.displayWidth)*30/len), 0.5)
+          // console.log(this.closestEnemy)
+          
+          let target = velocityToTarget(this.closestEnemy, this.heady);
+  
+          let vecTorsoHeady = velocityToTarget(this.torso, this.heady)
+          let angleSlugTarget = Angle.ShortestBetween(RadToDeg(vecTorsoHeady.angle()), RadToDeg(target.angle()));
+          
+          let speed = 8*this.scale;
+    
+          let tail1Vec = velocityFacing(this.tail1, speed/2); 
+          let tail0Vec = velocityFacing(this.tail0, speed/2); 
+          let torsoVec = velocityFacing(this.torso, speed/2); 
+          let headyVec = velocityFacing(this.heady, speed/2); 
+          // this.tail1.setVelocity(tail1Vec.x, tail1Vec.y)
+          // this.tail0.setVelocity(velocityFacing(this.tail0, speed).x, velocityFacing(this.tail0, 1).y)
+          // this.torso.setVelocity(velocityFacing(this.torso, speed).x, velocityFacing(this.torso, 1).y)
+          // this.heady.setVelocity(headyVec.x, headyVec.y)
+  
+          
+          if(!this.rotationDirection) {
+            if(angleSlugTarget > 0 && angleSlugTarget > 50) {
+              this.rotationDirection = -1;
+              console.log('rotating left')
+            } else if(angleSlugTarget < 0 && angleSlugTarget < -50) {
+              this.rotationDirection = 1;
+              console.log('rotating right')
+            }
+          }
+  
+          let correctionAngle = DegToRad(40);
+          // console.log(Math.round(angleSlugTarget), this.rotationDirection)
+          
+          if((angleSlugTarget > 0 && angleSlugTarget < 70)||(angleSlugTarget < 0 && angleSlugTarget > -70)){
+            headyVec.add(target);
+            this.torso.setVelocity(headyVec.x, headyVec.y);
+            this.heady.setVelocity(headyVec.x, headyVec.y);
+            // this.heady.applyForce(this.heady, this.heady, headyVec);
+            this.heady.setAngle(RadToDeg(headyVec.angle()))
+            
+          }
+          else if(this.rotationDirection == -1 && (angleSlugTarget > 50 || angleSlugTarget < -50)) {
+            // console.log('counter clockwise')
+            
+            let torsoVec = headyVec.clone().setLength(0.25*speed);
+            this.torso.setVelocity(torsoVec.x, torsoVec.y);
+            headyVec.setAngle(this.heady.rotation - correctionAngle)
+            tail0Vec.setAngle(this.tail0.rotation + correctionAngle);
+            // headyVec.add(target);
+            this.heady.setVelocity(headyVec.x, headyVec.y);
+            this.tail0.setVelocity(tail0Vec.x, tail0Vec.y);
+          }
+          else if(this.rotationDirection == 1 && (angleSlugTarget > 50 || angleSlugTarget < -50)) {
+            // console.log('clockwise (right)')
+            
+            let torsoVec = headyVec.clone().setLength(0.25*speed);
+            this.torso.setVelocity(torsoVec.x, torsoVec.y);
+            headyVec.setAngle(this.heady.rotation + correctionAngle)
+            tail0Vec.setAngle(this.tail0.rotation - correctionAngle);
+            // headyVec.add(target);
+            this.heady.setVelocity(headyVec.x, headyVec.y);
+            this.tail0.setVelocity(tail0Vec.x, tail0Vec.y);
+          }
+          // drawVec(headyVec.setLength(100), this.heady, 0xF00000, Math.min(this.heady.displayWidth, (this.heady.displayWidth+this.closestEnemy.displayWidth)*30/len), 0.5)
+          this.timer += delta;
+          while(this.timer > 300) {
+            // console.log('slugtimer')
+            this.waveIndex = (this.waveIndex+1) % this.swimStates.length;
+            this.timer -= 300;
+          }
+        }
+      }, this);
+    }
+
+    saturate(on=true) {
+      const grayscalePipeline = this.scene.renderer.pipelines.get('Grayscale');
+      console.log(on)
+      if(on) {
+        this.bodyparts.forEach(e => {
+          e.resetPipeline();
+        })
+      } else {
+        console.log(grayscalePipeline)
+        this.bodyparts.forEach(e => {
+          e.setPipeline(grayscalePipeline);
+        })
+      }
     }
 
 }
