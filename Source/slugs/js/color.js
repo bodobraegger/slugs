@@ -36,9 +36,18 @@ function sameColorCategory(color1, color2) { // color blindness: https://coloror
     }
 }  
 
-function getRandomColorInCat(cat=-1) {
-    let chosenCatIndex = Math.floor(Math.random()*(COLORCATS.length-1))
-    if(cat != -1) { chosenCatIndex = cat+1}
+function getRandomColorInCat(cat) {
+    let chosenCatIndex;
+    if(Array.isArray(cat)) {
+        let v = Math.floor(Math.random()*(cat.length))
+        chosenCatIndex = COLORCATS.indexOf(cat[v])+1
+    } else if(typeof cat == 'number') { 
+        chosenCatIndex = cat+1
+        //console.log(cat, Array.isArray(cat), chosenCatIndex, COLORCATS_HR[chosenCatIndex])
+    } else {
+        chosenCatIndex = Math.floor(Math.random()*(COLORCATS.length-1))
+    }
+    
     let hue = -1;
     let padding = 0.03
     let rangeStart = COLORCATS.at(chosenCatIndex-1)+padding;

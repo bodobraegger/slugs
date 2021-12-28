@@ -5,6 +5,7 @@
 let COLORCATS_HR  = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink','red']
 let COLORCATS_360 = [0, 5, 45, 75, 165, 240, 285, 350]
 let COLORCATS     = [ 0 ];
+let COLORCATS_DICT = {}
 
 let ATTRIBUTES = ['color', 'texture', 'shape']
 
@@ -13,8 +14,9 @@ let EDITABLE_withSingular = ['rule', 'routine'].concat(EDITABLE)
 
 for(let i = 0; i < COLORCATS_360.length; i++) {
   COLORCATS[i] = COLORCATS_360[i]/360;
+  COLORCATS_DICT[COLORCATS_HR[i]] = COLORCATS[i];
 }
-// console.log(COLORCATS)
+console.log(COLORCATS_DICT)
 
 let ENTITY_TYPES = ['food', 'others']
 
@@ -113,8 +115,7 @@ class Scene2 extends Phaser.Scene {
     let slug_x = getCanvasWidth()/2;
     let slug_y = getCanvasHeight()/2;
     
-    
-    let playersBeingColor = getRandomColorInCat();
+    let playersBeingColor = getRandomColorInCat([ COLORCATS_DICT['purple'], COLORCATS_DICT['blue'], COLORCATS_DICT['orange'] ]);
     changeStylesheetRule(document.styleSheets[0], '.beingscolor', `background-color`, `#${playersBeingColor.color.toString(16)}`)
     changeStylesheetRule(document.styleSheets[0], `.${COLORCATS_HR[getColorCategory(playersBeingColor)]}`, `color`, `#${playersBeingColor.color.toString(16)}`)
     this.pb = new Slug(this, slug_x, slug_y, slug_r, playersBeingColor);
