@@ -24,12 +24,12 @@ function changeStylesheetRule(stylesheet, selector, property, value) {
 	for(var i = 0; i < stylesheet.cssRules.length; i++) {
 		var rule = stylesheet.cssRules[i];
 		if(rule.selectorText === selector) {
-            console.log('replacing css')
+            // console.log('replacing css')
 			rule.style[property] = value;
 			return;
 		}
 	}
-    console.log('creating css')
+    // console.log('creating css')
 	stylesheet.insertRule(selector + " { " + property + ": " + value + "; }", 0);
-    console.log(stylesheet)
+    // console.log(stylesheet)
 }
