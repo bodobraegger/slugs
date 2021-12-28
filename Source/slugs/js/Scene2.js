@@ -295,7 +295,7 @@ class Scene2 extends Phaser.Scene {
       this.stage++;
       this.cameras.main.zoomTo(1/this.stage, 2000, 'Sine.easeInOut');
     }
-    if(this.stage == 1 && !this.enemySpawned) {
+    if(this.stage == 4 && !this.enemySpawned) {
       this.enemySpawned = true;
       let x = this.pb.torso.x+this.pb.torso.scale*getCanvasWidth()/2;
       let y = this.pb.torso.y+this.pb.torso.scale*getCanvasHeight()/2
@@ -303,6 +303,7 @@ class Scene2 extends Phaser.Scene {
       this.enemy.name = 'enemy'
       ENEMIES.add(this.enemy);
       console.log(`spawned enemy at`, this.enemy.x, this.enemy.y, this.enemy);
+      this.enemy.eat();
     }
     this.controls.update(delta)
     let vecTorsoHeady = velocityToTarget(this.pb.torso, this.pb.heady);
@@ -393,7 +394,7 @@ class Scene2 extends Phaser.Scene {
     FOOD_MATCHING.getMatching('visible', true).forEach(f => {
       let headyToTarget = new Vector2(f).subtract(this.pb.heady);
       let len = headyToTarget.length();
-      if(!f.targeted && len < (this.pb.scale*100+f.displayWidth)*4) {
+      if(!(f==this.pb.chosenFood) && len < (this.pb.scale*100+f.displayWidth)*4) {
         let alpha =(this.pb.heady.displayWidth+f.displayWidth)*3/len;
         drawVec(headyToTarget, this.pb.heady, this.pb.color.color, Math.min(this.pb.heady.displayWidth/2.5, (this.pb.heady.displayWidth+f.displayWidth)*10/len), Math.min(alpha, 0.5))
       }
@@ -695,6 +696,12 @@ class Scene2 extends Phaser.Scene {
         }
         return;
       }
+      case 'flee': {
+        output += `you tell your being to flee!<br>`
+        output += this.pb.flee();
+        break;
+      }
+
       case 'intro':{
         narration_intro();
         return;
@@ -770,7 +777,7 @@ class Scene2 extends Phaser.Scene {
     o.shape = 'round'
     let s = playersBeing;
     o.setOnCollideWith(s.heady, pair => {
-      if(o.targeted) {
+      if(o == this.pb.chosenFood) {
         if(o.displayWidth <= s.heady.displayWidth) {
           let output = ``
           if(sameColorCategory(o.color, s.color) && o.txtr == s.txtr && o.shape == s.shape) {
@@ -810,7 +817,6 @@ class Scene2 extends Phaser.Scene {
             output +='...<br>'
             s.eating = false;
           }
-          o.targeted = false;
           if(o.joints) {
             if(o.group) {
               o.joints.forEach(j => {
@@ -839,7 +845,6 @@ class Scene2 extends Phaser.Scene {
           }
           logOutput(output)
         }
-        o.targeted = false;
       }
     })
     return o;

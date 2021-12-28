@@ -222,7 +222,6 @@ class Slug extends Phaser.GameObjects.Container {
 
       // having found our food stuff, move to it until you're close!
       this.chosenFood = findClosest(this.heady, FOOD_MATCHING.getMatching('active', true));
-      this.chosenFood.targeted = true;
       let plant = this.chosenFood.group;
       this.rotationDirection = 0;
      
@@ -256,10 +255,8 @@ class Slug extends Phaser.GameObjects.Container {
           }
           
           if(!this.chosenFood.active) {
-            this.chosenFood.targeted = false;
             console.log('replacing closest match with', closestMatchNew)
             this.chosenFood = closestMatchNew;
-            this.chosenFood.targeted = true;
           }
           let targetToHeady = new Vector2(this.chosenFood).subtract(this.heady);
           let len = targetToHeady.length()
@@ -340,8 +337,6 @@ class Slug extends Phaser.GameObjects.Container {
             if( closer > 50){
               
               console.log(closestMatchNew)
-              closestMatchNew.targeted = true;
-              this.chosenFood.targeted = false;
               this.chosenFood = closestMatchNew;
               this.rotationDirection = 0;
               console.log('target switched')
@@ -365,11 +360,8 @@ class Slug extends Phaser.GameObjects.Container {
     stop() {
       this.eating = false;
       this.fleeing = false;
-      // FOOD.getMatching('active', true).forEach(e=> {
-      //  e.targeted = false;
-      // })
+      
       if(this.chosenFood) {
-        this.chosenFood.targeted = false;
         this.chosenFood = null;
       }
       if(this.closestEnemy) {
@@ -380,12 +372,19 @@ class Slug extends Phaser.GameObjects.Container {
 
     flee() {
       stop();
+      let output = ``;
       this.rotationDirection = 0;  
       this.timer = 0;
       this.fleeing = 0;
       this.closestEnemy = findClosest(this.heady, ENEMIES.getMatching('active', true)).heady;
       
       let dist = Distance.BetweenPoints(this.heady, this.closestEnemy)
+      if(dist > 900 * this.scale) {
+        output += `it does not see any harmful creature nearby :).`
+        return output;
+      } else {
+        output += `it tries to flee from the angry creature!`
+      }
       this.fleeing = true
       this.scene.events.on('postupdate', function(time, delta) {
         if(this.fleeing && ENEMIES.countActive() && dist < 900 * this.scale){
@@ -473,6 +472,8 @@ class Slug extends Phaser.GameObjects.Container {
           }
         }
       }, this);
+
+      return output;
     }
 
     saturate(on=true) {

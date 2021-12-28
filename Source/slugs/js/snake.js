@@ -34,8 +34,9 @@ class Snake extends Phaser.GameObjects.Container {
           if(this.heady.displayWidth > playersBeing.torso.displayWidth) {
             playersBeing.setAlpha(0.2)
             playersBeing.saturate(false);
+            logOutput(`oh no! the angry creature ate your beings color :( try to get it to eat something so it can regain its color!`)
           } else {
-            console.log(`phew, your being is lucky it is too large to be eaten!`)
+            logOutput(`phew, your being is lucky it is too large to be eaten!`)
           }
           this.eating = false;
         });
@@ -150,7 +151,6 @@ class Snake extends Phaser.GameObjects.Container {
     eat(foodType='any') {
       // having found our food stuff, move to it until you're close!
       this.eating = true
-      playersBeing.torso.targeted = true;
       let rotationDirection = 0;
      
       let swimStates = [-20, 0, 20, 0];
