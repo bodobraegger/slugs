@@ -152,7 +152,7 @@ class Slug extends Phaser.GameObjects.Container {
     }
   
     eat(foodType='any') {
-      stop()
+      this.stop()
       this.scene.triggerFoodUpdate = true;
       this.eating = true;
       if(RULES.length) {
@@ -269,7 +269,7 @@ class Slug extends Phaser.GameObjects.Container {
           let vecTorsoHeady = velocityToTarget(this.torso, this.heady)
           let angleSlugTarget = Angle.ShortestBetween(RadToDeg(vecTorsoHeady.angle()), RadToDeg(target.angle()));
           
-          let speed = 4*this.scale;
+          let speed = this.torso.displayWidth/10;
     
           let tail1Vec = velocityFacing(this.tail1, speed/2); 
           let tail0Vec = velocityFacing(this.tail0, speed/2); 
@@ -371,7 +371,7 @@ class Slug extends Phaser.GameObjects.Container {
     }
 
     flee() {
-      stop();
+      this.stop();
       let output = ``;
       this.rotationDirection = 0;  
       this.timer = 0;
@@ -388,8 +388,8 @@ class Slug extends Phaser.GameObjects.Container {
       this.fleeing = true
       this.scene.events.on('postupdate', function(time, delta) {
         if(this.fleeing && ENEMIES.countActive() && dist < 900 * this.scale){
-          console.log(this.rotationDirection)
-          console.log(this.closestEnemy, dist)
+          // console.log(this.rotationDirection)
+          // console.log(this.closestEnemy, dist)
           dist = Distance.BetweenPoints(this.heady, this.closestEnemy)
           if( !ENEMIES.getMatching('active', true).length) {
             let output = `your being does not see any harmful creatures :). it will stop trying to flee!`
@@ -408,7 +408,7 @@ class Slug extends Phaser.GameObjects.Container {
           let vecTorsoHeady = velocityToTarget(this.torso, this.heady)
           let angleSlugTarget = Angle.ShortestBetween(RadToDeg(vecTorsoHeady.angle()), RadToDeg(target.angle()));
           
-          let speed = 8*this.scale;
+          let speed = this.torso.displayWidth/5;
     
           let tail1Vec = velocityFacing(this.tail1, speed/2); 
           let tail0Vec = velocityFacing(this.tail0, speed/2); 

@@ -172,7 +172,7 @@ class Snake extends Phaser.GameObjects.Container {
           let vecTorsoHeady = velocityToTarget(this.torso, this.heady)
           let angleSlugTarget = Angle.ShortestBetween(RadToDeg(vecTorsoHeady.angle()), RadToDeg(target.angle()));
           
-          let speed = 4*this.scale;
+          let speed = this.torso.displayWidth/10;
     
           let tail1Vec = velocityFacing(this.tail1, speed/2); 
           let tail0Vec = velocityFacing(this.tail0, speed/2); 
