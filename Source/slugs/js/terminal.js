@@ -9,7 +9,7 @@ const ifWord = 'if',
     editWord = 'replace',
     deleteWord = 'forget';
 
-let wordsAction = ['eat', 'avoid', stopWord]
+let wordsAction = ['eat', stopWord, 'flee']
 
 const wordsFirst = wordsAction.concat([ifWord, loopWord, showWord, editWord, deleteWord, 'help', 'clear'])
 const wordsForCmdString = [].concat(wordsFirst.slice(0, 2));
@@ -17,7 +17,7 @@ let wordsIfConditionLeft = [].concat(ENTITY_TYPES);
 let wordsIfConditionRight = [].concat(SIZES, COLORCATS_HR, TEXTURES);
 const wordsBoolean = [thenWord, andWord, equalWord] //orWord, ;
 
-let wordsLoop1 = ['food'];
+let wordsLoop1 = ['fruit'];
 let wordsLoop2 = [equalWord];
 let wordsLoop3 = ['on', 'close']
 let wordsLoop4 = ['plant']
@@ -143,7 +143,12 @@ terminal_input.addEventListener('keyup', (e) => {
             wordsToCompare = [equalWord]; 
           }
           else if(wordsOfInterest.at(-1) == thenWord) {
-            wordsToCompare = wordsAction;
+            wordsToCompare = [...wordsAction];
+            if(wordsOfInterest.at(-4) == 'fruit') {
+              wordsToCompare.splice(wordsToCompare.indexOf('flee'), 1);
+            } else if(wordsOfInterest.at(-4) == 'other_creature') {
+              wordsToCompare.reverse();
+            }
           } 
         }
         // ELSE we have ...
@@ -151,7 +156,12 @@ terminal_input.addEventListener('keyup', (e) => {
           // if XX is YY then ...,
           if(current_word == thenWord) {
             // console.log('// if XX is YY then ...,')
-            wordsToCompare = wordsAction;
+            wordsToCompare = [...wordsAction];
+            if(wordsOfInterest.at(-4) == 'fruit') {
+              wordsToCompare.splice(wordsToCompare.indexOf('flee'), 1);
+            } else if(wordsOfInterest.at(-4) == 'other_creature') {
+              wordsToCompare.reverse();
+            }
           }
           // if XX is ..., 
           else if(current_word == equalWord) {

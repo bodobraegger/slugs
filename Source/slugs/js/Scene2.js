@@ -18,7 +18,7 @@ for(let i = 0; i < COLORCATS_360.length; i++) {
 }
 console.log(COLORCATS_DICT)
 
-let ENTITY_TYPES = ['food', 'others']
+let ENTITY_TYPES = ['fruit', 'other_creature']
 
 let TEXTURES = ['smooth', 'spiky']
 
@@ -41,14 +41,16 @@ let playersBeing = new Object
 let massMultiplierConstant = 2.2860618138362114;
 const { Vector2, Angle, Distance, DegToRad, RadToDeg, Between, FloatBetween } = Phaser.Math;
 const { Color } = Phaser.Display;
-const ifExample = 'if food is red then eat';
-const loopExample = 'while food on plant eat';
+const ifExample = 'if fruit is red then eat';
+const loopExample = 'while fruit on plant eat';
 const editExample = `replace rule 1 with ${ifExample}`;
 const deleteExample = 'forget rule 1'
 
 let timerEvents = [ ]
 
 let SCENE;
+
+let NARRATION = new Narration();
 
 const flowerTextures = ['flower_1', 'flower_2']
 const spikyTextures = ['circle_spiky_1','circle_spiky_2', 'circle_spiky_3']
@@ -132,12 +134,12 @@ class Scene2 extends Phaser.Scene {
     this.enemySpawned = false;
 
     let foodsInitial = [ 
-      this.addFood(0, 0, 10, pbColorCat, 'flower'),
-      this.addFood(getCanvasWidth(), 0, 15, pbColorCat, 'flower'),
-      this.addFood(getCanvasWidth(), getCanvasHeight(), 20, pbColorCat, 'flower'),
-      this.addFood(getCanvasWidth(), getCanvasHeight()+5, 20, pbColorCat, 'flower'),
-      this.addFood(getCanvasWidth()+5, getCanvasHeight()+5, 20, pbColorCat, 'flower'),
-      this.addFood(0, getCanvasHeight(), 25, pbColorCat, 'circle_spiky'),
+      this.addFruit(0, 0, 10, pbColorCat, 'flower'),
+      this.addFruit(getCanvasWidth(), 0, 15, pbColorCat, 'flower'),
+      this.addFruit(getCanvasWidth(), getCanvasHeight(), 20, pbColorCat, 'flower'),
+      this.addFruit(getCanvasWidth(), getCanvasHeight()+5, 20, pbColorCat, 'flower'),
+      this.addFruit(getCanvasWidth()+5, getCanvasHeight()+5, 20, pbColorCat, 'flower'),
+      this.addFruit(0, getCanvasHeight(), 25, pbColorCat, 'circle_spiky'),
     ];
     
     FOOD = new Phaser.GameObjects.Group(this, foodsInitial);
@@ -182,7 +184,7 @@ class Scene2 extends Phaser.Scene {
 
       let c = getRandomColorInCat();
       
-      // FOOD.add(this.addFood(20+c.color%(rand*10), c.color%(rand*10), 5*rand, c, 'flower'));
+      // FOOD.add(this.addFruit(20+c.color%(rand*10), c.color%(rand*10), 5*rand, c, 'flower'));
       let plant; 
       if(yesOrNo) {
         plant = new Plant(this, distx, disty, c, randSize, randFS, randFN, true)
@@ -221,29 +223,8 @@ class Scene2 extends Phaser.Scene {
     this.controls = new Phaser.Cameras.Controls.SmoothedKeyControl(controlConfig);
     this.input.keyboard.preventDefault = false;
 
-    /*timerEvents.push(
-      this.time.addEvent({ delay: Between(2000, 8000),
-          loop: true, callbackScope: this, callback: function() {
-            // updateHealthyFood();
-            // console.log(FOOD_HEALTHY)
-            if(FOOD_HEALTHY.getMatching('active', true).length < FOOD_MINIMUM) {
-              let distx = this.pb.x+(Math.random()<0.5 ? Between(-3000*this.pb.scale, -1000*this.pb.scale):Between(1000*this.pb.scale, 3000*this.pb.scale))
-              let disty = this.pb.y+(Math.random()<0.5 ? Between(-3000*this.pb.scale, -1000*this.pb.scale):Between(1000*this.pb.scale, 3000*this.pb.scale))
-              let texture = Math.random()<0.5 ? 'flower':'circle_spiky'
-              let newFood = this.addFood(
-                distx, disty, 
-                Between(this.pb.heady.radius, this.pb.heady.radius * this.pb.scale), 
-                pbColorCat, texture);
-              // console.log(`spawning new food near being at ${newFood.x}, ${newFood.y}`, newFood)
-              // console.log(FOOD.getChildren().length, FOOD_HEALTHY.getChildren().length)
-              FOOD.add(newFood);
-              FOOD_HEALTHY.add(newFood);
-              console.log(FOOD.getChildren().length, FOOD_HEALTHY.getChildren().length)
-            }
-          }})
-    );*/
     // NARRATION
-    narration_intro();
+    NARRATION.intro();
 
   }
 
@@ -260,7 +241,7 @@ class Scene2 extends Phaser.Scene {
     constraints = [ ]
     PLANTS.getChildren().forEach(p => {
       if(p.circle && p.width < this.pb.torso.displayWidth*1.5) {
-        let f = this.addFood(p.getFirstAlive().x, p.getFirstAlive().y, p.width/2, p.color, 'flower');
+        let f = this.addFruit(p.getFirstAlive().x, p.getFirstAlive().y, p.width/2, p.color, 'flower');
         console.log('replacing',p,'with',f)
         FOOD.add(f)
         p.destroy(true, true);
@@ -296,13 +277,16 @@ class Scene2 extends Phaser.Scene {
       this.cameras.main.zoomTo(1/this.stage, 2000, 'Sine.easeInOut');
     }
     if(this.stage == 4 && !this.enemySpawned) {
+      this.pb.stop();
       this.enemySpawned = true;
       let x = this.pb.torso.x+this.pb.torso.scale*getCanvasWidth()/2;
       let y = this.pb.torso.y+this.pb.torso.scale*getCanvasHeight()/2
-      this.enemy = new Snake(this, x, y, this.pb.torso.displayWidth, getRandomColorInCat());
+      this.enemy = new Snake(this, x, y, this.pb.torso.displayWidth, getRandomColorInCat(['red', 'yellow']).darken(25));
       this.enemy.name = 'enemy'
       ENEMIES.add(this.enemy);
       console.log(`spawned enemy at`, this.enemy.x, this.enemy.y, this.enemy);
+      changeStylesheetRule(document.styleSheets[0], '.enemycolor', `background-color`, `#${this.enemy.color.color.toString(16)}`)
+      NARRATION.hunted();
       this.enemy.eat();
     }
     this.controls.update(delta)
@@ -317,29 +301,28 @@ class Scene2 extends Phaser.Scene {
         healthyCount++;
       }
       /*if(f.displayWidth*15 < this.pb.heady.displayWidth/2 && !f.group) {
-          let newFood = this.addFood(
+          let fruit = this.addFruit(
             this.pb.x+(Math.random()<0.5 ? Between(-3000*this.pb.scale, -1000*this.pb.scale):Between(1000*this.pb.scale, 3000*this.pb.scale)), 
             this.pb.y+(Math.random()<0.5 ? Between(-3000*this.pb.scale, -1000*this.pb.scale):Between(1000*this.pb.scale, 3000*this.pb.scale)),
             this.pb.displayWidth/2-5,
             f.color,
             f.txtr  
           )
-          console.log('replacing', f, 'with', newFood);
-          FOOD.add(newFood)
+          console.log('replacing', f, 'with', fruit);
+          FOOD.add(fruit)
           f.destroy();
       }*/
     })
 
     if(RULES.length != this.rulesLength || this.triggerFoodUpdate || this.activeFoodlength != FOOD.getMatching('active', true).length) {
-      console.log('adapting matching food!', RULES.length != this.rulesLength)
       this.rulesLength = RULES.length;
       FOOD_MATCHING.clear();
       let foodSelected = FOOD.getMatching('active', true);
-      
-      for(let i = 0; i < RULES.length; i++) {
+      let rulesFood = this.pb.rulesParsed.filter(e => e.action == 'eat')
+      for(let i = 0; i < rulesFood.length; i++) {
         let foodCurrentlySelected = [ ];
-        let r = this.pb.rulesFood[i]; 
-        console.log('adapting matching food! -> rule', r)
+        let r = rulesFood[i]; 
+        console.log('adapting matching fruit! -> rule', r)
         let booleanExpr = r.booleanExpr;
         let booleanString = booleanExpr.join(' '); // .splice(1, 0, '(').push(')')
         booleanString = booleanString.replaceAll(equalWord, '==').replaceAll(andWord, '&&').replaceAll(` ${orWord}`, ` ||`);
@@ -359,25 +342,25 @@ class Scene2 extends Phaser.Scene {
         for(let i = 0; i < foodSelected.length; i++) {
           let f = foodSelected[i];
           // VARIABLE NAME NEEDS TO BE SAME AS INPUT!!
-          let food = '';
+          let fruit = '';
           if(r.ifColor) {
-            food = COLORCATS_HR[getColorCategory(f.color)];
+            fruit = COLORCATS_HR[getColorCategory(f.color)];
           }
           if(r.ifSize) {
             if(booleanString.includes('beings size')) {
               booleanString.replaceAll('beings size', `'beings size'`);
-              food = (this.pb.heady.displayWidth > f.displayWidth - 5*this.pb.scale || this.pb.heady.displayWidth < f.displayWidth - 5*this.pb.scale ? "beings size":"not same size" );
+              fruit = (this.pb.heady.displayWidth > f.displayWidth - 5*this.pb.scale || this.pb.heady.displayWidth < f.displayWidth - 5*this.pb.scale ? "beings size":"not same size" );
             } else{
-              food = (this.pb.heady.displayWidth < f.displayWidth ? 'bigger':'smaller' )
+              fruit = (this.pb.heady.displayWidth < f.displayWidth ? 'bigger':'smaller' )
             }
           }
           if(r.ifTexture) {
-            food = f.txtr;
+            fruit = f.txtr;
           }
-          // console.log(booleanString, 'food var:', food);
+          // console.log(booleanString, 'fruit var:', fruit);
           let evaluation = eval(booleanString);
-          console.log(evaluation);
-          if(evaluation && !r.avoid) {
+          console.log(booleanString, fruit, evaluation);
+          if(evaluation) {
             foodCurrentlySelected.push(foodSelected[i]);
           }
         }
@@ -403,14 +386,14 @@ class Scene2 extends Phaser.Scene {
     if(healthyCount<FOOD_MINIMUM) {
       let x = this.pb.x+(Math.random()<0.5 ? Between(-1000*this.pb.scale, -500*this.pb.scale):Between(500*this.pb.scale, 1000*this.pb.scale)), 
       y = this.pb.y+(Math.random()<0.5 ? Between(-1000*this.pb.scale, -500*this.pb.scale):Between(500*this.pb.scale, 1000*this.pb.scale));
-      let f = this.addFood(
+      let f = this.addFruit(
         x, y,
         this.pb.displayWidth/2-5,
         getRandomColorInCat(this.pb.color),
         'flower'  
       )
       FOOD.add(f)
-      console.log('new food because not enough eatable! at', x, y, f)
+      console.log('new fruit because not enough healthy! at', x, y, f)
     }
     // COMPANION
     // console.log(Math.max(Math.abs(this.companion.body.velocity.x), Math.abs(this.companion.body.velocity.y)))
@@ -448,56 +431,12 @@ class Scene2 extends Phaser.Scene {
           logOutput(ifError);
           return;
         }
-        let thenIndex = cmd.indexOf(thenWord); 
-        let condition = cmd.slice(1, thenIndex);
-        let action = cmd.slice(thenIndex+1);
-        // console.log(condition);
-        // console.log(action);
         let ruleString = cmd.join(' ');
         if(RULES.includes(ruleString)) {
           output += `your being already learned that rule :)`
         }
         else {
-          RULES.push(ruleString);
-                // FOOD_MATCHING = new Phaser.GameObjects.Group(this.scene);
-          let ifColor = false;
-          let ifTexture = false;
-          let ifSize = false;
-          let ifShape = false;
-          let avoid = false;
-          let r = ruleString.split(" ");
-          let type = r.at(1);
-      
-          avoid = (r.at(-1) == 'avoid');
-          if(type == 'food') {
-            let booleanExpr = r.slice(1,r.length-2);
-            
-            booleanExpr.forEach((e, i) => {
-              if(wordsIfConditionRight.includes(e)) {
-                booleanExpr[i] = `'${e}'`
-              }
-              if(COLORCATS_HR.includes(e) || e=='color') {
-                ifColor = true;
-              }
-              if(TEXTURES.includes(e) || e=='texture') {
-                ifTexture = true;
-              }
-              if(SIZES.includes(e) || e=='size') {
-                ifSize = true;
-              }
-              if(SHAPES.includes(e) || e=='shape') {
-                ifSize = true;
-              }
-            });
-            this.pb.rulesFood.push({
-              booleanExpr,
-              ifColor,
-              ifTexture,
-              ifSize,
-              ifShape,
-              avoid,
-            });
-          }
+          this.pb.addRule(ruleString);
           
           output += `your being learned the rule you gave it!`
         }
@@ -616,7 +555,7 @@ class Scene2 extends Phaser.Scene {
         RULESorROUTINES.splice(index, 1);
         logOutput(`your being forgot the ${ruleOrRoutine} with the number ${cmd[2]} :)`)
         if(ruleOrRoutine == 'rule') {
-          this.pb.rulesFood.splice(index, 1);
+          this.pb.rulesParsed.splice(index, 1);
         }
         return;
       }
@@ -661,14 +600,14 @@ class Scene2 extends Phaser.Scene {
             case 'eat':
               output += `you can use the ${wrapCmd('eat')} command to tell your being to look for food :). if you give it rules using the ${wrapCmd(ifWord)} about the food it should eat, then it won't just eat the first thing it can.`
               break;
-            case 'avoid':
-              output += `TODO`
+            case 'flee':
+              output += `you can use the ${wrapCmd('flee')} command to tell your being to flee from an ${wrapCmd('other_creature')}. if you give it rules using the ${wrapCmd(ifWord)} about the creatures it should flee from, then it won't just flee from anything.`
               break;
             case ifWord:
-              output += `with the ${wrapCmd('if')} keyword you can give rules to your being! your being will use these rules to figure out what to ${wrapCmd('eat')} and what to ${wrapCmd('avoid')} :). An if rule needs to be of the form ${wrapCmd('if <i>condition</i> then <i>action</i>')}, for example: ${wrapCmd(ifExample)}!`;
+              output += `with the ${wrapCmd('if')} keyword you can give rules to your being! your being will use these rules to figure out what to ${wrapCmd('eat')} and what to ${wrapCmd('action')} :). An if rule needs to be of the form ${wrapCmd('if <i>condition</i> then <i>action</i>')}, for example: ${wrapCmd(ifExample)}!`;
               break;
             case loopWord:
-              output += `TODO`
+              output += `to make your being more efficient in eating, you can give it a ${wrapCmd('routine')} to follow so it can do things automatically. for example: ${wrapCmd(loopExample)}.`
               break;
             case stopWord:
               output += `${wrapCmd(stopWord)} will ${wrapCmd(stopWord)} your being from doing the last action you told it to do, probably ${wrapCmd('eat')}ing!`
@@ -703,7 +642,7 @@ class Scene2 extends Phaser.Scene {
       }
 
       case 'intro':{
-        narration_intro();
+        NARRATION.intro();
         return;
       }
       default: {
@@ -751,7 +690,7 @@ class Scene2 extends Phaser.Scene {
     var o = this.matter.add.gameObject(triangle, this.matter.add.fromVertices(x, y, [p0, p1, p2]))
     return o;
   }
-  addFood(x, y, radius, color = getRandomColorInCat(), texture = 'circle') {
+  addFruit(x, y, radius, color = getRandomColorInCat(), texture = 'circle') {
     if(texture == 'flower') {
       texture = randomElement(flowerTextures);
     } else if(texture.includes('spiky')) {
@@ -793,7 +732,7 @@ class Scene2 extends Phaser.Scene {
             if(s.plantLoop && o.group) {
               let oGroupMatchTemp = new Phaser.GameObjects.Group(this, FOOD_MATCHING.getMatching('group', o.group));
               if(oGroupMatchTemp.countActive()) { 
-                output += `it will look for more food now!<br>`
+                output += `it will look for more fruit now!<br>`
                 s.eating = true; 
               } else if(o.group.countActive()) { logOutput(`no more fruits on this plant match the beings rules`) } 
               else { logOutput(`your being ate all of the fruit on this plant!🌴`) }
@@ -968,7 +907,7 @@ class Plant extends Phaser.GameObjects.Group {
       } else {
         p = pointOnCircle(x, y, width/2, DegToRad(360/fruitsNumber * i));
       }
-      let f = scene.addFood(p.x, p.y, Between(fruitsRadius-5, fruitsRadius+5), getRandomColorInCat(colorCat), texture);
+      let f = scene.addFruit(p.x, p.y, Between(fruitsRadius-5, fruitsRadius+5), getRandomColorInCat(colorCat), texture);
       FOOD.add(f);
       f.group = this;
       this.add(f)

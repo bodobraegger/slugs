@@ -7,8 +7,8 @@ class Snake extends Phaser.GameObjects.Container {
       this.txtr = 'smooth';
       this.shape = 'round';
       this.plantLoop = false;
-      let headyColor = getRandomColorInCat().lighten((Math.min(0.2+Math.random(), 0.8))*50);
-      let tailColor = getRandomColorInCat().lighten((Math.min(0.1+Math.random(), 0.8))*30);
+      let headyColor = getRandomColorInCat(getColorCategory(color)).lighten((Math.min(0.2+Math.random(), 0.8))*50);
+      let tailColor = getRandomColorInCat(getColorCategory(color)).lighten((Math.min(0.1+Math.random(), 0.8))*30);
   
       let headyRadius = radius/1.4
       let tail0Radius = radius/1.7
@@ -34,6 +34,7 @@ class Snake extends Phaser.GameObjects.Container {
           if(this.heady.displayWidth > playersBeing.torso.displayWidth) {
             playersBeing.setAlpha(0.2)
             playersBeing.saturate(false);
+            playersBeing.stop();
             logOutput(`oh no! the angry creature ate your beings color :( try to get it to eat something so it can regain its color!`)
           } else {
             logOutput(`phew, your being is lucky it is too large to be eaten!`)
@@ -79,7 +80,7 @@ class Snake extends Phaser.GameObjects.Container {
       this.tint = color.color;
       this.setScale(1);
       this.body = this.torso.body;
-      this.rulesFood = [ ];
+      this.rulesParsed = [ ];
     }
     
     setAlpha(a) {

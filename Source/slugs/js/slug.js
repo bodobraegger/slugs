@@ -64,13 +64,14 @@ class Slug extends Phaser.GameObjects.Container {
       this.tint = color.color;
       this.setScale(1);
       this.body = this.torso.body;
-      this.rulesFood = [ ];
+      this.rulesParsed = [ ];
 
       // for movement
       this.swimStates = [-20, 0, 20, 0];
       this.swimStates.forEach((e, i) => {this.swimStates[i] = DegToRad(e)})
       this.waveIndex = 0;
       this.timer = 0;
+      this.moveRandomly();
   
     }
     
@@ -148,7 +149,7 @@ class Slug extends Phaser.GameObjects.Container {
     }
   
     moveRandomly() {
-      this.scene.matter.applyForce(this.heady, {x: FloatBetween(-0.2, 0.2), y: FloatBetween(-0.2, 0.2)})
+      this.scene.matter.applyForce(this.heady, {x: FloatBetween(-0.05, 0.05), y: FloatBetween(-0.05, 0.05)})
     }
   
     eat(foodType='any') {
@@ -160,15 +161,16 @@ class Slug extends Phaser.GameObjects.Container {
       }
       let foodSelected = FOOD.getMatching('active', true);
 
-      if(this.rulesFood.length) {
-          logOutput(`it remembers the following food ${wrapCmd('rules')}:`)
+      let rulesFood = this.rulesParsed.filter(e => e.action == 'eat')
+      if(rulesFood.length) {
+        logOutput(`it remembers the following food ${wrapCmd('rules')}:`)
         
-        for(let i = 0; i < this.rulesFood.length; i++) {
+        for(let i = 0; i < rulesFood.length; i++) {
           let foodCurrentlySelected = [ ];
-          let r = this.rulesFood[i]; 
+          let r = rulesFood[i]; 
           let booleanExpr = r.booleanExpr;
           let booleanString = booleanExpr.join(' '); // .splice(1, 0, '(').push(')')
-            logOutput(`${i+1}. ${wrapCmd(booleanString.replaceAll("'", ""))} ${i<this.rulesFood.length-1 ? 'and' : ''}`)
+          logOutput(`${i+1}. ${wrapCmd(booleanString.replaceAll("'", ""))} ${i<rulesFood.length-1 ? 'and' : ''}`)
           booleanString = booleanString.replaceAll(equalWord, '==').replaceAll(andWord, '&&').replaceAll(` ${orWord}`, ` ||`);
           if(booleanString.includes('beings ')) {
             ATTRIBUTES.forEach( (e,i) => {
@@ -186,25 +188,25 @@ class Slug extends Phaser.GameObjects.Container {
           for(let i = 0; i < foodSelected.length; i++) {
             let f = foodSelected[i];
             // VARIABLE NAME NEEDS TO BE SAME AS INPUT!!
-            let food = '';
+            let fruit = '';
             if(r.ifColor) {
-              food = COLORCATS_HR[getColorCategory(f.color)];
+              fruit = COLORCATS_HR[getColorCategory(f.color)];
             }
             if(r.ifSize) {
               if(booleanString.includes('beings size')) {
                 booleanString.replaceAll('beings size', `'beings size'`);
-                food = (this.heady.displayWidth > f.displayWidth - 5*this.scale || this.heady.displayWidth < f.displayWidth - 5*this.scale ? "beings size":"not same size" );
+                fruit = (this.heady.displayWidth > f.displayWidth - 5*this.scale || this.heady.displayWidth < f.displayWidth - 5*this.scale ? "beings size":"not same size" );
               } else{
-                food = (this.heady.displayWidth < f.displayWidth ? 'bigger':'smaller' )
+                fruit = (this.heady.displayWidth < f.displayWidth ? 'bigger':'smaller' )
               }
             }
             if(r.ifTexture) {
-              food = f.txtr;
+              fruit = f.txtr;
             }
-            // console.log(booleanString, 'food var:', food);
+            // console.log(booleanString, 'fruit var:', fruit);
             let evaluation = eval(booleanString);
             // console.log(evaluation);
-            if(evaluation && !r.avoid) {
+            if(evaluation) {
               foodCurrentlySelected.push(foodSelected[i]);
             }
           }
@@ -364,8 +366,8 @@ class Slug extends Phaser.GameObjects.Container {
       if(this.chosenFood) {
         this.chosenFood = null;
       }
-      if(this.closestEnemy) {
-        this.closestEnemy = null;
+      if(this.closestEnemyHeady) {
+        this.closestEnemyHeady = null;
       }
   
     }
@@ -376,9 +378,9 @@ class Slug extends Phaser.GameObjects.Container {
       this.rotationDirection = 0;  
       this.timer = 0;
       this.fleeing = 0;
-      this.closestEnemy = findClosest(this.heady, ENEMIES.getMatching('active', true)).heady;
+      this.closestEnemyHeady = findClosest(this.heady, ENEMIES.getMatching('active', true)).heady;
       
-      let dist = Distance.BetweenPoints(this.heady, this.closestEnemy)
+      let dist = Distance.BetweenPoints(this.heady, this.closestEnemyHeady)
       if(dist > 900 * this.scale) {
         output += `it does not see any harmful creature nearby :).`
         return output;
@@ -389,8 +391,8 @@ class Slug extends Phaser.GameObjects.Container {
       this.scene.events.on('postupdate', function(time, delta) {
         if(this.fleeing && ENEMIES.countActive() && dist < 900 * this.scale){
           // console.log(this.rotationDirection)
-          // console.log(this.closestEnemy, dist)
-          dist = Distance.BetweenPoints(this.heady, this.closestEnemy)
+          // console.log(this.closestEnemyHeady, dist)
+          dist = Distance.BetweenPoints(this.heady, this.closestEnemyHeady)
           if( !ENEMIES.getMatching('active', true).length) {
             let output = `your being does not see any harmful creatures :). it will stop trying to flee!`
             logOutput(output);
@@ -398,12 +400,12 @@ class Slug extends Phaser.GameObjects.Container {
             return;
           }
 
-          let targetToHeady = new Vector2(this.heady).subtract(this.closestEnemy);
+          let targetToHeady = new Vector2(this.heady).subtract(this.closestEnemyHeady);
           let len = targetToHeady.length()
-          drawVec(targetToHeady, this.heady, 0xFFFFFF, Math.min(this.heady.displayWidth, (this.heady.displayWidth+this.closestEnemy.displayWidth)*30/len), 0.5)
-          // console.log(this.closestEnemy)
+          drawVec(targetToHeady, this.heady, 0xFFFFFF, Math.min(this.heady.displayWidth, (this.heady.displayWidth+this.closestEnemyHeady.displayWidth)*30/len), 0.5)
+          // console.log(this.closestEnemyHeady)
           
-          let target = velocityToTarget(this.closestEnemy, this.heady);
+          let target = velocityToTarget(this.closestEnemyHeady, this.heady);
   
           let vecTorsoHeady = velocityToTarget(this.torso, this.heady)
           let angleSlugTarget = Angle.ShortestBetween(RadToDeg(vecTorsoHeady.angle()), RadToDeg(target.angle()));
@@ -463,7 +465,7 @@ class Slug extends Phaser.GameObjects.Container {
             this.heady.setVelocity(headyVec.x, headyVec.y);
             this.tail0.setVelocity(tail0Vec.x, tail0Vec.y);
           }
-          // drawVec(headyVec.setLength(100), this.heady, 0xF00000, Math.min(this.heady.displayWidth, (this.heady.displayWidth+this.closestEnemy.displayWidth)*30/len), 0.5)
+          // drawVec(headyVec.setLength(100), this.heady, 0xF00000, Math.min(this.heady.displayWidth, (this.heady.displayWidth+this.closestEnemyHeady.displayWidth)*30/len), 0.5)
           this.timer += delta;
           while(this.timer > 300) {
             // console.log('slugtimer')
@@ -474,6 +476,46 @@ class Slug extends Phaser.GameObjects.Container {
       }, this);
 
       return output;
+    }
+
+    addRule(ruleString) {
+      let ifColor = false;
+      let ifTexture = false;
+      let ifSize = false;
+      let ifShape = false;
+      let r = ruleString.split(" ");
+      let type = r.at(1);
+      
+      let action = r.at(-1);
+      let booleanExpr = r.slice(1,r.length-2);
+      
+      booleanExpr.forEach((e, i) => {
+        if(wordsIfConditionRight.includes(e)) {
+          booleanExpr[i] = `'${e}'`
+        }
+        if(COLORCATS_HR.includes(e) || e=='color') {
+          ifColor = true;
+        }
+        if(TEXTURES.includes(e) || e=='texture') {
+          ifTexture = true;
+        }
+        if(SIZES.includes(e) || e=='size') {
+          ifSize = true;
+        }
+        if(SHAPES.includes(e) || e=='shape') {
+          ifSize = true;
+        }
+      });
+      this.rulesParsed.push({
+        type,
+        booleanExpr,
+        ifColor,
+        ifTexture,
+        ifSize,
+        ifShape,
+        action,
+      });
+      RULES.push(ruleString);
     }
 
     saturate(on=true) {
