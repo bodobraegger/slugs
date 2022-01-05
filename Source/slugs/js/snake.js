@@ -35,7 +35,7 @@ class Snake extends Phaser.GameObjects.Container {
             playersBeing.setAlpha(0.2)
             playersBeing.saturate(false);
             playersBeing.stop();
-            logOutput(`oh no! the angry creature ate your beings color :( try to get it to eat something so it can regain its color!`)
+            logOutput(`oh no! the angry creature ate your being's color :( try to get it to eat something so it can regain its color!`)
           } else {
             logOutput(`phew, your being is lucky it is too large to be eaten!`)
           }
