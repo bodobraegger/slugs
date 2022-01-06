@@ -37,6 +37,9 @@ function sameColorCategory(color1, color2) { // color blindness: https://coloror
 }  
 
 function getRandomColorInCat(cat) {
+  if(cat instanceof Color) {
+    cat = getColorCategory(cat);
+  }
     let chosenCatIndex;
     if(Array.isArray(cat)) {
         let v = Math.floor(Math.random()*(cat.length))
