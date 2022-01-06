@@ -322,7 +322,13 @@ terminal_input.addEventListener('keydown', (e) => {
       }
       return;
     */
-      case 'Enter': {
+    case ' ': {
+      if(terminal_input.value.at(-1) == ' ') {
+        e.preventDefault();
+      }
+      break;
+    } 
+    case 'Enter': {
       e.preventDefault()
       let cmd = terminal_input.value.toLowerCase().match(/\w+/g).filter(word => !wordsFilter.includes(word))
       if(!cmd) { return; }
