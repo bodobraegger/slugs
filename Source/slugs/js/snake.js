@@ -1,6 +1,6 @@
 class Snake extends Slug {
     constructor(scene=Scene2, x=0, y=0, radius=20, color=getRandomColorInCat()) {
-      super(scene, x, y);
+      super(scene, x, y, radius, color);
       this.setDataEnabled();
       this.data.values.color = color;
       this.color = color
@@ -100,58 +100,9 @@ class Snake extends Slug {
       this.rulesParsed = [ ];
     }
     
-    setAlpha(a) {
-      this.list.forEach(element => {
-        element.setAlpha(a);
-      });
-      this.alpha = a;
-    }
-    
-    setTint(t) {
-      this.list.forEach(element => {
-        try { element.setTint(t); }
-        catch {
-          element.fillColor = t;
-        }
-      });
-      this.tint = t;
-    }
-    
-    setScale(sX, sY=undefined) {
-      this.scaleX = sX;
-      (sY) ? this.scaleY = sY : this.scaleY = sX;
-      this.scale = (this.scaleX+this.scaleY) / 2;
-      this.list.forEach(element => {
-        element.setScale(sX, sY);
-        element.scale = (element.scaleX+element.scaleY) / 2;
-        if(element.type == 'RenderTexture' ) {
-          let rt = element;
-          let crcl = rt.arc;
-          
-          rt.clearMask(true);
-          crcl.setScale(sX, sY);
-          let mask = new Phaser.Display.Masks.GeometryMask(this, crcl);
-          rt.setMask(mask);
-        }
-      });
-  
-      for(let i = 0; i < this.joints.length; i++) {
-        let j = this.joints[i];
-        let diff = sX-1;
-        j.length = (2+j.originalLength)*(1+diff*Math.PI/2);
-      }
-  
-    }
-  
     eat(foodType='any') {
       // having found our food stuff, move to it until you're close!
-      this.eating = true
-      let rotationDirection = 0;
-     
-      let swimStates = [-20, 0, 20, 0];
-      swimStates.forEach((e, i) => {swimStates[i] = DegToRad(e)})
-      let waveIndex = 0;
-  
+      this.eating = true  
       this.timer = 0;
       this.scene.events.on('postupdate', function(time, delta) {
         if(this.eating && playersBeing.alpha == 1 && playersBeing.color.s > 0.5){
@@ -161,81 +112,10 @@ class Snake extends Slug {
           drawVec(headyToTarget, this.heady, this.color.color, Math.min(this.heady.displayWidth, (this.heady.displayWidth+playersBeing.torso.displayWidth)*30/len))
           // console.log(playersBeing.torso)
           
-          let target = velocityToTarget(this.heady, playersBeing.torso);
-          let distanceToFood = Distance.BetweenPoints(this.heady, playersBeing.torso)
-  
-          let vecTorsoHeady = velocityToTarget(this.torso, this.heady)
-          let angleSlugTarget = Angle.ShortestBetween(RadToDeg(vecTorsoHeady.angle()), RadToDeg(target.angle()));
-          
-          let speed = this.torso.displayWidth/10;
-    
-          let tail1Vec = velocityFacing(this.tail1, speed/2); 
-          let tail0Vec = velocityFacing(this.tail0, speed/2); 
-          let torsoVec = velocityFacing(this.torso, speed/2); 
-          let headyVec = velocityFacing(this.heady, speed/2); 
-          // this.tail1.setVelocity(tail1Vec.x, tail1Vec.y)
-          // this.tail0.setVelocity(velocityFacing(this.tail0, speed).x, velocityFacing(this.tail0, 1).y)
-          // this.torso.setVelocity(velocityFacing(this.torso, speed).x, velocityFacing(this.torso, 1).y)
-          // this.heady.setVelocity(headyVec.x, headyVec.y)
-  
-          
-          if(! rotationDirection) {
-            if(angleSlugTarget > 0 && angleSlugTarget > 50) {
-              rotationDirection = -1;
-            } else if(angleSlugTarget < 0 && angleSlugTarget < -50) {
-              rotationDirection = 1;
-            }
-          }
-  
-          let correctionAngle = DegToRad(40);
-          // console.log(Math.round(angleSlugTarget), rotationDirection)
-          
-          if((angleSlugTarget > 0 && angleSlugTarget < 70)||(angleSlugTarget < 0 && angleSlugTarget > -70)){
-            headyVec.add(target);
-            this.torso.setVelocity(headyVec.x, headyVec.y);
-            this.heady.setVelocity(headyVec.x, headyVec.y);
-            // this.heady.applyForce(this.heady, this.heady, headyVec);
-            this.heady.setAngle(RadToDeg(headyVec.angle()))
-            
-            
-            if(distanceToFood > 50) {
-              // this.tail1.setVelocity(headyVec.x, headyVec.y);
-              tail0Vec.rotate(swimStates[waveIndex]); // headyVec.mirror(vecTorsoHeady);
-              this.tail0.setVelocity(tail0Vec.x, tail0Vec.y);
-            }
-          }
-          else if(rotationDirection == -1 && (angleSlugTarget > 50 || angleSlugTarget < -50)) {
-            // console.log('counter clockwise')
-            
-            let torsoVec = headyVec.clone().setLength(0.25*speed);
-            this.torso.setVelocity(torsoVec.x, torsoVec.y);
-            headyVec.setAngle(this.heady.rotation - correctionAngle)
-            tail0Vec.setAngle(this.tail0.rotation + correctionAngle);
-            // headyVec.add(target);
-            this.heady.setVelocity(headyVec.x, headyVec.y);
-            this.tail0.setVelocity(tail0Vec.x, tail0Vec.y);
-          }
-          else if(rotationDirection == 1 && (angleSlugTarget > 50 || angleSlugTarget < -50)) {
-            // console.log('clockwise (right)')
-            
-            let torsoVec = headyVec.clone().setLength(0.25*speed);
-            this.torso.setVelocity(torsoVec.x, torsoVec.y);
-            headyVec.setAngle(this.heady.rotation + correctionAngle)
-            tail0Vec.setAngle(this.tail0.rotation - correctionAngle);
-            // headyVec.add(target);
-            this.heady.setVelocity(headyVec.x, headyVec.y);
-            this.tail0.setVelocity(tail0Vec.x, tail0Vec.y);
-          }
-          
-          this.timer += delta;
-          while(this.timer > 600) {
-            // console.log('slugtimer')
-            waveIndex = (waveIndex+1) % swimStates.length;
-            this.timer -= 600;
-          }
-        }
-        else {
-          rotationDirection = 0
+          let target = playersBeing.torso          
+          let speedMod = 1;
+          this.moveTo(target, speedMod);
+
         }
       }, this);
     }

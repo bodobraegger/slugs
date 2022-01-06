@@ -121,8 +121,8 @@ class Slug extends Phaser.GameObjects.Container {
         }
       });
   
-      for(let i = 0; i < this.jointsBody.length; i++) {
-        let j = this.jointsBody[i];
+      for(let i = 0; i < this.joints.length; i++) {
+        let j = this.joints[i];
         let diff = sX-1;
         j.length = (2+j.originalLength)*(1+diff*Math.PI/2);
         // if(j.length < 2+this.heady.radius*this.scale+this.torso.radius*this.scale)
@@ -347,7 +347,7 @@ class Slug extends Phaser.GameObjects.Container {
           this.moveTo(this.chosenFood, 1);
 
           if(closestMatchNew && this.chosenFood != closestMatchNew) {
-            if(Distance.BetweenPoints(this.heady, closestMatchNew) - Distance.BetweenPoints(this.heady, this.chosenFood) < -20*this.scale){
+            if(Distance.BetweenPoints(this.heady, closestMatchNew) - Distance.BetweenPoints(this.heady, this.chosenFood) < -50*this.scale){
               
               console.log(closestMatchNew)
               this.chosenFood = closestMatchNew;
