@@ -1,4 +1,4 @@
-class Snake extends Phaser.GameObjects.Container {
+class Snake extends Slug {
     constructor(scene=Scene2, x=0, y=0, radius=20, color=getRandomColorInCat()) {
       super(scene, x, y);
       this.setDataEnabled();
@@ -7,19 +7,19 @@ class Snake extends Phaser.GameObjects.Container {
       this.txtr = 'smooth';
       this.shape = 'round';
       this.plantLoop = false;
-      let headyColor = getRandomColorInCat(getColorCategory(color)).lighten((Math.min(0.2+Math.random(), 0.8))*50);
-      let tailColor = getRandomColorInCat(getColorCategory(color)).lighten((Math.min(0.1+Math.random(), 0.8))*30);
-  
-      let headyRadius = radius/1.4
+      let headyColor = getRandomColorInCat(color);
+      let tailColor =  getRandomColorInCat(color);
+      
+      let torsoRadius = radius/1.4
       let tail0Radius = radius/1.7
       let tail1Radius = radius/2.4
-  
-      this.heady   = this.scene.addGameCircle(x, y, headyRadius, headyColor);
-      this.torso   = this.scene.addGameCircleTextured(x-radius-headyRadius, y, radius, this.color);
-      this.tail0 = this.scene.addGameCircle(x-radius-headyRadius-tail0Radius, y, tail0Radius, tailColor);
-      this.tail1 = this.scene.addGameCircle(x-radius-headyRadius-tail0Radius-tail1Radius, y, tail1Radius, tailColor);
-  
-  
+
+      this.heady = this.scene.addGameCircle(x, y, radius, headyColor);
+      this.torso = this.scene.addGameCircleTextured(x-radius-torsoRadius, y, radius, this.color);
+      this.tail0 = this.scene.addGameCircle(x-radius-torsoRadius-tail0Radius, y, tail0Radius, tailColor);
+      this.tail1 = this.scene.addGameCircle(x-radius-torsoRadius-tail0Radius-tail1Radius, y, tail1Radius, tailColor);
+      this.bodyparts = [this.heady, this.torso, this.tail0, this.tail1]; //this.a1, this.a2, 
+
       this.headyjoint  = this.scene.matter.add.joint(
         this.heady, this.torso, 
         2+(this.heady.radius+this.torso.radius)/2, 0.5, 
@@ -27,7 +27,48 @@ class Snake extends Phaser.GameObjects.Container {
           pointA: {x: -this.heady.radius/2, y: 0}, 
           pointB: {x: this.torso.radius/2, y: 0} }
       ); // , {pointA: {x: this.torso.radius/2, y: 0}}
-  
+      this.torsojoint  = this.scene.matter.add.joint(
+        this.torso, this.tail0, 
+        2+(this.torso.radius+this.tail0.radius)/2, 0.5,
+        { pointA: {x: -this.torso.radius/2, y: 0}, 
+          pointB: {x: this.tail0.radius/2, y: 0} }
+      );
+      this.tailjoint  = this.scene.matter.add.joint(
+        this.tail0, this.tail1, 
+        2+(this.tail0.radius+this.tail1.radius)/2, 0.5,
+        { pointA: {x: -this.tail0.radius/2, y: 0}, 
+        pointB: {x: this.tail1.radius/2, y: 0} }
+      );
+      this.headyjoint.angularStiffness = 0.2;
+      
+      this.joints = [
+        this.headyjoint,
+        this.torsojoint,
+        this.tailjoint
+      ]
+
+      let currentDist = radius+torsoRadius+tail0Radius+tail1Radius;
+      for(let i = 0; i < 3; i++) {
+        let currentRadius = radius/(2.4+i*0.6) 
+        currentDist += currentRadius;
+        this.bodyparts.push(
+          this.scene.addGameCircle(x-currentDist, y, currentRadius, getRandomColorInCat(color).lighten(FloatBetween(0.2, 0.8)*20*(i+1)))
+        )
+        let prev = this.bodyparts.at(-2);
+        let curb = this.bodyparts.at(-1);
+        let j = this.scene.matter.add.joint(
+          prev, curb, 
+          2+(prev.radius+curb.radius)/2, 0.5,
+          { pointA: {x: -prev.radius/2, y: 0}, 
+          pointB: {x: curb.radius/2, y: 0} }
+        );
+        this.joints.push(j)
+      }
+        
+      this.joints.forEach(e => {
+        e.originalLength = e.length;
+      })
+      
       playersBeing.bodyparts.forEach(limb => {
         this.heady.setOnCollideWith(limb, pair => {
           console.log('snake colliding with', limb, pair)
@@ -44,32 +85,8 @@ class Snake extends Phaser.GameObjects.Container {
 
       });
 
-      this.torsojoint  = this.scene.matter.add.joint(
-        this.torso, this.tail0, 
-        2+(this.torso.radius+this.tail0.radius)/2, 0.5,
-        { pointA: {x: -this.torso.radius/2, y: 0}, 
-          pointB: {x: this.tail0.radius/2, y: 0} }
-      );
-      this.tailjoint  = this.scene.matter.add.joint(
-        this.tail0, this.tail1, 
-        2+(this.tail0.radius+this.tail1.radius)/2, 0.5,
-        { pointA: {x: -this.tail0.radius/2, y: 0}, 
-        pointB: {x: this.tail1.radius/2, y: 0} }
-        );
-        this.headyjoint.angularStiffness = 0.2;
         
-        this.jointsBody = [
-          this.headyjoint,
-          this.torsojoint,
-          this.tailjoint
-        ]
-        this.joints = [...this.jointsBody]  
-        this.joints.forEach(e => {
-          e.originalLength = e.length;
-        })
-        
-        this.bodyparts = [this.heady, this.torso, this.tail0, this.tail1]; //this.a1, this.a2, 
-        this.bodyparts.forEach((e, i) => {
+      this.bodyparts.forEach((e, i) => {
         // e.setCollisionGroup(i);
         // e.setCollidesWith(0);
         // this.add(e);
@@ -118,35 +135,12 @@ class Snake extends Phaser.GameObjects.Container {
         }
       });
   
-      for(let i = 0; i < this.jointsBody.length; i++) {
-        let j = this.jointsBody[i];
+      for(let i = 0; i < this.joints.length; i++) {
+        let j = this.joints[i];
         let diff = sX-1;
         j.length = (2+j.originalLength)*(1+diff*Math.PI/2);
       }
   
-    }
-  
-    getMass() {
-      let m = 0;
-      this.list.forEach(e => {
-        m += e.body.mass;
-      })
-      return m;
-  
-    }
-  
-    getArea() {
-      let s = 0;
-      this.list.forEach(e => {
-        // s += Phaser.Geom.Circle.Area(e) // Math.PI * circle.radius * circle.radius
-        console.log(e.type, e.radius, e.scaleX)
-        s += Math.PI * (e.radius*(e.scaleX))**2
-      })
-      return s;
-    }
-  
-    moveRandomly() {
-      this.scene.matter.applyForce(this.heady, {x: FloatBetween(-0.2, 0.2), y: FloatBetween(-0.2, 0.2)})
     }
   
     eat(foodType='any') {
