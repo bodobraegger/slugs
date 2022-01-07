@@ -458,12 +458,24 @@ class Slug extends Phaser.GameObjects.Container {
       console.log(on)
       if(on) {
         this.bodyparts.forEach(e => {
-          e.resetPipeline();
+          if(e instanceof GameObjects.Arc) {
+            e.fillColor = e.color.color;
+          } else if(e instanceof GameObjects.Sprite) {
+            e.setTint(e.color.color)
+          }
+          //e.resetPipeline();
         })
       } else {
-        console.log(grayscalePipeline)
         this.bodyparts.forEach(e => {
-          e.setPipeline(grayscalePipeline);
+          let greyed = e.color.clone().gray( (e.color.r+e.color.b+e.color.b)/3 )
+          // ALTERNATIVE: 
+          // let greyed = e.color.clone().desaturate(75).color
+          if(e instanceof GameObjects.Arc) {
+            e.fillColor = greyed.color;
+          } else if(e instanceof GameObjects.Sprite) {
+            e.setTint(greyed.color)
+          }
+          //e.setPipeline(grayscalePipeline);
         })
       }
     }

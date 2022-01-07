@@ -41,6 +41,7 @@ let playersBeing = new Object
 let massMultiplierConstant = 2.2860618138362114;
 const { Vector2, Angle, Distance, DegToRad, RadToDeg, Between, FloatBetween } = Phaser.Math;
 const { Color } = Phaser.Display;
+const { GameObjects } = Phaser; 
 const ifExample = 'if fruit is red then eat';
 const loopExample = 'while fruit on plant eat';
 const editExample = `replace rule 1 with ${ifExample}`;
