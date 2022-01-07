@@ -73,7 +73,7 @@ class Snake extends Slug {
         this.heady.setOnCollideWith(limb, pair => {
           console.log('snake colliding with', limb, pair)
           if(this.heady.displayWidth > playersBeing.torso.displayWidth) {
-            playersBeing.setAlpha(0.2)
+            playersBeing.setAlpha(0.8)
             playersBeing.saturate(false);
             playersBeing.stop();
             logOutput(`oh no! the angry creature ate your being's color :( try to get it to eat something so it can regain its color!`)
