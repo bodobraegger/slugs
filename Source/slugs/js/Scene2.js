@@ -359,8 +359,13 @@ class Scene2 extends Phaser.Scene {
             fruit = f.txtr;
           }
           // console.log(booleanString, 'fruit var:', fruit);
-          let evaluation = eval(booleanString);
-          console.log(booleanString, fruit, evaluation);
+          let evaluation;
+          try {
+            evaluation = eval(booleanString);
+            // console.log(booleanString, fruit, evaluation);
+          } catch (error) {
+            console.error(error);
+          }
           if(evaluation) {
             foodCurrentlySelected.push(foodSelected[i]);
           }
@@ -429,6 +434,7 @@ class Scene2 extends Phaser.Scene {
       case ifWord: {
         const ifError = `uh oh, an if rule needs to be of the form ${wrapCmd('if <i>condition</i> then <i>action</i>')}, for example: ${wrapCmd(ifExample)}!`
         if(cmd.length < 6 || !cmd.at(-2) == thenWord || !wordsAction.includes(cmd.at(-1)) || !(cmd.includes(ENTITY_TYPES[0])||cmd.includes(ENTITY_TYPES.at(-1))) ) { 
+          logInput(output);
           logOutput(ifError);
           return;
         }
