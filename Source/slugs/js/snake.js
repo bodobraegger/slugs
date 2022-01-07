@@ -1,6 +1,6 @@
 class Snake extends Slug {
     constructor(scene=Scene2, x=0, y=0, radius=20, color=getRandomColorInCat()) {
-      super(scene, x, y, radius, color);
+      super(scene, x, y, radius, color, false);
       this.setDataEnabled();
       this.data.values.color = color;
       this.color = color

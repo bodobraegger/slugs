@@ -1,5 +1,5 @@
 class Slug extends Phaser.GameObjects.Container {
-    constructor(scene=Scene2, x=0, y=0, radius=20, color=getRandomColorInCat()) {
+    constructor(scene=Scene2, x=0, y=0, radius=20, color=getRandomColorInCat(), render=true) {
       super(scene, x, y);
       this.setDataEnabled();
       this.data.values.color = color;
@@ -83,6 +83,13 @@ class Slug extends Phaser.GameObjects.Container {
       }, this);
       
       this.moveRandomly();
+      if(!render) {
+        this.bodyparts.forEach(e=> {
+          e.destroy();
+        })
+        this.scene.matter.world.removeConstraint(this.joints, true);
+        this.joints = []
+      }
   
     }
     
@@ -181,7 +188,6 @@ class Slug extends Phaser.GameObjects.Container {
       let vecTorsoHeady = velocityToTarget(this.torso, this.heady)
       let angleSlugTarget = Angle.ShortestBetween(RadToDeg(vecTorsoHeady.angle()), RadToDeg(targetVec.angle()));
       
-      let tail1Vec = velocityFacing(this.tail1, speed/2); 
       let tail0Vec = velocityFacing(this.tail0, speed/2); 
       let torsoVec = velocityFacing(this.torso, speed/2); 
       let headyVec = velocityFacing(this.heady, speed/2); 
@@ -308,9 +314,9 @@ class Slug extends Phaser.GameObjects.Container {
 
       // having found our food stuff, move to it until you're close!
       this.chosenFood = findClosest(this.heady, FOOD_MATCHING.getMatching('active', true));
-      let plant = this.chosenFood.group;
+      
       this.rotationDirection = 0;
-
+      
       this.scene.events.on('postupdate', function(time, delta) {
         if(this.eating && FOOD_MATCHING.countActive()){
           FOOD_MATCHING.getMatching('active', true).forEach((e, i) => {
@@ -356,7 +362,7 @@ class Slug extends Phaser.GameObjects.Container {
               this.chosenFood = this.chosenFood;
             } 
           }
-          plant = this.chosenFood.group;
+          let plant = this.chosenFood.group;
           if(!closestMatchNew && plant && this.plantLoop) {
             FOOD_MATCHING.addMultiple(plant.getMatching('visible', true));
           }
