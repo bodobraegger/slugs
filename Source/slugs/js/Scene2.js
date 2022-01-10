@@ -238,7 +238,7 @@ class Scene2 extends Phaser.Scene {
       // SHOW THE SKELETONS OF THE SLUGS
       constraints = constraints.concat(e.jointsBody);
     })
-    this.renderConstraint(constraints, 0xF9F6EE, undefined, 2*this.pb.scale, undefined, 0xF9F6DE, 2*this.pb.scale);
+    this.renderConstraint(constraints, 0xF9F6EE, undefined, 2*this.pb.scale);
     constraints = [ ]
     PLANTS.getChildren().forEach(p => {
       let visible = p.getVisible();
@@ -750,15 +750,27 @@ class Scene2 extends Phaser.Scene {
             s.eating = false;
           }
           if(o.joints) {
-            if(o.group) {
-              o.joints.forEach(j => {
-                let i = o.group.joints.indexOf(j);
-                if(i !== -1) {
+            o.joints.forEach(j => {
+              if(o.group) {
+                var i = o.group.joints.indexOf(j);
+                if(i !== -1) { 
+                  console.log(o.group.joints, j, i)
                   o.group.joints.splice(i, 1);
+                  console.log(o.group.joints)
                 }
-              })
-            }
+              }
+              var otherO = j.bodyA.gameObject == o ? j.bodyA.gameObject : j.bodyB.gameObject;
+              if(otherO) {
+                var i = otherO.joints.indexOf(j);
+                if(i !== -1) {
+                  console.log(otherO.joints, j, i)
+                  otherO.joints.splice(i, 1);
+                  console.log(otherO.joints)
+                }
+              }
+            })
             this.matter.world.removeConstraint(o.joints, true);
+            o.joints = [];
           }
           o.destroy();
           // FOOD.splice(f_index);
@@ -828,7 +840,7 @@ class Scene2 extends Phaser.Scene {
     return o;
   }
 
-  renderConstraint(constraints, lineColor, lineOpacity, lineThickness, pinSize, anchorColor, anchorSize, clear = false) {
+  renderConstraint(constraints, lineColor, lineOpacity, lineThickness, pinSize=null, anchorColor=null, anchorSize, clear = false) {
     if(clear) {
       this.graphics.clear();
     }
@@ -953,14 +965,14 @@ class Plant extends GroupDynVis {
         if(i+1<fruitsNumber || circle) {
           let j = this.scene.matter.add.joint(f0, f1, undefined, 0.1, );
           if(f0.joints.length < 2 || f1.joints.length < 2 || i==fruitsNumber-1)  { this.joints.push(j) }
-          if(f0.joints.length < 2) { f0.joints.push(j); }
-          if(f1.joints.length < 2) { f1.joints.push(j); }
+          if(f0.joints.length < 2 || i==fruitsNumber-1) { f0.joints.push(j); }
+          if(f1.joints.length < 2 || i==fruitsNumber-1) { f1.joints.push(j); }
         }
         if(circle) {
           let j = this.scene.matter.add.joint(f0, f2, undefined, 0.05, )
-          if(f0.joints.length < 4 || f1.joints.length < 4)  { this.joints.push(j) }
+          if(f0.joints.length < 4 || f2.joints.length < 4)  { this.joints.push(j) }
           if(f0.joints.length < 4) { f0.joints.push(j); }
-          if(f1.joints.length < 4) { f1.joints.push(j); }
+          if(f2.joints.length < 4) { f2.joints.push(j); }
         }
 
       }
