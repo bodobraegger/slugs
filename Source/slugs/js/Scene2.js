@@ -966,20 +966,30 @@ class Plant extends GroupDynVis {
         if(!f2.joints) f2.joints = []
         if(i+1<fruitsNumber || circle) {
           let j = this.scene.matter.add.joint(f0, f1, undefined, 0.1, );
-          if(f0.joints.length < 2 || f1.joints.length < 2 || i==fruitsNumber-1)  { this.joints.push(j) }
-          if(f0.joints.length < 2 || i==fruitsNumber-1) { f0.joints.push(j); }
-          if(f1.joints.length < 2 || i==fruitsNumber-1) { f1.joints.push(j); }
+          if(f0.joints.length < 2 || f1.joints.length < 2 || i==fruitsNumber-1)  { 
+            this.joints.push(j)
+            f0.joints.push(j); 
+            f1.joints.push(j); 
+          }
         }
         if(circle) {
           let j = this.scene.matter.add.joint(f0, f2, undefined, 0.05, )
-          if(f0.joints.length < 4 || f2.joints.length < 4)  { this.joints.push(j) }
-          if(f0.joints.length < 4) { f0.joints.push(j); }
-          if(f2.joints.length < 4) { f2.joints.push(j); }
+          if(f0.joints.length < 4 || f2.joints.length < 4)  { 
+            this.joints.push(j) 
+            f0.joints.push(j); 
+            f2.joints.push(j); 
+          }
           // console.log(f0.joints.length)
         }
 
       }
-    //}
+      if(circle) {
+        console.log('start')
+        this.getChildren().forEach(e => {
+          console.log(e.joints.length)
+        })
+        console.log('end')
+      }
     scene.add.existing(this);
   }
   destroy(clearChildren = false, destroyChildren=false) {
