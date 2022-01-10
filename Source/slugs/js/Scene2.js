@@ -752,7 +752,7 @@ class Scene2 extends Phaser.Scene {
                   console.log(o.group.joints)
                 }
               }
-              var otherO = j.bodyA.gameObject == o ? j.bodyA.gameObject : j.bodyB.gameObject;
+              var otherO = j.bodyA.gameObject == o ? j.bodyB.gameObject : j.bodyA.gameObject;
               if(otherO) {
                 var i = otherO.joints.indexOf(j);
                 if(i !== -1) {
