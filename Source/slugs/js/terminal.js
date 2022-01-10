@@ -443,10 +443,10 @@ function wrapCmd(cmd) {
     return r.trimEnd();
   }
   let i = 0;
-  let classList = `cmd `
+  let classList = `cmd ${cmd} `
   for(i; i<wordsAllArrays.length; i++) {
       if(wordsAllArrays[i].includes(cmd)) {
-        classList += `${cmd.replace('/', ' ')} ${wordsAllArraysStrings[i]}`;
+        classList += `${wordsAllArraysStrings[i]}`;
         break;
       }
   }

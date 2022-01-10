@@ -175,8 +175,8 @@ BGDarker
 .blue {
     color: blue;
 }
-.green {
-    color: green;
+.green, .plant {
+    color: #006400;
 }
 .yellow {
     color: yellow;
