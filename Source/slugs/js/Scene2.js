@@ -61,6 +61,19 @@ class Scene2 extends Phaser.Scene {
     super("playGame")
   }
   preload() {
+    this.graphics = this.add.graphics();
+    this.newGraphics = this.add.graphics();
+    let progressBar = new Phaser.Geom.Rectangle(200, 200, 400, 50);
+    let progressBarFill = new Phaser.Geom.Rectangle(205, 205, 290, 40);
+
+    this.graphics.fillStyle(0xffffff, 1);
+    this.graphics.fillRectShape(progressBar);
+
+    this.newGraphics.fillStyle(0x3587e2, 1);
+    this.newGraphics.fillRectShape(progressBarFill);
+
+    this.loadingText = this.add.text(250,260,"Loading: ", { fontSize: '32px', fill: '#F0F' });
+
     this.load.setBaseURL(document.getElementById('phaser_container').getAttribute('data-assets-baseURL')); 
     this.load.image('circle', 'assets/circle.png');
     this.load.image('circle_spiky_1', 'assets/circle_spiky_1.png');
@@ -71,68 +84,66 @@ class Scene2 extends Phaser.Scene {
     
     this.load.image('square_rounded', 'assets/square_rounded.png');
     this.load.image('circle_leopard', 'assets/circle_leopard.png');
-    this.load.spritesheet('jelly', 'assets/jellyfish_spritesheet.png', {frameWidth: 32, frameHeight: 32})
+    // this.load.spritesheet('jelly', 'assets/jellyfish_spritesheet.png', {frameWidth: 32, frameHeight: 32})
 
+
+    this.matter.add.mouseSpring();
+    // this.anims.create({key: 'jelly_idle', frames: this.anims.generateFrameNumbers('jelly', {start:0, end:4}), frameRate:5, repeat: -1})
+    // this.anims.create({key: 'jelly_jump', frames: this.anims.generateFrameNumbers('jelly', {start:7, end:11}), frameRate:5, repeat: -1})
+    // this.anims.create({key: 'jelly_move', frames: this.anims.generateFrameNumbers('jelly', {start:14, end:18}), frameRate:5, repeat: -1})
+    // this.anims.create({key: 'jelly_expl', frames: this.anims.generateFrameNumbers('jelly', {start:21, end:27}), frameRate:5, repeat: -1})
     // this.load.svg('antennae', 'assets/antennae-dotgrid.svg')
+    SCENE = this;
+
+    this.load.on('progress', this.updateLoadingBar, {newGraphics:this.newGraphics,loadingText:this.loadingText});
+    // this.load.on('complete', this.completeLoading, {newGraphics:this.newGraphics,loadingText:loadingText});
+  }
+  updateLoadingBar(percentage) {
+    percentage = percentage/2;
+    this.newGraphics.clear();
+    this.newGraphics.fillStyle(0x3587e2, 1);
+    this.newGraphics.fillRect(205, 205, percentage*390, 40);
+        
+    percentage = percentage * 100;
+    let t = `Loading: ${percentage.toFixed(2)} %`
+    console.log(t);
+    this.loadingText.setText(t);
+    
+  }
+  completeLoading() {
+    console.log("COMPLETE!");
+    this.newGraphics.clear()
+    this.newGraphics.destroy();
+    this.loadingText.destroy();
   }
   create() {
-    SCENE = this;
+    // SETUP
+    this.graphics.destroy();
     this.graphics = this.add.graphics();
-    // this.matter.world.setBounds();
-    this.matter.add.mouseSpring();
-    this.anims.create({key: 'jelly_idle', frames: this.anims.generateFrameNumbers('jelly', {start:0, end:4}), frameRate:5, repeat: -1})
-    this.anims.create({key: 'jelly_jump', frames: this.anims.generateFrameNumbers('jelly', {start:7, end:11}), frameRate:5, repeat: -1})
-    this.anims.create({key: 'jelly_move', frames: this.anims.generateFrameNumbers('jelly', {start:14, end:18}), frameRate:5, repeat: -1})
-    this.anims.create({key: 'jelly_expl', frames: this.anims.generateFrameNumbers('jelly', {start:21, end:27}), frameRate:5, repeat: -1})
-    // this.matter.enableAttractorPlugin();  
-    // this.cursors = this.input.keyboard.createCursorKeys()
-    /*
-    let circle = this.add.circle(1, 1, 10, 0xFFF000);
-    let arc = this.add.arc(100, 100, 50, 1, 180, false, 0xFFF000)
-    let rectangle = this.matter.add.gameObject(this.add.rectangle(400, 200, 20, 10, 0x9966ff), this.matter.add.rectangle(400, 200, 20, 10))
-    
-    let length = 20
-    
-    let antenna_vertices = `0 0 0 ${2*length} ${2*length} ${1.5*length} ${2*length} ${0.5*length}`;
-    // let antenna_vertices = [0,0, 0,2*length, 2*length,1.5*length, 2*length,.5*length]
-    
-    let polygon = this.matter.add.gameObject(this.add.polygon(200, 400, antenna_vertices, 0xFF22FF),  { shape: { type: 'fromVerts', verts: antenna_vertices, flagInternal: true } });
-    // polygon = this.matter.add.gameObject(polygon, m_polygon);
-    // polygon.setScale(0.2, 0.2);
-    
-    // let svg = this.add.image(250, 400, 'antennae').setScale(0.05);
-    
-    let group = this.add.group([circle, arc, rectangle, polygon]);
-    group.setAlpha(0.5)
-    
-    
-    let matterArc = this.matter.add.trapezoid(1, 1, 10, 20, 0.5);
-    */
-   
-   
-    this.companion = this.add.sprite(300, 300, 'jelly').setScale(10);
 
-   
-    this.companion = this.matter.add.gameObject(this.companion, this.matter.add.rectangle(0, 0, this.companion.displayWidth/3, this.companion.displayHeight/2))
-    
+    // PLAYERSBEING
     let slug_r = 20;
     let slug_x = getCanvasWidth()/2;
     let slug_y = getCanvasHeight()/2;
-    
     let playersBeingColor = getRandomColorInCat([ COLORCATS_DICT['purple'], COLORCATS_DICT['blue'], COLORCATS_DICT['orange'] ]);
     changeStylesheetRule(document.styleSheets[0], '.beingscolor', `background-color`, `#${playersBeingColor.color.toString(16)}`)
     changeStylesheetRule(document.styleSheets[0], `.${COLORCATS_HR[getColorCategory(playersBeingColor)]}`, `color`, `#${playersBeingColor.color.toString(16)}`)
+    let pbColorCat = getRandomColorInCat(playersBeingColor)
+
     this.pb = new Slug(this, slug_x, slug_y, slug_r, playersBeingColor);
     playersBeing = this.pb;
     this.rulesLength = 0;
-    let pbColorCat = getRandomColorInCat(playersBeingColor)
-
+    
     // let s1 = new Slug(this, slug_x-280, slug_y-5, 10);
     this.cameras.main.startFollow(this.pb.torso, true, 0.08, 0.08);
     this.stage = 1;
     this.slugs = [this.pb];
-   
+    
     this.enemySpawned = false;
+
+    // COMPANION
+    // this.companion = this.add.sprite(300, 300, 'jelly').setScale(10);
+    // this.companion = this.matter.add.gameObject(this.companion, this.matter.add.rectangle(0, 0, this.companion.displayWidth/3, this.companion.displayHeight/2))
 
     let foodsInitial = [ 
       this.addFruit(0, 0, 10, pbColorCat, 'flower'),
@@ -159,8 +170,9 @@ class Scene2 extends Phaser.Scene {
       let y = (e.getChildren()[0].y+e.getChildren().at(-1).y)/2;
       coordinates.push({x, y})
     })
-
+    
     for(var i = 0; i < 25; i++) {
+      if((i+1)%5 == 0) {this.updateLoadingBar.call({newGraphics:this.newGraphics,loadingText:this.loadingText}, [1+1/25*(i+1)]); }
       let yesOrNo = Between(0, 3)
       let randFN = Between(3, 15) 
       let randFS = Between(15, 150)
@@ -196,7 +208,7 @@ class Scene2 extends Phaser.Scene {
       // let s = new Slug(this, slug_x+i*10*rand, slug_y+i*10*rand, (slug_r+20)*rand/10)
       // this.slugs.push(s);
       this.activeFoodlength = FOOD.getMatching('active', true)
-    }
+    } this.completeLoading.call({newGraphics:this.newGraphics,loadingText:this.loadingText});
 
     ENEMIES = new Phaser.GameObjects.Group(this, []);
     
@@ -208,7 +220,6 @@ class Scene2 extends Phaser.Scene {
       // WE HAVE A HOOK INTO THE TERMINAL
       this.processCommand(e.detail.value);
     });
-
     let controlConfig = {
       camera: this.cameras.main,
       left: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT),
@@ -220,9 +231,9 @@ class Scene2 extends Phaser.Scene {
       acceleration: 0.03,
       drag: 0.0003,
       maxSpeed: 0.8
-  };
+    };
     this.controls = new Phaser.Cameras.Controls.SmoothedKeyControl(controlConfig);
-    this.input.keyboard.preventDefault = false;
+    this.input.keyboard.preventDefault = false;    
 
     // NARRATION
     NARRATION.intro();
@@ -387,22 +398,7 @@ class Scene2 extends Phaser.Scene {
       FOOD.add(f)
       console.log('new fruit because not enough healthy! at', x, y, f)
     }
-    // COMPANION
-    // console.log(Math.max(Math.abs(this.companion.body.velocity.x), Math.abs(this.companion.body.velocity.y)))
-    if(this.companion.visible) {
-      if(Math.max(Math.abs(this.companion.body.velocity.x), Math.abs(this.companion.body.velocity.y)) < 1) {
-        this.companion.play('jelly_idle', true)
-      }
-      else if(Math.max(Math.abs(this.companion.body.velocity.x), Math.abs(this.companion.body.velocity.y)) < 5) {
-        this.companion.play('jelly_jump', true)
-      }
-      else {
-        this.companion.play('jelly_move', true)
-      }
-      this.companion.setRotation(this.pb.torso.rotation+DegToRad(90));
-      // this.companion.x = this.pb.torso.x+30*this.pb.scale;
-      // this.companion.y = this.pb.torso.y+30*this.pb.scale;      
-    }
+
   }
   processCommand(input = [], newSegment=true) {
     let cmd = input;
@@ -918,7 +914,7 @@ class GroupDynVis extends GameObjects.Group {
         // also get objects at other end of joints so joints don't disappear suddendly
         if(f.joints) {
           f.joints.forEach(j => {
-            var otherO = j.bodyA.gameObject == f ? j.bodyA.gameObject : j.bodyB.gameObject;
+            var otherO = j.bodyA.gameObject == f ? j.bodyB.gameObject : j.bodyA.gameObject;
             if(otherO) {
               r.add(otherO);
             }
