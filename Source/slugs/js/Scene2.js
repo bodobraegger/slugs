@@ -486,50 +486,47 @@ class Scene2 extends Phaser.Scene {
         if(cmd.length > 1) {
           toShow = cmd.slice(1);
         }
-        if(['rules', 'rule'].includes(toShow[0]) && toShow.length > 1) {
-          if(toShow[1]-1 < RULES.length) {
-            logOutput(`this is the rule number ${toShow[1]}.: ${RULES[toShow[1]-1]}.<br>`)
+        if(['rules', 'rule'].includes(cmd[1]) && cmd.length == 3) {
+          if(toShow[2]-1 < RULES.length) {
+            logOutput(`this is the rule number ${cmd[2]}.: ${RULES[cmd[2]-1]}.<br>`)
           } else {
-            logError(`your being knows no rule number ${toShow[1]}<br>`);
-            return;
+            logError(`your being knows no rule number ${cmd[2]}<br>`);
           }
-        } else if(['routines', 'routine'].includes(toShow[0]) && toShow.length > 1) {
-          if(toShow[1]-1 < ROUTINES.length) {
-            if(toShow[1]-1 < ROUTINES.length) {
-              logOutput(`this is the routine number ${toShow[1]}.: ${ROUTINES[toShow[1]-1]}.<br>`)
-            } else {
-              logError(`your being knows no routine number ${toShow[1]}<br>`);
-            }
-            return;
+        } else if(['routines', 'routine'].includes(cmd[1]) && cmd.length == 3) {
+          if(cmd[2]-1 < ROUTINES.length) {
+            logOutput(`this is the routine number ${cmd[1]}.: ${ROUTINES[cmd[1]-1]}.<br>`)
+          } else {
+            logError(`your being knows no routine number ${toShow[1]}<br>`);
           }
-        }
-        toShow.forEach((e, i) => {
-          if(wordsToShow.includes(e)) {
-            let RULESorROUTINES = []
-            if(e=='rules') { RULESorROUTINES = RULES;
-            } else if(e=='routines') { RULESorROUTINES = ROUTINES; }  
-            if(EDITABLE.includes(e)){
-              if(RULESorROUTINES.length) {
-                logOutput(`it knows the following ${wrapCmd(e)}: <br>`)
-                output = '';
-                RULESorROUTINES.forEach( (e, i) => {
-                  output += `${i+1}. ${wrapCmd(e)} <br>`; //•
-                })
-                logOutput(output)
-              } else {
-                logOutput(`your being does not know any ${wrapCmd(e)} yet. try giving it one by typing ${wrapCmd(ifExample)}!<br>`);
+        } else {
+          toShow.forEach((e, i) => {
+            if(wordsToShow.includes(e)) {
+              let RULESorROUTINES = []
+              if(e=='rules') { RULESorROUTINES = RULES;
+              } else if(e=='routines') { RULESorROUTINES = ROUTINES; }  
+              if(EDITABLE.includes(e)){
+                if(RULESorROUTINES.length) {
+                  logOutput(`it knows the following ${wrapCmd(e)}: <br>`)
+                  output = '';
+                  RULESorROUTINES.forEach( (e, i) => {
+                    output += `${i+1}. ${wrapCmd(e)} <br>`; //•
+                  })
+                  logOutput(output)
+                } else {
+                  logOutput(`your being does not know any ${wrapCmd(e)} yet. try giving it one by typing ${wrapCmd(RULESorROUTINES == RULES ? ifExample:loopExample)}!<br>`);
+                }
+              } else if(e=='color') {
+                logOutput(`your being tells you its ${wrapCmd(e)} is ${wrapCmd(COLORCATS_HR[getColorCategory(this.pb.color)])}.`); 
+              } else if(e=='texture') {
+                logOutput(`your being says its ${wrapCmd(e)} feels ${wrapCmd(this.pb.txtr)}.`); 
+              } else if(e=='shape') {
+                logOutput(`because your being is made of circles, it thinks its ${wrapCmd(e)} is ${wrapCmd(this.pb.shape)}.`); 
               }
-            } else if(e=='color') {
-              logOutput(`your being tells you its ${wrapCmd(e)} is ${wrapCmd(COLORCATS_HR[getColorCategory(this.pb.color)])}.`); 
-            } else if(e=='texture') {
-              logOutput(`your being says its ${wrapCmd(e)} feels ${wrapCmd(this.pb.txtr)}.`); 
-            } else if(e=='shape') {
-              logOutput(`because your being is made of circles, it thinks its ${wrapCmd(e)} is ${wrapCmd(this.pb.shape)}.`); 
+            } else {
+              logError(`${wrapCmd(e)}: is not something your being could know!<br>`);
             }
-          } else {
-            logError(`${wrapCmd(e)}: is not something your being could know!<br>`);
-          }
-        })
+          })
+        }
         return;
       }
       case deleteWord: {
@@ -908,7 +905,7 @@ class GroupDynVis extends GameObjects.Group {
     return this.visible;
   }
   getVisible() {
-    let r = []
+    let r = new Set();
     this.getChildren().forEach((f, i) => {
       let c = this.scene.cameras.main;
       let mp = c.midPoint;
@@ -917,10 +914,19 @@ class GroupDynVis extends GameObjects.Group {
       if(Phaser.Geom.Rectangle.Overlaps(viewRec,f.getBounds())) {
         f.visible = true;
         this.visible = true;
-        r.push(f);
+        r.add(f)
+        // also get objects at other end of joints so joints don't disappear suddendly
+        if(f.joints) {
+          f.joints.forEach(j => {
+            var otherO = j.bodyA.gameObject == f ? j.bodyA.gameObject : j.bodyB.gameObject;
+            if(otherO) {
+              r.add(otherO);
+            }
+          })
+        }
       }
     });
-    return r;
+    return [...r];
   }
 }
 
@@ -973,6 +979,7 @@ class Plant extends GroupDynVis {
           if(f0.joints.length < 4 || f2.joints.length < 4)  { this.joints.push(j) }
           if(f0.joints.length < 4) { f0.joints.push(j); }
           if(f2.joints.length < 4) { f2.joints.push(j); }
+          // console.log(f0.joints.length)
         }
 
       }

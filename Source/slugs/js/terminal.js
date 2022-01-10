@@ -23,7 +23,7 @@ let wordsLoop3 = ['on', 'close']
 let wordsLoop4 = ['plant']
 
 
-let wordsToShow = EDITABLE.concat(ATTRIBUTES);
+let wordsToShow = ATTRIBUTES.concat(EDITABLE);
 
 let wordsAll = wordsFirst.concat(wordsIfConditionLeft, wordsIfConditionRight, equalWord, wordsBoolean, wordsAction, wordsToShow, wordsLoop1, wordsLoop2, wordsLoop3, wordsLoop4);
 
@@ -278,7 +278,7 @@ terminal_input.addEventListener('keyup', (e) => {
         }
       	autocomplete.innerHTML += wordsToCompare[i].slice(checkAgainst.length, wordsToCompare[i].length);
         
-        if(wordsToCompare != wordsIfConditionLeft && wordsToCompare != wordsAction && wordsToCompare != wordsBoolean) {
+        if(wordsToCompare != wordsIfConditionLeft && wordsToCompare != wordsAction && wordsToCompare != wordsBoolean && wordsToCompare != wordsToShow) {
           /*
           console.log('shuffling', wordsToCompare)
           let t = wordsToCompare[0];
