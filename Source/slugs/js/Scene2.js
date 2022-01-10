@@ -241,37 +241,23 @@ class Scene2 extends Phaser.Scene {
     this.renderConstraint(constraints, 0xF9F6EE, undefined, 2*this.pb.scale, undefined, 0xF9F6DE, 2*this.pb.scale);
     constraints = [ ]
     PLANTS.getChildren().forEach(p => {
-      if(p.circle && p.width < this.pb.torso.displayWidth*1.5) {
+      let visible = p.getVisible();
+      if( !visible.length && p.circle && p.width < this.pb.torso.displayWidth*1.5) {
         let f = this.addFruit(p.getFirstAlive().x, p.getFirstAlive().y, p.width/2, p.color, 'flower');
         console.log('replacing',p,'with',f)
         FOOD.add(f)
         p.destroy(true, true);
         return;
       }
-      let someFVisible = false;
-      p.getChildren().some((f, i) => {
-        if(!p.countActive()) {
-          p.constraints = [];
-        }
-        let c = this.cameras.main;
-        let mp = c.midPoint;
-        let viewRec = new Phaser.Geom.Rectangle(mp.x-c.displayWidth/2, mp.y-c.displayHeight/2, c.displayWidth, c.displayHeight);
-        // console.log(viewRec)
-        if(Phaser.Geom.Rectangle.Overlaps(viewRec,f.getBounds())) {
-          someFVisible = true;
-          // return someFVisible;
-          // f.setActive(true);
-        } else {
-         // f.setActive(false); 
-        }
-      })
-      if( someFVisible && (this.pb.scale <= 10 || (p.circle && (p.fruitsNumber < 16 || p.fruitsRadius > this.pb.heady.displayWidth/2-50))) ) { //  && constraints.length < 80
-       this.renderConstraint(p.joints, 0x006400, 0.8, 3, 1, 0x006400, 4);
-      }
-      else {
+      if(visible.length && (this.pb.scale <= 10 || (p.circle && (p.fruitsNumber < 16 || p.fruitsRadius > this.pb.heady.displayWidth/2-50))) ) {
+        visible.forEach(v => {
+          constraints = [... new Set(constraints.concat(v.joints))];
+        })
+      } else {
         // p.destroy();  
       }
     })
+    this.renderConstraint(constraints, 0x006400, 0.8, 3, 1, 0x006400, 4 )
     
     if(this.pb.scale > this.stage+1) {
       this.stage++;
@@ -893,7 +879,40 @@ class gameSpriteCircle extends Phaser.GameObjects.GameObject {
   }
 }
 
-class Plant extends Phaser.GameObjects.Group {
+class GroupDynVis extends GameObjects.Group {
+  someVisible() {
+    this.getChildren().some((f, i) => {
+      let c = this.scene.cameras.main;
+      let mp = c.midPoint;
+      let viewRec = new Phaser.Geom.Rectangle(mp.x-c.displayWidth/2, mp.y-c.displayHeight/2, c.displayWidth, c.displayHeight);
+      // console.log(viewRec)
+      if(Phaser.Geom.Rectangle.Overlaps(viewRec,f.getBounds())) {
+        f.visible = true;
+        this.visible = true;
+        return this.visible;
+        // f.setActive(true);
+      }
+    });
+    return this.visible;
+  }
+  getVisible() {
+    let r = []
+    this.getChildren().forEach((f, i) => {
+      let c = this.scene.cameras.main;
+      let mp = c.midPoint;
+      let viewRec = new Phaser.Geom.Rectangle(mp.x-c.displayWidth/2, mp.y-c.displayHeight/2, c.displayWidth, c.displayHeight);
+      // console.log(viewRec)
+      if(Phaser.Geom.Rectangle.Overlaps(viewRec,f.getBounds())) {
+        f.visible = true;
+        this.visible = true;
+        r.push(f);
+      }
+    });
+    return r;
+  }
+}
+
+class Plant extends GroupDynVis {
   constructor(scene, x=0, y=0, color=new Color().random(), width = 40, fruitsRadius = 10, fruitsNumber = 8, circle = false) {
     super(scene, 0, 0, []);
     this.circle = circle;
