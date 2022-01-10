@@ -3,17 +3,26 @@
 - [x] resume
 - [x] list of publications: greenvvz
 - [x] flyer for schools
-- [ ] choose questionnaires
-  - [ ] [Computational thinking concept inventory [Tran 2019]](https://journals.sagepub.com/doi/full/10.1177/0735633117743918)
-  - [ ] [Computer Anxiety questionnaire [Wild 2012]](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3483565/)
-  - [ ] [Attitude towards Computer Science questionnaire [Drobnis 2010]](http://mars.gmu.edu/bitstream/handle/1920/5806/AWD-Dissertation.pdf?isAllowed=y&sequence=1)
-  - [ ] [Attitude towards Video games questionnaire [Chang 2014]](http://maiga.athabascau.ca/publication/Conference-2014-ICCE2014.pdf)
-  - [ ] [System Usability Scale questionnaire [Brooke 1996]](https://www.researchgate.net/publication/228593520_SUS_A_quick_and_dirty_usability_scale)
-  - [ ] **[STUDENT INTEREST IN TECHNOLOGY AND SCIENCE (SITS) SURVEY](https://link.springer.com/content/pdf/10.1007/s10763-013-9410-3.pdf)**
-  - [ ] [Student Computer Science Attitude Survey: CS Principles](https://csedresearch.org/wp-content/uploads/Instruments/Computing/PDF/Haynie_Technical%20Document_StudentCSAttitudeSurvey.pdf)
-  - [ ] [Predicting Women's Persistence in Computer Science- and Technology-Related Majors from High School to College](https://dl.acm.org/doi/pdf/10.1145/3343195)
-  - [ ] [Computing Attitudes Survey](http://stelar.edc.org/sites/stelar.edc.org/files/cas-v4.pdf)
-  - [ ] [Interest, Confidence and Intentions to Learn Computing](https://csedresearch.org/tool/?id=206) ???
+---------------------------------------------------------------------
+- [ ] choose questionnaires, learning assessments
+- beginning 
+  - (one off - answer questionnaires online beforehand? move to end?):
+    - [Computer Anxiety questionnaire [Wild 2012]](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3483565/)
+    - [Attitude towards Video games questionnaire [Chang 2014]](http://maiga.athabascau.ca/publication/Conference-2014-ICCE2014.pdf)
+    - [ ] DIY pre assessment 
+    - [ ] break, comics?
+  - [Student Computer Science Attitude Survey: CS Principles [Haynie, 2017]](https://csedresearch.org/wp-content/uploads/Instruments/Computing/PDF/Haynie_Technical%20Document_StudentCSAttitudeSurvey.pdf)
+  - [Predicting Women's Persistence in Computer Science- and Technology-Related Majors from High School to College](https://dl.acm.org/doi/pdf/10.1145/3343195), https://csedresearch.org/tool/?id=206
+- middle
+  - [System Usability Scale questionnaire [Brooke 1996]](https://www.researchgate.net/publication/228593520_SUS_A_quick_and_dirty_usability_scale)
+
+- end
+  - [Student Computer Science Attitude Survey: CS Principles [Haynie, 2017]](https://csedresearch.org/wp-content/uploads/Instruments/Computing/PDF/Haynie_Technical%20Document_StudentCSAttitudeSurvey.pdf)
+  - [Predicting Women's Persistence in Computer Science- and Technology-Related Majors from High School to College](https://dl.acm.org/doi/pdf/10.1145/3343195), https://csedresearch.org/tool/?id=206)
+  - [ ] DIY post assessment
+ ---------------------------------------------------------------------
+  - [ ] [Computational thinking concept inventory [Tran 2019]](https://journals.sagepub.com/doi/full/10.1177/0735633117743918) -- too sequential
+  - [ ] [Computing Attitudes Survey](http://stelar.edc.org/sites/stelar.edc.org/files/cas-v4.pdf) -- too advanced
 - [ ] 2 days of workshops end of jan
 - [ ] analysis until first, second week of feb
 - [ ] write doc
