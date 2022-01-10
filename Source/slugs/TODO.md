@@ -26,19 +26,20 @@
 - [ ] 2 days of workshops end of jan
 - [ ] analysis until first, second week of feb
 - [ ] write doc
+---
 ## game
 - [x] new being with different states
 - [x] if attacking state, you need to protect, timely component
 - [ ] babies of different color, enemies suck out the color
 - [ ] if food is little beings color then feed it
 - [ ] feed
-  
+
 1. [x] natural movement
 2. [x] editing and viewing rules
 3. [x] parsing loop
 
 
-
+---
 ### done or scratched
 <s>
 ## presentation, 20 minutes
