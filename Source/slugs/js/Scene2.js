@@ -238,7 +238,7 @@ class Scene2 extends Phaser.Scene {
       // SHOW THE SKELETONS OF THE SLUGS
       constraints = constraints.concat(e.jointsBody);
     })
-    this.renderConstraint(constraints, 0xF9F6EE, 1*this.pb.scale, 1*this.pb.scale, 1*this.pb.scale, 0xF9F6EE, 1*this.pb.scale);
+    this.renderConstraint(constraints, 0xF9F6EE, undefined, 2*this.pb.scale, undefined, 0xF9F6DE, 2*this.pb.scale);
     constraints = [ ]
     PLANTS.getChildren().forEach(p => {
       if(p.circle && p.width < this.pb.torso.displayWidth*1.5) {
