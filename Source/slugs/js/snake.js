@@ -6,7 +6,7 @@ class Snake extends Slug {
       this.color = color
       this.txtr = 'smooth';
       this.shape = 'round';
-      this.plantLoop = false;
+      this.pursuitDistance = this.torso.displayWidth * 20; 
       let headyColor = getRandomColorInCat(color);
       let tailColor =  getRandomColorInCat(color);
       
@@ -104,10 +104,11 @@ class Snake extends Slug {
       // having found our food stuff, move to it until you're close!
       this.eating = true  
       this.timer = 0;
+      let headyToTarget = new Vector2(playersBeing.torso).subtract(this.heady);
       this.scene.events.on('postupdate', function(time, delta) {
-        if(this.eating && playersBeing.alpha == 1 && playersBeing.color.s > 0.5){
+        if(this.eating && playersBeing.alpha == 1 && playersBeing.color.s > 0.5 && headyToTarget.length() < this.pursuitDistance){
 
-          let headyToTarget = new Vector2(playersBeing.torso).subtract(this.heady);
+          headyToTarget = new Vector2(playersBeing.torso).subtract(this.heady);
           let len = headyToTarget.length()
           drawVec(headyToTarget, this.heady, this.color.color, Math.min(this.heady.displayWidth, (this.heady.displayWidth+playersBeing.torso.displayWidth)*30/len))
           // console.log(playersBeing.torso)
@@ -116,6 +117,10 @@ class Snake extends Slug {
           let speedMod = 1;
           this.moveTo(target, speedMod);
 
+        }
+        else if(this.eating) {
+          logOutput('your being is no longer being <u class="enemycolor">hunted</u> :).')
+          this.stop();
         }
       }, this);
     }
