@@ -378,7 +378,7 @@ class Slug extends Phaser.GameObjects.Container {
         this.roaming = true;
       }
       this.scene.events.on('postupdate', function(time, delta) {
-        if(this.roaming && !(this.fleeing || this.eating || this.alpha == 1)){
+        if(this.roaming && !(this.fleeing || this.eating || this.alpha != 1)){
           // console.log(this.rotationDirection)
           // console.log(this.closestEnemyHeady, dist)
           let target = this.roamingTarget;
