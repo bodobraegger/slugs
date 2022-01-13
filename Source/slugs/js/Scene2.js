@@ -1002,13 +1002,6 @@ class Plant extends GroupDynVis {
         }
 
       }
-      if(circle) {
-        console.log('start')
-        this.getChildren().forEach(e => {
-          console.log(e.joints.length)
-        })
-        console.log('end')
-      }
     scene.add.existing(this);
   }
   destroy(clearChildren = false, destroyChildren=false) {
