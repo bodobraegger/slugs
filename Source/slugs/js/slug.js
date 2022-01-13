@@ -82,7 +82,7 @@ class Slug extends Phaser.GameObjects.Container {
         }
       }, this);
       
-      this.moveRandomly();
+      this.roam();
       if(!render) {
         this.bodyparts.forEach(e=> {
           e.destroy();
@@ -170,7 +170,7 @@ class Slug extends Phaser.GameObjects.Container {
       this.scene.matter.applyForce(this.heady, {x: FloatBetween(-0.05, 0.05), y: FloatBetween(-0.05, 0.05)})
     }
 
-    moveTo(target, speedMod = 1) {
+    moveTo(target, speedMod = 1, draw=true) {
       this.speedMod = speedMod;
       let reachedDist = this.heady.displayWidth+20*this.scale;
       if(target instanceof Phaser.GameObjects.GameObject) {
@@ -180,7 +180,7 @@ class Slug extends Phaser.GameObjects.Container {
       let speed = this.torso.displayWidth/10 * speedMod;
       let targetToHeady = new Vector2(target).subtract(this.heady);
       let len = targetToHeady.length()
-      drawVec(targetToHeady, this.heady, this.color.color, Math.min(this.heady.displayWidth, (this.heady.displayWidth+target.displayWidth)*30/len))
+      if(draw) { drawVec(targetToHeady, this.heady, this.color.color, Math.min(this.heady.displayWidth, (this.heady.displayWidth+target.displayWidth)*30/len)) }
       
       let targetVec = velocityToTarget(this.heady, target);
       let distanceToTarget = Distance.BetweenPoints(this.heady, target)
@@ -369,20 +369,52 @@ class Slug extends Phaser.GameObjects.Container {
         }
       }, this);
     }
-  
-    stop() {
-      this.eating = false;
-      this.fleeing = false;
-      
-      if(this.chosenFood) {
-        this.chosenFood = null;
+    roam() {
+      this.roaming = true;
+      this.roamingTarget = this.getRandomPointClose(this.torso);
+      const callback = function(params)  {
+        this.roamingTarget = this.getRandomPointClose(this.roamingTarget)
+        console.log('setting new roaming target: ', this.roamingTarget)
+        this.roaming = true;
       }
-      if(this.closestEnemyHeady) {
-        this.closestEnemyHeady = null;
-      }
-  
+      this.scene.events.on('postupdate', function(time, delta) {
+        if(this.roaming && !(this.fleeing || this.eating || this.alpha == 1)){
+          // console.log(this.rotationDirection)
+          // console.log(this.closestEnemyHeady, dist)
+          let target = this.roamingTarget;
+          this.moveTo(target, 0.5);
+          let distSq = Distance.BetweenPointsSquared(this.heady, this.roamingTarget);
+          if(distSq < this.heady.displayWidth**2 * 4) {
+            this.roaming = false;
+            let delay = Between(5, 10) * 1000
+            var timer = this.scene.time.delayedCall(delay, callback, undefined, this);  // delay in ms
+          }
+        }
+      }, this);
     }
 
+    getRandomPointClose(point) {
+      let r = new Vector2();
+      let x, y;
+      if(point) {
+        x = Between(
+          Between(point.x-800*this.torso.displayWidth/30, point.x-400*this.torso.displayWidth/30), 
+          Between(point.x+400*this.torso.displayWidth/30, point.x+800*this.torso.displayWidth/30)
+        );
+        y = Between(
+          Between(point.y-800*this.torso.displayWidth/30, point.y-400*this.torso.displayWidth/30), 
+          Between(point.y+400*this.torso.displayWidth/30, point.y+800*this.torso.displayWidth/30)
+        );
+      }
+      else {
+        x = Between(this.scene.xBorderLeft, this.scene.xBorderRight);
+        y = Between(this.scene.yBorderLow, this.scene.yBorderHigh);
+      }
+      r = {x, y};
+      return r;
+      
+    }
+  
     flee() {
       this.stop();
       let output = ``;
@@ -418,6 +450,24 @@ class Slug extends Phaser.GameObjects.Container {
 
       return output;
     }
+
+    stop() {
+      this.eating = false;
+      this.fleeing = false;
+      this.roaming = false;
+      let delay = 15 * 1000;
+      var timer = this.scene.time.delayedCall(delay, () => this.roam(), undefined, this);  // delay in ms
+
+      if(this.chosenFood) {
+        this.chosenFood = null;
+      }
+      if(this.closestEnemyHeady) {
+        this.closestEnemyHeady = null;
+      }
+      
+          
+    }
+
 
     addRule(ruleString) {
       let ifColor = false;
