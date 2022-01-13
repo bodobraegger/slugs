@@ -1,8 +1,6 @@
 class Snake extends Slug {
     constructor(scene=Scene2, x=0, y=0, radius=20, color=getRandomColorInCat()) {
       super(scene, x, y, radius, color, false);
-      this.setDataEnabled();
-      this.data.values.color = color;
       this.color = color
       this.txtr = 'smooth';
       this.shape = 'round';
@@ -72,15 +70,17 @@ class Snake extends Slug {
       playersBeing.bodyparts.forEach(limb => {
         this.heady.setOnCollideWith(limb, pair => {
           console.log('snake colliding with', limb, pair)
-          if(this.heady.displayWidth > playersBeing.torso.displayWidth) {
-            playersBeing.setAlpha(0.8)
-            playersBeing.saturate(false);
-            playersBeing.stop();
-            logOutput(`oh no! the angry creature ate your being's color :( try to get it to eat something so it can regain its color!`)
-          } else {
-            logOutput(`phew, your being is lucky it is too large to be eaten!`)
+          if(this.eating) {
+            if(this.heady.displayWidth > playersBeing.torso.displayWidth) {
+              playersBeing.setAlpha(0.8)
+              playersBeing.saturate(false);
+              playersBeing.stop();
+              logOutput(`oh no! the angry creature ate your being's color :( try to get it to eat something so it can regain its color!`)
+            } else {
+              logOutput(`phew, your being is lucky it is too large to be eaten!`)
+            }
+            this.eating = false;
           }
-          this.eating = false;
         });
 
       });

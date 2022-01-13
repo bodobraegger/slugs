@@ -35,6 +35,7 @@ let FOOD_MINIMUM = 3;
 
 let PLANTS;
 let ENEMIES;
+let BEINGS;
 
 let playersBeing = new Object
 
@@ -125,7 +126,9 @@ class Scene2 extends Phaser.Scene {
     this.xBorderRight = this.xBorderLeft+this.gameWidth;
     this.yBorderHigh = -5000;
     this.yBorderLow = this.yBorderHigh + this.gameHeight;
-
+    
+    ENEMIES = new Phaser.GameObjects.Group(this, []);
+    BEINGS = new Phaser.GameObjects.Group(this, []);
     // PLAYERSBEING
     let slug_r = 20;
     let slug_x = getCanvasWidth()/2;
@@ -136,6 +139,7 @@ class Scene2 extends Phaser.Scene {
     let pbColorCat = getRandomColorInCat(playersBeingColor)
 
     this.pb = new Slug(this, slug_x, slug_y, slug_r, playersBeingColor);
+    BEINGS.add(this.pb)
     playersBeing = this.pb;
     this.rulesLength = 0;
     
@@ -213,9 +217,14 @@ class Scene2 extends Phaser.Scene {
       // let s = new Slug(this, slug_x+i*10*rand, slug_y+i*10*rand, (slug_r+20)*rand/10)
       // this.slugs.push(s);
       this.activeFoodlength = FOOD.getMatching('active', true)
+
+      if(i%2) {
+        ENEMIES.add(new Snake(this, distx+Between(30, 300), disty+Between(30, 300), Between(30, 60), getRandomColorInCat([ COLORCATS_DICT['red'], COLORCATS_DICT['pink'], COLORCATS_DICT['green'], COLORCATS_DICT['yellow'] ])))
+        BEINGS.add(new Slug(this, distx+Between(30, 300), disty+Between(30, 300), Between(30, 60), getRandomColorInCat([ COLORCATS_DICT['red'], COLORCATS_DICT['pink'], COLORCATS_DICT['green'], COLORCATS_DICT['yellow'] ])))
+      }
+
     } this.completeLoading.call({newGraphics:this.newGraphics,loadingText:this.loadingText});
 
-    ENEMIES = new Phaser.GameObjects.Group(this, []);
     
     // RENDER TERMINAL ON TOP OF PHASER
     // const ph_terminal_container = this.add.dom(0.8*document.getElementById("phaser_container").clientWidth, 0.9*document.getElementById("phaser_container").clientHeight/2, terminal_container)
@@ -247,14 +256,20 @@ class Scene2 extends Phaser.Scene {
   update(time, delta) {
     this.graphics.clear()
     // console.log(constraints)
-    let constraints = [ ]
-    this.slugs.forEach(e => {
+    BEINGS.getMatching('active', true).forEach(e => {
       // SHOW THE SKELETONS OF THE SLUGS
-      constraints = constraints.concat(e.jointsBody);
+      if(e.someVisible()) {
+        this.renderConstraint(e.joints, 0xF9F6EE, undefined, e.torso.displayWidth/20);
+      }
     })
-    this.renderConstraint(constraints, 0xF9F6EE, undefined, 2*this.pb.scale);
-    constraints = [ ]
-    PLANTS.getChildren().forEach(p => {
+    ENEMIES.getMatching('active', true).forEach(e => {
+      // SHOW THE SKELETONS OF THE SLUGS
+      if(e.someVisible()) {
+        this.renderConstraint(e.joints, 0xF9F6EE, undefined, e.heady.displayWidth/20);
+      }
+    })
+    let constraints = [ ]
+    PLANTS.getMatching('active', true).forEach(p => {
       let visible = p.getVisible();
       if( !visible.length && p.circle && p.width < this.pb.torso.displayWidth*1.5) {
         let f = this.addFruit(p.getFirstAlive().x, p.getFirstAlive().y, p.width/2, p.color, 'flower');
