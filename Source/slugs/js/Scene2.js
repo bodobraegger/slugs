@@ -120,6 +120,11 @@ class Scene2 extends Phaser.Scene {
     // SETUP
     this.graphics.destroy();
     this.graphics = this.add.graphics();
+    this.gameWidth = this.gameHeight = 10000;
+    this.xBorderLeft = -5000;
+    this.xBorderRight = this.xBorderLeft+this.gameWidth;
+    this.yBorderHigh = -5000;
+    this.yBorderLow = this.yBorderHigh + this.gameHeight;
 
     // PLAYERSBEING
     let slug_r = 20;
@@ -239,8 +244,6 @@ class Scene2 extends Phaser.Scene {
     NARRATION.intro();
 
   }
-
-
   update(time, delta) {
     this.graphics.clear()
     // console.log(constraints)
@@ -400,6 +403,7 @@ class Scene2 extends Phaser.Scene {
     }
 
   }
+
   processCommand(input = [], newSegment=true) {
     let cmd = input;
     let output = `${wrapCmd(cmd.join(' '))}: `
