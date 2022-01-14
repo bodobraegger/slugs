@@ -12,7 +12,7 @@ class Narration {
     }
     hunted() {
         startNewLogSegment()
-        logError(`uh oh, a larger creature is angry and hungry and wants to <u class='enemycolor'>eat your being, it is project a line to it!</u>`)
+        logError(`uh oh, a larger creature is angry and hungry and wants to <u class='playerscolor'>eat your being, it is project a line to it!</u>`)
         logOutput(`you must quickly make a flee rule: ${wrapCmd('if other_creature is <i>condition</i> then <i>flee</i>')}, and then tell your being to ${wrapCmd('flee')}!`)
     }
 }

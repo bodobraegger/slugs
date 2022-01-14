@@ -67,23 +67,27 @@ class Snake extends Slug {
         e.originalLength = e.length;
       })
       
-      playersBeing.bodyparts.forEach(limb => {
-        this.heady.setOnCollideWith(limb, pair => {
-          console.log('snake colliding with', limb, pair)
-          if(this.eating) {
-            if(this.heady.displayWidth > playersBeing.torso.displayWidth) {
-              playersBeing.setAlpha(0.8)
-              playersBeing.saturate(false);
-              playersBeing.stop();
-              logOutput(`oh no! the angry creature ate your being's color :( try to get it to eat something so it can regain its color!`)
-            } else {
-              logOutput(`phew, your being is lucky it is too large to be eaten!`)
+      BEINGS.getMatching('active', true).forEach(b=>{
+        b.bodyparts.forEach(limb => {
+          this.heady.setOnCollideWith(limb, pair => {
+            // console.log('snake colliding with', limb, pair)
+            if(this.eating) {
+              if(this.heady.displayWidth > b.torso.displayWidth && b.hunter == this) {
+                b.setAlpha(0.8)
+                b.saturate(false);
+                b.stop();
+                if(this.scene.pb == b) {
+                  logOutput(`oh no! the angry creature ate your being's color :( try to get it to eat something so it can regain its color!`)
+                }
+              } else if(this.scene.pb == b) {
+                logOutput(`phew, your being is lucky it is too large to be eaten!`)
+              }
+              this.eating = false;
             }
-            this.eating = false;
-          }
+          });
         });
+      })
 
-      });
 
         
       this.bodyparts.forEach((e, i) => {
@@ -98,27 +102,54 @@ class Snake extends Slug {
       this.setScale(1);
       this.body = this.torso.body;
       this.rulesParsed = [ ];
+      this.roaming = true;
+      this.roamingTarget = this.getRandomPointClose(this.torso);
     }
     
     eat(foodType='any') {
       // having found our food stuff, move to it until you're close!
       this.eating = true  
       this.timer = 0;
-      let headyToTarget = new Vector2(playersBeing.torso).subtract(this.heady);
+
+      let possible_victims = []
+      BEINGS.getMatching('active', true).forEach(b => {
+        if(sameColorCategory(b.color, this.color), b.torso.displayWidth < this.heady.displayWidth) {
+          possible_victims.push(b);
+        }
+      });
+      this.hunted = possible_victims[0];
+      possible_victims.forEach(v => {
+        if(Distance.BetweenPointsSquared(this.heady, v.torso) < Distance.BetweenPointsSquared(this.heady, this.hunted.torso)) {
+          this.hunted = v;
+        }
+      }) 
+      let headyToTarget = new Vector2(this.hunted.torso).subtract(this.heady);
+      if(!this.hunted.hunter && this.hunted.alpha == 1 && this.hunted.color.s > 0.5 && headyToTarget.length() < this.pursuitDistance){
+        this.hunted.hunter = this
+        if(this.hunted == this.scene.pb) {
+          if(this.scene.stage >= 3) {
+            NARRATION.hunted();
+          } else {
+            this.stop();
+          }
+        }
+      }
       this.scene.events.on('postupdate', function(time, delta) {
-        if(this.eating && playersBeing.alpha == 1 && playersBeing.color.s > 0.5 && headyToTarget.length() < this.pursuitDistance && this.scene.stage >= 4){
-          headyToTarget = new Vector2(playersBeing.torso).subtract(this.heady);
+        if(this.eating && this.hunted.alpha == 1 && this.hunted.color.s > 0.5 && headyToTarget.length() < this.pursuitDistance){
+          headyToTarget = new Vector2(this.hunted.torso).subtract(this.heady);
           let len = headyToTarget.length()
-          drawVec(headyToTarget, this.heady, this.color.color, Math.min(this.heady.displayWidth, (this.heady.displayWidth+playersBeing.torso.displayWidth)*30/len))
-          // console.log(playersBeing.torso)
+          drawVec(headyToTarget, this.heady, this.color.color, Math.min(this.heady.displayWidth, (this.heady.displayWidth+this.hunted.torso.displayWidth)*30/len))
+          // console.log(this.hunted.torso)
           
-          let target = playersBeing.torso          
+          let target = this.hunted.torso          
           let speedMod = 1;
           this.moveTo(target, speedMod);
 
         }
-        else if(this.eating) {
-          logOutput('your being is no longer being <u class="enemycolor">hunted</u> :).')
+        else if(this.eating && this.hunted.hunter == this) {
+          if(this.hunted == this.scene.pb) {
+            logOutput('your being is no longer being <u class="enemycolor">this.hunted</u> :).')
+          }
           this.stop();
         }
       }, this);
@@ -126,6 +157,11 @@ class Snake extends Slug {
   
     stop() {
       this.eating = false;
+      if(this.hunted) {
+        if(this.hunted.hunter == this) {
+          this.hunted.hunter = null;
+        }
+      }
     }
 
 }
