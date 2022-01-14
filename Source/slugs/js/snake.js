@@ -106,8 +106,7 @@ class Snake extends Slug {
       this.timer = 0;
       let headyToTarget = new Vector2(playersBeing.torso).subtract(this.heady);
       this.scene.events.on('postupdate', function(time, delta) {
-        if(this.eating && playersBeing.alpha == 1 && playersBeing.color.s > 0.5 && headyToTarget.length() < this.pursuitDistance){
-
+        if(this.eating && playersBeing.alpha == 1 && playersBeing.color.s > 0.5 && headyToTarget.length() < this.pursuitDistance && this.scene.stage >= 4){
           headyToTarget = new Vector2(playersBeing.torso).subtract(this.heady);
           let len = headyToTarget.length()
           drawVec(headyToTarget, this.heady, this.color.color, Math.min(this.heady.displayWidth, (this.heady.displayWidth+playersBeing.torso.displayWidth)*30/len))
