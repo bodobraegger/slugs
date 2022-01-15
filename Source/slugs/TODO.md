@@ -33,6 +33,9 @@
 - [ ] babies of different color, enemies suck out the color
 - [ ] if food is little beings color then feed it
 - [ ] feed
+- [ ] https://www.thebotanistgame.com/blog/2015/08/12/saving-loading-game-state-phaserjs.html
+- [ ] working sandbox
+- [ ] narration
 
 1. [x] natural movement
 2. [x] editing and viewing rules

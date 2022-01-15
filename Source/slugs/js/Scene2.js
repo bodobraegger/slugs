@@ -97,6 +97,20 @@ class Scene2 extends Phaser.Scene {
 
     this.load.on('progress', this.updateLoadingBar, {newGraphics:this.newGraphics,loadingText:this.loadingText});
     // this.load.on('complete', this.completeLoading, {newGraphics:this.newGraphics,loadingText:loadingText});
+
+    this.lastLogged = Date.now();
+    this.mutationObserver = new MutationObserver(function(mutations) {
+      // console.log( Math.round((Date.now() - this.lastLogged) / 1000) )
+      this.lastLogged = Date.now();
+    });
+    this.mutationObserver.observe(terminal_log, {
+      attributes: true,
+      characterData: true,
+      childList: true,
+      subtree: true,
+      attributeOldValue: true,
+      characterDataOldValue: true
+    });
   }
   updateLoadingBar(percentage) {
     percentage = percentage/2;
@@ -337,7 +351,7 @@ class Scene2 extends Phaser.Scene {
       for(let i = 0; i < rulesFood.length; i++) {
         let foodCurrentlySelected = [ ];
         let r = rulesFood[i]; 
-        console.log('adapting matching fruit! -> rule', r)
+        // console.log('adapting matching fruit! -> rule', r)
         let booleanExpr = r.booleanExpr;
         let booleanString = booleanExpr.join(' '); // .splice(1, 0, '(').push(')')
         booleanString = booleanString.replaceAll(equalWord, '==').replaceAll(andWord, '&&').replaceAll(` ${orWord}`, ` ||`);

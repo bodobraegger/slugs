@@ -83,7 +83,7 @@ class Slug extends Phaser.GameObjects.Container {
       
 
       const callback = function(params)  {
-        if(!(this.fleeing || this.eating)) {
+        if(!(this.fleeing || this.eating || this.scene.lastLogged > Date.now() - 20 * 1000)) {
           let c = Between(0, 19);
           let player = ( this == this.scene.pb )
           let playerNotPassive = ( player && (this.alpha != 1 || this.hunter) )
@@ -115,7 +115,7 @@ class Slug extends Phaser.GameObjects.Container {
       }
       this.roam();
       var timer = scene.time.addEvent({
-        delay: Between(10, 20) * 1000,
+        delay: Between(20, 30) * 1000,
         callback: callback,
         callbackScope: this,
         loop: true
