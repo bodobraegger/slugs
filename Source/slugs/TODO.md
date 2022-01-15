@@ -36,6 +36,8 @@
 - [ ] https://www.thebotanistgame.com/blog/2015/08/12/saving-loading-game-state-phaserjs.html
 - [ ] working sandbox
 - [ ] narration
+- [ ] think about cannibalistic behaviour..
+- [ ] 
 
 1. [x] natural movement
 2. [x] editing and viewing rules

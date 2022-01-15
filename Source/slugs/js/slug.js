@@ -83,10 +83,10 @@ class Slug extends Phaser.GameObjects.Container {
       
 
       const callback = function(params)  {
-        if(!(this.fleeing || this.eating || this.scene.lastLogged > Date.now() - 20 * 1000)) {
+        if(!(this.fleeing || this.eating)) {
           let c = Between(0, 19);
           let player = ( this == this.scene.pb )
-          let playerNotPassive = ( player && (this.alpha != 1 || this.hunter) )
+          let playerNotPassive = ( player && (this.alpha != 1 || this.hunter || this.scene.lastLogged > Date.now() - 20 * 1000) )
           if(playerNotPassive) {
             return;
           }
@@ -113,13 +113,15 @@ class Slug extends Phaser.GameObjects.Container {
           }
         }
       }
-      this.roam();
       var timer = scene.time.addEvent({
         delay: Between(20, 30) * 1000,
         callback: callback,
         callbackScope: this,
         loop: true
       });
+
+      this.roam();
+      
       if(!render) {
         this.bodyparts.forEach(e=> {
           e.destroy();
@@ -425,12 +427,15 @@ class Slug extends Phaser.GameObjects.Container {
       }, this);
     }
     roam() {
+      this.stop()
       this.roaming = true;
       this.roamingTarget = this.getRandomPointClose(this.torso);
       const callback = function(params)  {
-        this.roamingTarget = this.getRandomPointClose(this.roamingTarget)
-        // console.log('setting new roaming target: ', this.roamingTarget)
-        this.roaming = true;
+        if(!(this.fleeing || this.eating || this.alpha != 1)) {
+          this.roamingTarget = this.getRandomPointClose(this.roamingTarget)
+          // console.log('setting new roaming target: ', this.roamingTarget)
+          this.roaming = true;
+        }
       }
       this.scene.events.on('postupdate', function(time, delta) {
         if(this.roaming && !(this.fleeing || this.eating || this.alpha != 1)){
@@ -524,8 +529,7 @@ class Slug extends Phaser.GameObjects.Container {
       this.fleeing = false;
       this.roaming = false;
       let delay = 15 * 1000;
-      var timer = this.scene.time.delayedCall(delay, () => this.roam(), undefined, this);  // delay in ms
-
+      
       if(this.chosenFood) {
         this.chosenFood = null;
       }

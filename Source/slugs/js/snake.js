@@ -73,11 +73,17 @@ class Snake extends Slug {
             // console.log('snake colliding with', limb, pair)
             if(this.eating && b.hunter == this) {
               if(this.heady.displayWidth > b.torso.displayWidth) {
+                // successfully ate
                 b.setAlpha(0.8)
                 b.saturate(false);
                 b.stop();
                 if(this.scene.pb == b) {
                   logOutput(`oh no! the angry creature ate your being's color :( try to get it to eat something so it can regain its color!`)
+                }
+                if(sameColorCategory(this.color, b.color)) {
+                  this.setScale(this.scale+0.2);
+                } else {
+                  this.setAlpha(0.8);
                 }
               } else if(this.scene.pb == b) {
                 logOutput(`phew, your being is lucky it is too large to be eaten!`)
