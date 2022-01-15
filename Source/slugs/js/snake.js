@@ -71,8 +71,8 @@ class Snake extends Slug {
         b.bodyparts.forEach(limb => {
           this.heady.setOnCollideWith(limb, pair => {
             // console.log('snake colliding with', limb, pair)
-            if(this.eating) {
-              if(this.heady.displayWidth > b.torso.displayWidth && b.hunter == this) {
+            if(this.eating && b.hunter == this) {
+              if(this.heady.displayWidth > b.torso.displayWidth) {
                 b.setAlpha(0.8)
                 b.saturate(false);
                 b.stop();
