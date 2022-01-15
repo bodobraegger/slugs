@@ -92,11 +92,13 @@ class Slug extends Phaser.GameObjects.Container {
           }
           if(c < 10) {
             if(player) {
+              startNewLogSegment();
               logInput(`your being roams around... maybe you could tell it what to do? try seeing how by typing ${wrapCmd('help')}!`)
               this.roam();
             } 
           } else if(c < 15) {
             if(player) {
+              startNewLogSegment();
               logInput(`your being tries to eat as it feels hungry and you did not tell it what to do. to talk to your being, check out the ${wrapCmd('help')} command!`)
               this.eat()
             } else {
@@ -104,6 +106,7 @@ class Slug extends Phaser.GameObjects.Container {
             }
           } else if(c < 18) {
             if(player) {
+              startNewLogSegment();
               logInput(`your being seems a bit bored... maybe you could tell it what to do? try seeing how by typing ${wrapCmd('help')}!`)
             }
             this.stop();
