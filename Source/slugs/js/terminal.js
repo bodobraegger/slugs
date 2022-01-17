@@ -485,6 +485,7 @@ function parseEncased(parentheses, input_arr) {
 async function blink(e = document.getElementById('id')) {
   let borderOriginal = (e.style.border ? e.style.border : ``);
   let border = `thin solid rgba(255, 165, 0, 0.8)`
+  e.classList.remove('old')
   setTimeout(function() {
      // e.style.display = (e.style.display == 'none' ? '' : 'none');
      e.style.border = (e.style.border == border ? borderOriginal : border);
