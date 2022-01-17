@@ -347,16 +347,9 @@ class Slug extends Phaser.GameObjects.Container {
           logOutput(`none of the ${wrapCmd('rules')} tell your being what to eat, so it will try to eat anything!`)
         }
       }
-      this.food_matching.clear()
-      this.food_matching.addMultiple(foodSelected.filter(e => (e.displayWidth > this.heady.displayWidth/4 && e.displayWidth < this.heady.displayWidth*3)));
-
-      // having found our food stuff, move to it until you're close!
-      this.chosenFood = findClosest(this.heady, this.food_matching.getMatching('active', true));
-      
-      this.rotationDirection = 0;
-      
       if(foodType == 'healthy') {
-        this.food_matching.clear();
+        foodSelected = []
+        /*
         BEINGS.getMatching('active', true).forEach( b => {
           if(b!=this) {
             if(sameColorCategory(this.color, b.color) && this.heady.displayWidth > b.torso.displayWidth && this.shape == b.shape && this.txtr == b.txtr) {
@@ -364,13 +357,25 @@ class Slug extends Phaser.GameObjects.Container {
             }
           }
         });
-        FRUIT.getMatching('active', true).forEach( f => {
+        */
+       FRUIT.getMatching('active', true).forEach( f => {
           if(sameColorCategory(this.color, f.color) && this.heady.displayWidth > f.displayWidth && this.shape == f.shape && this.txtr == f.txtr) {
-            this.food_matching.add(f)
+            foodSelected.push(f)
           }
         });
 
       }
+      this.food_matching.clear()
+      this.food_matching.addMultiple(foodSelected.filter(e => (e.displayWidth > this.heady.displayWidth/4 && e.displayWidth < this.heady.displayWidth*3)));
+
+      // having found our food stuff, move to it until you're close!
+      this.chosenFood = findClosest(this.heady, this.food_matching.getMatching('active', true));
+      if(this.chosenFood) {
+        this.chosenFood.hunter = this;
+      }
+      
+      this.rotationDirection = 0;
+      
 
       this.scene.events.on('postupdate', function(time, delta) {
         if(this.eating && this.food_matching.countActive()){
@@ -405,18 +410,19 @@ class Slug extends Phaser.GameObjects.Container {
           
           if(!this.chosenFood.active) {
             // console.log('replacing closest match with', closestMatchNew)
+            this.chosenFood.hunter = null
             this.chosenFood = closestMatchNew;
+            this.chosenFood.hunter = this;
           }
           this.moveTo(this.chosenFood, 1);
 
           if(closestMatchNew && this.chosenFood != closestMatchNew) {
             if(Distance.BetweenPoints(this.heady, closestMatchNew) - Distance.BetweenPoints(this.heady, this.chosenFood) < -50*this.scale){
-              
+              this.chosenFood.hunter = null;
               // console.log(closestMatchNew)
               this.chosenFood = closestMatchNew;
+              this.chosenFood.hunter = this;
               this.rotationDirection = 0;
-              // console.log('target switched')
-              this.chosenFood = this.chosenFood;
             } 
           }
           let plant = this.chosenFood.group;
@@ -531,6 +537,7 @@ class Slug extends Phaser.GameObjects.Container {
       let delay = 15 * 1000;
       
       if(this.chosenFood) {
+        this.chosenFood.hunter = null;
         this.chosenFood = null;
       }
       if(this.hunterHeady) {

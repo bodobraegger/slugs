@@ -240,6 +240,10 @@ class Scene2 extends Phaser.Scene {
 
     } this.completeLoading.call({newGraphics:this.newGraphics,loadingText:this.loadingText});
 
+    FRUIT.getChildren().forEach(o => {
+      this.setOnCollidesWithForFruit(o);
+    })
+
     
     // RENDER TERMINAL ON TOP OF PHASER
     // const ph_terminal_container = this.add.dom(0.8*document.getElementById("phaser_container").clientWidth, 0.9*document.getElementById("phaser_container").clientHeight/2, terminal_container)
@@ -732,93 +736,132 @@ class Scene2 extends Phaser.Scene {
     // o.shape = texture.includes('circle') ? 'round':'edgy'
     o.shape = 'round'
     let s = playersBeing;
-    o.setOnCollideWith(s.heady, pair => {
-      if(o == this.pb.chosenFood) {
-        if(o.displayWidth <= s.heady.displayWidth) {
-          let output = ``
-          if(sameColorCategory(o.color, s.color) && o.txtr == s.txtr && o.shape == s.shape) {
-            output += `the being enjoyed this snack😋<br>`
-            if(s.alpha < 1) {
-              s.saturate(1)
-              s.setAlpha(1);
-              output += `it feels healthy again!➕<br>`
-            } else {
-              s.setScale(0.3+s.scaleX);
-              output += `your being was able to grow!🥰<br>`
-            }
-            if(s.plantLoop && o.group) {
-              let oGroupMatchTemp = new Phaser.GameObjects.Group(this, this.pb.food_matching.getMatching('group', o.group));
-              if(oGroupMatchTemp.countActive()) { 
-                output += `it will look for more fruit now!<br>`
-                s.eating = true; 
-              } else if(o.group.countActive()) { logOutput(`no more fruits on this plant match the beings rules`) } 
-              else { logOutput(`your being ate all of the fruit on this plant!🌴`) }
-            } else {
-              output += `it is done eating now...`
-              s.eating = false;
-            }
-          } else {
-            //console.log(sameColorCategory(o.color, s.color), o.txtr == s.txtr, o.shape == s.shape)
-            output = `oh no, the being did not like what it ate 🤢! it has turned see-through`
-            s.setAlpha(0.5);
-            if(!sameColorCategory(o.color, s.color)) {
-              output += `<br>perhaps it did not like its color 🍎🍏`
-            }
-            if(!(o.txtr == s.txtr)) {
-              output += `<br>perhaps it did not like its texture 🌸🌵`
-            }
-            if(!(o.shape == s.shape)) {
-              output += `<br>perhaps it did not like its shape ⚪⬜`
-            }
-            output +='...<br>'
-            s.eating = false;
-          }
-          if(o.joints) {
-            o.joints.forEach(j => {
-              if(o.group) {
-                var i = o.group.joints.indexOf(j);
-                if(i !== -1) { 
-                  console.log(o.group.joints, j, i)
-                  o.group.joints.splice(i, 1);
-                  console.log(o.group.joints)
-                }
-              }
-              var otherO = j.bodyA.gameObject == o ? j.bodyB.gameObject : j.bodyA.gameObject;
-              if(otherO) {
-                var i = otherO.joints.indexOf(j);
-                if(i !== -1) {
-                  console.log(otherO.joints, j, i)
-                  otherO.joints.splice(i, 1);
-                  console.log(otherO.joints)
-                }
-              }
-            })
-            this.matter.world.removeConstraint(o.joints, true);
-            o.joints = [];
-          }
-          o.destroy();
-          // FRUIT.splice(f_index);
-          logOutput(output)
-        } else {
-          let output = `the being can't eat anything bigger than its head :0<br>`
-          if(s.plantLoop && o.group) {
-            let oGroupMatchTemp = new Phaser.GameObjects.Group(this, this.pb.food_matching.getMatching('group', o.group));
-            if(oGroupMatchTemp.countActive()) {
-              output += `the being takes a look at the other fruits on this plant :)`
-              this.pb.food_matching.kill(o);
-            } else {
-              output += `there is no more matching food on this plant`
-              s.eating = false;
-            }
-          } else {
-            s.eating = false;
-          }
-          logOutput(output)
-        }
-      }
-    })
+    this.setOnCollidesWithForFruit(o);
     FRUIT.add(o);
     return o;
+  }
+
+  setOnCollidesWithForFruit(o, beings=[]) {
+    if(!beings.length) {
+      beings = BEINGS.getChildren('active', true);
+    }
+    beings.forEach(s=> {
+      o.setOnCollideWith(s.heady, pair => {
+        if(o == s.chosenFood) {
+          if(o.displayWidth <= s.heady.displayWidth) {
+            let output = ``
+            if(sameColorCategory(o.color, s.color) && o.txtr == s.txtr && o.shape == s.shape) {
+              output += `the being enjoyed this snack😋<br>`
+              if(s.alpha < 1) {
+                s.saturate(1)
+                s.setAlpha(1);
+                output += `it feels healthy again!➕<br>`
+              } else {
+                s.setScale(0.3+s.scaleX);
+                output += `your being was able to grow!🥰<br>`
+              }
+              if(s.plantLoop && o.group) {
+                let oGroupMatchTemp = new Phaser.GameObjects.Group(this, this.pb.food_matching.getMatching('group', o.group));
+                if(oGroupMatchTemp.countActive()) { 
+                  output += `it will look for more fruit now!<br>`
+                  s.eating = true; 
+                } else if(o.group.countActive() && s == this.pb) { logOutput(`no more fruits on this plant match the beings rules`) } 
+                else if(s == this.pb) { logOutput(`your being ate all of the fruit on this plant!🌴`) }
+              } else {
+                output += `it is done eating now...`
+                s.eating = false;
+              }
+            } else {
+              //console.log(sameColorCategory(o.color, s.color), o.txtr == s.txtr, o.shape == s.shape)
+              output = `oh no, the being did not like what it ate 🤢! it has turned see-through`
+              s.setAlpha(0.5);
+              if(!sameColorCategory(o.color, s.color)) {
+                output += `<br>perhaps it did not like its color 🍎🍏`
+              }
+              if(!(o.txtr == s.txtr)) {
+                output += `<br>perhaps it did not like its texture 🌸🌵`
+              }
+              if(!(o.shape == s.shape)) {
+                output += `<br>perhaps it did not like its shape ⚪⬜`
+              }
+              output +='...<br>'
+              s.eating = false;
+            }
+            if(o.joints) {
+              o.joints.forEach(j => {
+                if(o.group) {
+                  var i = o.group.joints.indexOf(j);
+                  if(i !== -1) { 
+                    o.group.joints.splice(i, 1);
+                  }
+                }
+                var otherO = j.bodyA.gameObject == o ? j.bodyB.gameObject : j.bodyA.gameObject;
+                if(otherO) {
+                  var i = otherO.joints.indexOf(j);
+                  if(i !== -1) {
+                    otherO.joints.splice(i, 1);
+                  }
+                }
+              })
+              this.matter.world.removeConstraint(o.joints, true);
+              o.joints = [];
+            }
+            o.destroy();
+            // FRUIT.splice(f_index);
+            if(s == this.pb) {
+              logOutput(output)
+            }
+          } else {
+            let output = `the being can't eat anything bigger than its head :0<br>`
+            if(s.plantLoop && o.group) {
+              let oGroupMatchTemp = new Phaser.GameObjects.Group(this, this.pb.food_matching.getMatching('group', o.group));
+              if(oGroupMatchTemp.countActive()) {
+                output += `the being takes a look at the other fruits on this plant :)`
+                this.pb.food_matching.kill(o);
+              } else {
+                output += `there is no more matching food on this plant`
+                s.eating = false;
+              }
+            } else {
+              s.eating = false;
+            }
+            if(s == this.pb) {
+              logOutput(output)
+            }
+          }
+        }
+      })
+    })
+  }
+
+  setOnCollidesWithForBeings(being, others=[]) {
+    if(!others.length) {
+      others = BEINGS.getMatching('active', true) 
+    }
+    others.forEach(b=>{
+      being.heady.setOnCollideWith(b.torso, pair => {
+        // console.log('snake colliding with', limb, pair)
+        if(being.eating && (b.hunter == this || b.torso.hunter == this)) {
+          if(being.heady.displayWidth > b.torso.displayWidth) {
+            // successfully ate
+            b.setAlpha(0.8)
+            b.saturate(false);
+            b.stop();
+            if(this.pb == b) {
+              logOutput(`oh no! the angry creature ate your being's color :( try to get it to eat something so it can regain its color!`)
+            }
+            if(sameColorCategory(being.color, b.color)) {
+              being.setScale(being.scale+0.2);
+            } else {
+              being.setAlpha(0.8);
+            }
+          } else if(this.pb == b) {
+            logOutput(`phew, your being is lucky it is too large to be eaten!`)
+          }
+          being.eating = false;
+        }
+      });
+    });
   }
 
   addGameCircleTextured(x, y, radius, color =getRandomColorInCat(), texture = 'circle_leopard') {
