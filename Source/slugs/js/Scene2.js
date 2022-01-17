@@ -243,6 +243,9 @@ class Scene2 extends Phaser.Scene {
     FRUIT.getChildren().forEach(o => {
       this.setOnCollidesWithForFruit(o);
     })
+    ENEMIES.getChildren().forEach(e => {
+      e.setOnCollidesWithBeings();
+    })
 
     
     // RENDER TERMINAL ON TOP OF PHASER

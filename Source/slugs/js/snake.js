@@ -67,35 +67,8 @@ class Snake extends Slug {
         e.originalLength = e.length;
       })
       
-      BEINGS.getMatching('active', true).forEach(b=>{
-        b.bodyparts.forEach(limb => {
-          this.heady.setOnCollideWith(limb, pair => {
-            // console.log('snake colliding with', limb, pair)
-            if(this.eating && b.hunter == this) {
-              if(this.heady.displayWidth > b.torso.displayWidth) {
-                // successfully ate
-                b.setAlpha(0.8)
-                b.saturate(false);
-                b.stop();
-                if(this.scene.pb == b) {
-                  logOutput(`oh no! the angry creature ate your being's color :( try to get it to eat something so it can regain its color!`)
-                }
-                if(sameColorCategory(this.color, b.color)) {
-                  this.setScale(this.scale+0.2);
-                } else {
-                  this.setAlpha(0.8);
-                }
-              } else if(this.scene.pb == b) {
-                logOutput(`phew, your being is lucky it is too large to be eaten!`)
-              }
-              this.eating = false;
-            }
-          });
-        });
-      })
-
-
-        
+      this.setOnCollidesWithBeings()
+      
       this.bodyparts.forEach((e, i) => {
         // e.setCollisionGroup(i);
         // e.setCollidesWith(0);
@@ -168,6 +141,35 @@ class Snake extends Slug {
           this.hunted.hunter = null;
         }
       }
+    }
+
+    setOnCollidesWithBeings() {
+      BEINGS.getMatching('active', true).forEach(b=>{
+        b.bodyparts.forEach(limb => {
+          this.heady.setOnCollideWith(limb, pair => {
+            // console.log('snake colliding with', limb, pair)
+            if(this.eating && b.hunter == this) {
+              if(this.heady.displayWidth > b.torso.displayWidth) {
+                // successfully ate
+                b.setAlpha(0.8)
+                b.saturate(false);
+                b.stop();
+                if(this.scene.pb == b) {
+                  logOutput(`oh no! the angry creature ate your being's color :( try to get it to eat something so it can regain its color!`)
+                }
+                if(sameColorCategory(this.color, b.color)) {
+                  this.setScale(this.scale+0.2);
+                } else {
+                  this.setAlpha(0.8);
+                }
+              } else if(this.scene.pb == b) {
+                logOutput(`phew, your being is lucky it is too large to be eaten!`)
+              }
+              this.eating = false;
+            }
+          });
+        });
+      })
     }
 
 }
