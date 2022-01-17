@@ -284,7 +284,7 @@ class Slug extends Phaser.GameObjects.Container {
       this.stop()
       this.scene.triggerFoodUpdate = true;
       this.eating = true;
-      if(RULES.length) {
+      if(this.rulesParsed.length) {
         logOutput(`first, the being thinks of the ${wrapCmd('rules')} you gave it.`)
       }
       let foodSelected = FRUIT.getMatching('active', true);
