@@ -4,7 +4,7 @@ class Snake extends Slug {
       this.color = color
       this.txtr = 'smooth';
       this.shape = 'round';
-      this.pursuitDistance = this.torso.displayWidth * 20; 
+      this.pursuitDistance = this.torso.displayWidth * 40; 
       let headyColor = getRandomColorInCat(color);
       let tailColor =  getRandomColorInCat(color);
       
@@ -89,19 +89,26 @@ class Snake extends Slug {
       // having found our food stuff, move to it until you're close!
       this.eating = true  
       this.timer = 0;
-
-      let possible_victims = []
-      BEINGS.getMatching('active', true).forEach(b => {
-        if(sameColorCategory(b.color, this.color), b.torso.displayWidth < this.heady.displayWidth) {
-          possible_victims.push(b);
+      if(foodType=='any' || foodType =='healthy') {
+        let possible_victims = []
+        BEINGS.getMatching('active', true).forEach(b => {
+          if(sameColorCategory(b.color, this.color), b.torso.displayWidth < this.heady.displayWidth) {
+            possible_victims.push(b);
+          }
+        });
+        if(!possible_victims.length) {
+          return;
         }
-      });
-      this.hunted = possible_victims[0];
-      possible_victims.forEach(v => {
-        if(Distance.BetweenPointsSquared(this.heady, v.torso) < Distance.BetweenPointsSquared(this.heady, this.hunted.torso)) {
-          this.hunted = v;
-        }
-      }) 
+        this.hunted = possible_victims[0];
+        possible_victims.forEach(v => {
+          if(Distance.BetweenPointsSquared(this.heady, v.torso) < Distance.BetweenPointsSquared(this.heady, this.hunted.torso)) {
+            this.hunted = v;
+          }
+        }) 
+      }
+      if(foodType=='player'){
+        this.hunted = this.scene.pb
+      }
       let headyToTarget = new Vector2(this.hunted.torso).subtract(this.heady);
       if(!this.hunted.hunter && this.hunted.alpha == 1 && this.hunted.color.s > 0.5 && headyToTarget.length() < this.pursuitDistance){
         this.hunted.hunter = this

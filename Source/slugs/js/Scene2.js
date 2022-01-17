@@ -98,7 +98,6 @@ class Scene2 extends Phaser.Scene {
     this.load.on('progress', this.updateLoadingBar, {newGraphics:this.newGraphics,loadingText:this.loadingText});
     // this.load.on('complete', this.completeLoading, {newGraphics:this.newGraphics,loadingText:loadingText});
 
-    this.lastLogged = Date.now();
     this.mutationObserver = new MutationObserver(function(mutations) {
       // console.log( Math.round((Date.now() - this.lastLogged) / 1000) )
       this.lastLogged = Date.now();
@@ -159,7 +158,7 @@ class Scene2 extends Phaser.Scene {
     this.rulesLength = 0;
     
     // let s1 = new Slug(this, slug_x-280, slug_y-5, 10);
-    this.cameras.main.startFollow(this.pb.torso, true, 0.08, 0.08);
+    this.cameras.main.startFollow(this.pb.torso, true, 0.03, 0.03);
     this.stage = 1;
     this.slugs = [this.pb];
     
@@ -208,8 +207,6 @@ class Scene2 extends Phaser.Scene {
         tries = tries + 0.1
         distx = this.pb.x+(Math.random()<0.5 ? Between(-5*this.pb.scale, -4000*this.pb.scale):Between(4000*this.pb.scale, 5*this.pb.scale))
         disty = this.pb.y+(Math.random()<0.5 ? Between(-5*this.pb.scale, -4000*this.pb.scale):Between(4000*this.pb.scale, 5*this.pb.scale))
-        console.log(distx, disty, tries, coordinates)
-        
           coordinates.some(p=> {
             tooClose = ( Math.abs(p.x-distx) < Math.max(randSize/tries, 300/tries) && Math.abs(p.y-disty) < Math.max(randSize/tries, 300/tries) );
             // console.log(Math.abs(p.x-distx)+Math.abs(p.y-disty),randSize*3)
@@ -218,8 +215,7 @@ class Scene2 extends Phaser.Scene {
       } while(tooClose);
       
       coordinates.push({x: distx, y: disty});
-      console.log(coordinates)
-
+      
       let c = getRandomColorInCat();
       
       // this.addFruit(20+c.color%(rand*10), c.color%(rand*10), 5*rand, c, 'flower');
@@ -325,7 +321,7 @@ class Scene2 extends Phaser.Scene {
       console.log(`spawned enemy at`, this.enemy.x, this.enemy.y, this.enemy);
       changeStylesheetRule(document.styleSheets[0], '.enemycolor', `background-color`, `#${this.enemy.color.color.toString(16)}`)
       NARRATION.hunted();
-      this.enemy.eat();
+      this.enemy.eat('player');
     }
     this.controls.update(delta)
     let vecTorsoHeady = velocityToTarget(this.pb.torso, this.pb.heady);
@@ -766,10 +762,10 @@ class Scene2 extends Phaser.Scene {
               }
               if(s.plantLoop && o.group) {
                 let oGroupMatchTemp = new Phaser.GameObjects.Group(this, this.pb.food_matching.getMatching('group', o.group));
-                if(oGroupMatchTemp.countActive()) { 
+                if(oGroupMatchTemp.getChildren('active', true).length) { 
                   output += `it will look for more fruit now!<br>`
                   s.eating = true; 
-                } else if(o.group.countActive() && s == this.pb) { logOutput(`no more fruits on this plant match the beings rules`) } 
+                } else if(o.group.getChildren('active', true).length && s == this.pb) { logOutput(`no more fruits on this plant match the beings rules`) } 
                 else if(s == this.pb) { logOutput(`your being ate all of the fruit on this plant!🌴`) }
               } else {
                 output += `it is done eating now...`
@@ -819,7 +815,7 @@ class Scene2 extends Phaser.Scene {
             let output = `the being can't eat anything bigger than its head :0<br>`
             if(s.plantLoop && o.group) {
               let oGroupMatchTemp = new Phaser.GameObjects.Group(this, this.pb.food_matching.getMatching('group', o.group));
-              if(oGroupMatchTemp.countActive()) {
+              if(oGroupMatchTemp.getChildren('active', true).length) {
                 output += `the being takes a look at the other fruits on this plant :)`
                 this.pb.food_matching.kill(o);
               } else {

@@ -86,7 +86,7 @@ class Slug extends Phaser.GameObjects.Container {
         if(!(this.fleeing || this.eating)) {
           let c = Between(0, 19);
           let player = ( this == this.scene.pb )
-          let playerNotPassive = ( player && (this.alpha != 1 || this.hunter || this.scene.lastLogged > Date.now() - 20 * 1000) )
+          let playerNotPassive = ( player && (this.alpha != 1 || this.hunter || this.scene.mutationObserver.lastLogged > Date.now() - 20 * 1000) )
           if(playerNotPassive) {
             return;
           }
@@ -378,7 +378,7 @@ class Slug extends Phaser.GameObjects.Container {
       
 
       this.scene.events.on('postupdate', function(time, delta) {
-        if(this.eating && this.food_matching.countActive()){
+        if(this.eating && this.food_matching.getChildren('active', true).length){
           this.food_matching.getMatching('active', true).forEach((e, i) => {
             if(!e.active) {
               this.food_matching.remove(e);
@@ -400,11 +400,15 @@ class Slug extends Phaser.GameObjects.Container {
           }
           let closestMatchNew = findClosest(this.heady, this.food_matching.getMatching('active', true));
           if(this.chosenFood.group) {
-            if(this.chosenFood.group.countActive() && this.food_matching.getMatching('group', this.chosenFood.group).length) {
-              while(closestMatchNew.group != this.chosenFood.group && !closestMatchNew.active) {
-                closestMatchNew = findClosest(this.heady, this.food_matching.getMatching('group', this.chosenFood.group));
-                // console.log(closestMatchNew)
+            try {
+              if(this.chosenFood.group.getChildren('active', true).length && this.food_matching.getMatching('group', this.chosenFood.group).length) {
+                while(closestMatchNew.group != this.chosenFood.group && !closestMatchNew.active) {
+                  closestMatchNew = findClosest(this.heady, this.food_matching.getMatching('group', this.chosenFood.group));
+                  // console.log(closestMatchNew)
+                }
               }
+            } catch (error) {
+              console.warn(error)
             }
           }
           
@@ -487,42 +491,56 @@ class Slug extends Phaser.GameObjects.Container {
       this.rotationDirection = 0;  
       this.timer = 0;
       this.fleeing = 0;
+      let enemyHeadys = []
+      let enemyHeadyPointers = [];
+      ENEMIES.getMatching('active', true).forEach(e => {
+        enemyHeadyPointers.push({h: e.heady, e});
+        enemyHeadys.push(e.heady);
+      })
       if(!this.hunter) {
-        this.hunterHeady = findClosest(this.heady, ENEMIES.getMatching('active', true)).heady;
+        this.hunterHeady = findClosest(this.heady, enemyHeadys);
+        enemyHeadyPointers.forEach(ep => {
+          if(ep.h == this.hunterHeady) {
+            this.hunter = ep.e;
+          }
+        })
       } else {
         this.hunterHeady = this.hunter.heady;
       }
       
       let dist = Distance.BetweenPoints(this.heady, this.hunterHeady)
-      if(dist > 900 * this.displayWidth/40) {
-        output += `it does not see any harmful creature nearby :).`
+      let hunterPursuitDistance = this.hunter.pursuitDistance; 
+      if(dist > hunterPursuitDistance) {
+        output += `it thinks there are no angry creatures in reach :).`
         return output;
       } else {
         output += `it tries to flee from the angry creature!`
       }
       this.fleeing = true
-      this.scene.events.on('postupdate', function(time, delta) {
-        if(this.fleeing && ENEMIES.countActive() && dist < 900 * this.displayWidth/40){
-          // console.log(this.rotationDirection)
-          // console.log(this.hunterHeady, dist)
-          dist = Distance.BetweenPoints(this.heady, this.hunterHeady)
-          if( !ENEMIES.getMatching('active', true).length) {
-            let output = `your being does not see any harmful creatures :). it will stop trying to flee!`
-            if(this == this.scene.pb) {
-              logOutput(output);
+      this.scene.events.on('postupdate',function(time, delta) { 
+        if(this.fleeing) {
+          if(this.hunter && dist < hunterPursuitDistance){
+            // console.log(this.rotationDirection)
+            // console.log(this.hunterHeady, dist)
+            dist = Distance.BetweenPoints(this.heady, this.hunterHeady)
+            if( !ENEMIES.getMatching('active', true).length) {
+              let output = `your being does not see any harmful creatures anymore. it will stop trying to flee!`
+              if(this == this.scene.pb) {
+                logOutput(output);
+              }
+              this.stop();
+              return;
             }
-            this.stop();
-            return;
-          }
 
-          let target = new Vector2(this.heady).subtract(this.hunterHeady);
-          this.moveTo(target, 2);
-        }
-        else {
-          this.stop();
-          let output = `it thinks it is far away enough now...`
-          if(this == this.scene.pb) {
-            logOutput(output)
+            let target = new Vector2(this.heady).subtract(this.hunterHeady);
+            this.moveTo(target, 2);
+          }
+          else {
+            this.stop();
+            let output = `it thinks it is far away enough now...`
+            if(this == this.scene.pb) {
+              logOutput(output)
+            }
           }
         }
       }, this);
@@ -540,9 +558,8 @@ class Slug extends Phaser.GameObjects.Container {
         this.chosenFood.hunter = null;
         this.chosenFood = null;
       }
-      if(this.hunterHeady) {
-        this.hunterHeady = null;
-      }
+      this.hunterHeady = null;
+      this.hunter = null;
       
           
     }
