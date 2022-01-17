@@ -72,7 +72,7 @@ class Scene2 extends Phaser.Scene {
     this.newGraphics.fillStyle(0x3587e2, 1);
     this.newGraphics.fillRectShape(progressBarFill);
 
-    this.loadingText = this.add.text(250,260,"Loading: ", { fontSize: '32px', fill: '#F0F' });
+    this.loadingText = this.add.text(250,260,"Generating the world...", { fontSize: '32px', fill: '#F0F' });
 
     this.load.setBaseURL(document.getElementById('phaser_container').getAttribute('data-assets-baseURL')); 
     this.load.image('circle', 'assets/circle.png');
@@ -119,7 +119,7 @@ class Scene2 extends Phaser.Scene {
     this.newGraphics.fillRect(205, 205, percentage*390, 40);
         
     percentage = percentage * 100;
-    let t = `Loading: ${percentage.toFixed(2)} %`
+    let t = `Generating the world... ${percentage.toFixed(2)} %`
     console.log(t);
     this.loadingText.setText(t);
     
@@ -195,7 +195,7 @@ class Scene2 extends Phaser.Scene {
       coordinates.push({x, y})
     })
     
-    for(var i = 0; i < 25; i++) {
+    for(var i = 0; i < 35; i++) {
       if((i+1)%5 == 0) {this.updateLoadingBar.call({newGraphics:this.newGraphics,loadingText:this.loadingText}, [1+1/25*(i+1)]); }
       let yesOrNo = Between(0, 3)
       let randFN = Between(3, 15) 
@@ -203,21 +203,22 @@ class Scene2 extends Phaser.Scene {
       let randSize = Between(randFN*randFS+10, randFN*randFS+10)
       let tooClose = false;
       let distx, disty;
+      let tries = 1;
       do {
-        distx = this.pb.x+(Math.random()<0.5 ? Between(-4000*this.pb.scale, -400*this.pb.scale):Between(400*this.pb.scale, 4000*this.pb.scale))
-        disty = this.pb.y+(Math.random()<0.5 ? Between(-4000*this.pb.scale, -400*this.pb.scale):Between(400*this.pb.scale, 4000*this.pb.scale))
-        if(coordinates.length) {
-          coordinates.forEach(p=> {
-            tooClose = Math.abs(p.x-distx)+Math.abs(p.y-disty) < Math.max(randSize*3, 4000) || Math.abs(p.x-distx) < Math.max(randSize, 1000) || Math.abs(p.y-disty) < Math.max(randSize, 1000);
+        tries = tries + 0.1
+        distx = this.pb.x+(Math.random()<0.5 ? Between(-5*this.pb.scale, -4000*this.pb.scale):Between(4000*this.pb.scale, 5*this.pb.scale))
+        disty = this.pb.y+(Math.random()<0.5 ? Between(-5*this.pb.scale, -4000*this.pb.scale):Between(4000*this.pb.scale, 5*this.pb.scale))
+        console.log(distx, disty, tries, coordinates)
+        
+          coordinates.some(p=> {
+            tooClose = ( Math.abs(p.x-distx) < Math.max(randSize/tries, 300/tries) && Math.abs(p.y-disty) < Math.max(randSize/tries, 300/tries) );
             // console.log(Math.abs(p.x-distx)+Math.abs(p.y-disty),randSize*3)
-            if(tooClose) {
-              return tooClose;
-            }
+            return tooClose;
           })
-        }
       } while(tooClose);
       
       coordinates.push({x: distx, y: disty});
+      console.log(coordinates)
 
       let c = getRandomColorInCat();
       
