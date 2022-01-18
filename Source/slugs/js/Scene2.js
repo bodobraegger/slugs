@@ -194,56 +194,78 @@ class Scene2 extends Phaser.Scene {
       coordinates.push({x, y})
     })
     
-    for(var i = 0; i < 35; i++) {
-      if((i+1)%5 == 0) {this.updateLoadingBar.call({newGraphics:this.newGraphics,loadingText:this.loadingText}, [1+1/25*(i+1)]); }
-      let yesOrNo = Between(0, 3)
-      let randFN = Between(3, 15) 
-      let randFS = Between(15, 150)
-      let randSize = Between(randFN*randFS+10, randFN*randFS+10)
-      let tooClose = false;
-      let distx, disty;
-      let tries = 1;
-      do {
-        tries = tries + 0.1
-        distx = this.pb.x+(Math.random()<0.5 ? Between(-5*this.pb.scale, -4000*this.pb.scale):Between(4000*this.pb.scale, 5*this.pb.scale))
-        disty = this.pb.y+(Math.random()<0.5 ? Between(-5*this.pb.scale, -4000*this.pb.scale):Between(4000*this.pb.scale, 5*this.pb.scale))
-          coordinates.some(p=> {
-            tooClose = ( Math.abs(p.x-distx) < Math.max(randSize/tries, 300/tries) && Math.abs(p.y-disty) < Math.max(randSize/tries, 300/tries) );
-            // console.log(Math.abs(p.x-distx)+Math.abs(p.y-disty),randSize*3)
-            return tooClose;
-          })
-      } while(tooClose);
-      
-      coordinates.push({x: distx, y: disty});
-      
-      let c = getRandomColorInCat();
-      
-      // this.addFruit(20+c.color%(rand*10), c.color%(rand*10), 5*rand, c, 'flower');
-      let plant; 
-      if(yesOrNo) {
-        plant = new Plant(this, distx, disty, c, randSize, randFS, randFN, true)
-      } else {
-        plant = new Plant(this, distx, disty, c, randSize, randFS, Math.floor(randFN/3))
+    const generate = function(iterations) {
+      if(FRUIT.getChildren('active', true).length < 100) {
+        if(i==iterations-1) { console.log('generate loop, ran', iterations, 'times') }
+
+        for(var i = 0; i < iterations; i++) {
+          if((i+1)%5 == 0) {this.updateLoadingBar.call({newGraphics:this.newGraphics,loadingText:this.loadingText}, [1+1/25*(i+1)]); }
+          let yesOrNo = Between(0, 3)
+          let randFN = Between(3, 15) 
+          let randFS = Between(15, 150)
+          let randSize = Between(randFN*randFS+10, randFN*randFS+10)
+          let tooClose = false;
+          let distx, disty;
+          let tries = 1;
+          do {
+            tries = tries + 0.1
+            distx = this.pb.x+(Math.random()<0.5 ? Between(-5*this.pb.scale, -4000*this.pb.scale):Between(4000*this.pb.scale, 5*this.pb.scale))
+            disty = this.pb.y+(Math.random()<0.5 ? Between(-5*this.pb.scale, -4000*this.pb.scale):Between(4000*this.pb.scale, 5*this.pb.scale))
+              coordinates.some(p=> {
+                let c = this.cameras.main;
+                let mp = c.midPoint;
+                let viewRec = new Phaser.Geom.Rectangle(mp.x-c.displayWidth/2, mp.y-c.displayHeight/2, c.displayWidth, c.displayHeight);
+                // console.log(viewRec)
+                let visible = Phaser.Geom.Rectangle.Overlaps(viewRec, new Phaser.Geom.Rectangle(distx-randSize/2, disty-randSize/2, randSize, randSize));
+                
+                tooClose = ( Math.abs(p.x-distx) < Math.max(randSize/tries, 300/tries) && Math.abs(p.y-disty) < Math.max(randSize/tries, 300/tries) ) || visible;
+                // console.log(Math.abs(p.x-distx)+Math.abs(p.y-disty),randSize*3)
+                return tooClose;
+              })
+          } while(tooClose);
+          
+          coordinates.push({x: distx, y: disty});
+          
+          let c = getRandomColorInCat();
+          
+          // this.addFruit(20+c.color%(rand*10), c.color%(rand*10), 5*rand, c, 'flower');
+          let plant; 
+          if(yesOrNo) {
+            plant = new Plant(this, distx, disty, c, randSize, randFS, randFN, true)
+          } else {
+            plant = new Plant(this, distx, disty, c, randSize, randFS, Math.floor(randFN/3))
+          }
+          PLANTS.add(plant)
+          // let s = new Slug(this, slug_x+i*10*rand, slug_y+i*10*rand, (slug_r+20)*rand/10)
+          // this.slugs.push(s);
+          this.activeFoodlength = FRUIT.getMatching('active', true)
+  
+          if(i%2) {
+            BEINGS.add(new Slug(this, distx+Between(30, 300), disty+Between(30, 300), Between(30, 60), getRandomColorInCat(otherColors), true, false))
+            ENEMIES.add(new Snake(this, distx+Between(30, 300), disty+Between(30, 300), Between(30, 60), getRandomColorInCat()))
+          }
+  
+        } this.completeLoading.call({newGraphics:this.newGraphics,loadingText:this.loadingText});
+  
+        FRUIT.getChildren().forEach(o => {
+          this.setOnCollidesWithForFruit(o);
+        })
+        ENEMIES.getChildren().forEach(e => {
+          e.setOnCollidesWithBeings();
+        })
       }
-      PLANTS.add(plant)
-      // let s = new Slug(this, slug_x+i*10*rand, slug_y+i*10*rand, (slug_r+20)*rand/10)
-      // this.slugs.push(s);
-      this.activeFoodlength = FRUIT.getMatching('active', true)
+    }
 
-      if(i%2) {
-        BEINGS.add(new Slug(this, distx+Between(30, 300), disty+Between(30, 300), Between(30, 60), getRandomColorInCat(otherColors), true, false))
-        ENEMIES.add(new Snake(this, distx+Between(30, 300), disty+Between(30, 300), Between(30, 60), getRandomColorInCat()))
-      }
+    generate.call(this, [35]);
 
-    } this.completeLoading.call({newGraphics:this.newGraphics,loadingText:this.loadingText});
+    var timer = this.time.addEvent({
+      delay: 30 * 1000,
+      callback: generate,
+      args: [2],
+      callbackScope: this,
+      loop: true,
 
-    FRUIT.getChildren().forEach(o => {
-      this.setOnCollidesWithForFruit(o);
-    })
-    ENEMIES.getChildren().forEach(e => {
-      e.setOnCollidesWithBeings();
-    })
-
+    });
     
     // RENDER TERMINAL ON TOP OF PHASER
     // const ph_terminal_container = this.add.dom(0.8*document.getElementById("phaser_container").clientWidth, 0.9*document.getElementById("phaser_container").clientHeight/2, terminal_container)
@@ -664,6 +686,22 @@ class Scene2 extends Phaser.Scene {
 
       case 'intro':{
         NARRATION.intro();
+        return;
+      }
+      case 'fizzbuzz': {
+        try {
+          if(cmd.length >= 4) {
+            fizzbuzz(cmd[1], cmd[2], cmd[3])
+          } else if(cmd.length == 3) {
+            fizzbuzz(cmd[1], cmd[2])
+          } else if(cmd.length == 2) {
+            fizzbuzz(cmd[1])
+          } else {
+            fizzbuzz()
+          } 
+        } catch (error) {
+          console.log(error);
+        }
         return;
       }
       default: {

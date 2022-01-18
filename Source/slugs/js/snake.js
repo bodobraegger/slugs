@@ -121,6 +121,7 @@ class Snake extends Slug {
         }
       }
       this.scene.events.on('postupdate', function(time, delta) {
+        this.hunted.hunter == this;
         if(this.eating && this.hunted.alpha == 1 && this.hunted.color.s > 0.5 && headyToTarget.length() < this.pursuitDistance){
           headyToTarget = new Vector2(this.hunted.torso).subtract(this.heady);
           let len = headyToTarget.length()
@@ -155,7 +156,9 @@ class Snake extends Slug {
         b.bodyparts.forEach(limb => {
           this.heady.setOnCollideWith(limb, pair => {
             // console.log('snake colliding with', limb, pair)
-            if(this.eating && b.hunter == this) {
+            if(this.eating && b==this.hunted && this.hunted.hunter == this) {
+              console.log('collision with', b, b==this.scene.pb, b==this.hunted)
+              if(this.hunted) if(this.hunted.hunter){'IT WORKS', console.log(this.hunted.hunter)}
               if(this.heady.displayWidth > b.torso.displayWidth) {
                 // successfully ate
                 b.setAlpha(0.8)
