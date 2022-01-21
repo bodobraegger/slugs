@@ -135,7 +135,7 @@ class Snake extends Slug {
         }
         else if(this.eating && this.hunted.hunter == this) {
           if(this.hunted == this.scene.pb) {
-            logOutput('your being is no longer being <u class="enemycolor">this.hunted</u> :).')
+            logOutput('your being is no longer being <u class="enemycolor">hunted</u> :).')
           }
           this.stop();
         }
