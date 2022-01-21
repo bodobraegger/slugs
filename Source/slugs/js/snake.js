@@ -118,6 +118,10 @@ class Snake extends Slug {
           } else {
             this.stop();
           }
+        } else {
+          if(Between(1, 10) <= 5) {
+            this.hunted.flee();
+          }
         }
       }
       this.scene.events.on('postupdate', function(time, delta) {
