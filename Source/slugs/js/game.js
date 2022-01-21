@@ -90,7 +90,7 @@ const config = {
         //positionIterations: 1.5,
         //velocityIterations: 1,
         //constraintIterations: 0.5,
-        //enableSleeping: true,
+        enableSleeping: true,
         plugins: {
           attractors: true,
         }
