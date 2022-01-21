@@ -150,6 +150,7 @@ class Scene2 extends Phaser.Scene {
     let playersBeingColor = getRandomColorInCat([ COLORCATS_DICT['purple'], COLORCATS_DICT['blue'], COLORCATS_DICT['orange'] ]);
     changeStylesheetRule(document.styleSheets[0], '.beingscolor', `background-color`, `#${playersBeingColor.color.toString(16)}`)
     changeStylesheetRule(document.styleSheets[0], `.${COLORCATS_HR[getColorCategory(playersBeingColor)]}`, `color`, `#${playersBeingColor.color.toString(16)}`)
+    changeStylesheetRule(document.styleSheets[0], `.color`, `color`, `#${playersBeingColor.color.toString(16)} !important`)
     let otherColors = COLORCATS.filter((c, i) => i != getColorCategory(playersBeingColor))
     
     this.pb = new Slug(this, slug_x, slug_y, slug_r, playersBeingColor);
@@ -158,7 +159,10 @@ class Scene2 extends Phaser.Scene {
     this.rulesLength = 0;
     
     // let s1 = new Slug(this, slug_x-280, slug_y-5, 10);
+    this.cameras.main.setZoom(100);
     this.cameras.main.startFollow(this.pb.torso, true, 0.03, 0.03);
+    this.cameras.main.zoomTo(1, 4000, 'Power2');
+
     this.stage = 1;
     this.slugs = [this.pb];
     
