@@ -35,10 +35,15 @@ let wordsAllArraysStrings = ['wordsAction', 'wordsFirst', 'wordsIfConditionLeft'
 let logCount = 0;
 let logMax = 5;
 
+let logId = 0;
+
 const terminal_container = document.getElementById('terminal_container');
 const terminal_log = document.getElementById('terminal_log');
+const terminal_log_input = document.getElementById('terminal_log_input');
+const terminal_log_output = document.getElementById('terminal_log_output');
 const autocomplete = document.getElementById('autocomplete');
 const terminal_input = document.getElementById('terminal_input');
+const toBottomBtn = document.getElementById('toBottom');
 
 let rgbaError = 'rgba(255,102,0)'
 let rgbaOutput ='rgba(175,143,233)'
@@ -113,7 +118,7 @@ terminal_input.addEventListener('keyup', (e) => {
       let i = 1
       for( ; i < wordsOfInterest.length; i++) {
         if(!wordsAll.includes(wordsOfInterest[i])) {
-          console.log(wordsOfInterest[i], 'not in list of all words!')
+          console.debug(wordsOfInterest[i], 'not in list of all words!')
           wordsOfInterest = wordsOfInterest.slice(0, i);
           current_word = wordsOfInterest[i-1];
           break
@@ -129,17 +134,17 @@ terminal_input.addEventListener('keyup', (e) => {
         if(wordsOfInterest.length % 2 == 0) {
           // if xx is yy then zz ... 
           if(wordsAction.includes(current_word)) {
-            // console.log('// if xx is yy then zz')
+            // console.debug('// if xx is yy then zz')
             return;
           }
           // if XX is YY..., 
           else if(wordsOfInterest.at(-2) == equalWord) {
-            // console.log('// if XX is YY...,')
+            // console.debug('// if XX is YY...,')
             wordsToCompare = wordsBoolean;
           }
           // OR if XX ..., OR if XX is YY and ZZ ... 
           else if(wordsOfInterest.at(-2) == ifWord || wordsBoolean.includes(wordsOfInterest.at(-2))) {
-            // console.log('// OR if XX ..., OR if XX is YY and ZZ ...')
+            // console.debug('// OR if XX ..., OR if XX is YY and ZZ ...')
             wordsToCompare = [equalWord]; 
           }
           else if(wordsOfInterest.at(-1) == thenWord) {
@@ -155,7 +160,7 @@ terminal_input.addEventListener('keyup', (e) => {
         else if(wordsBoolean.concat(equalWord).includes(current_word)) {
           // if XX is YY then ...,
           if(current_word == thenWord) {
-            // console.log('// if XX is YY then ...,')
+            // console.debug('// if XX is YY then ...,')
             wordsToCompare = [...wordsAction];
             if(wordsOfInterest.at(-4) == 'fruit') {
               wordsToCompare.splice(wordsToCompare.indexOf('flee'), 1);
@@ -165,14 +170,14 @@ terminal_input.addEventListener('keyup', (e) => {
           }
           // if XX is ..., 
           else if(current_word == equalWord) {
-            // console.log('// if XX is ...,')
+            // console.debug('// if XX is ...,')
             wordsToCompare = wordsIfConditionRight;
           }
           // OR if XX is YY and ... 
           else if(wordsBoolean.includes(wordsOfInterest.at(-2))) {
-            // console.log('// OR if XX is YY and ...')
+            // console.debug('// OR if XX is YY and ...')
             wordsToCompare = wordsIfConditionLeft;
-            // console.log('juhui')
+            // console.debug('juhui')
           }
         }
       }
@@ -182,7 +187,7 @@ terminal_input.addEventListener('keyup', (e) => {
       let i = 1
       for( ; i < wordsOfInterest.length; i++) {
         if(!wordsAll.includes(wordsOfInterest[i])) {
-          console.log(wordsOfInterest[i], 'not in list of all words!')
+          console.debug(wordsOfInterest[i], 'not in list of all words!')
           wordsOfInterest = wordsOfInterest.slice(0, i);
           current_word = wordsOfInterest[i-1];
           break
@@ -200,7 +205,7 @@ terminal_input.addEventListener('keyup', (e) => {
       let i = 1
       for( ; i < wordsOfInterest.length; i++) {
         if(!wordsAll.includes(wordsOfInterest[i])) {
-          console.log(wordsOfInterest[i], 'not in list of all words!')
+          console.debug(wordsOfInterest[i], 'not in list of all words!')
           wordsOfInterest = wordsOfInterest.slice(0, i);
           current_word = wordsOfInterest[i-1];
           break
@@ -218,7 +223,7 @@ terminal_input.addEventListener('keyup', (e) => {
       let i = 1
       for( ; i < wordsOfInterest.length; i++) {
         if(!wordsAll.includes(wordsOfInterest[i])) {
-          console.log(wordsOfInterest[i], 'not in list of all words!')
+          console.debug(wordsOfInterest[i], 'not in list of all words!')
           wordsOfInterest = wordsOfInterest.slice(0, i);
           current_word = wordsOfInterest[i-1];
           break
@@ -236,7 +241,7 @@ terminal_input.addEventListener('keyup', (e) => {
       let i = 1
       for( ; i < wordsOfInterest.length; i++) {
         if(!wordsAll.includes(wordsOfInterest[i])) {
-          console.log(wordsOfInterest[i], 'not in list of all words!')
+          console.debug(wordsOfInterest[i], 'not in list of all words!')
           wordsOfInterest = wordsOfInterest.slice(0, i);
           current_word = wordsOfInterest[i-1];
           break
@@ -262,8 +267,8 @@ terminal_input.addEventListener('keyup', (e) => {
         }
       }
     }
-    // console.log(input, wordsOfInterest, current_word);
-    // console.log(checkAgainst, wordsToCompare);
+    // console.debug(input, wordsOfInterest, current_word);
+    // console.debug(checkAgainst, wordsToCompare);
     
     
     autocomplete.innerHTML = input;
@@ -280,7 +285,7 @@ terminal_input.addEventListener('keyup', (e) => {
         
         if(wordsToCompare != wordsIfConditionLeft && wordsToCompare != wordsAction && wordsToCompare != wordsBoolean && wordsToCompare != wordsToShow) {
           /*
-          console.log('shuffling', wordsToCompare)
+          console.debug('shuffling', wordsToCompare)
           let t = wordsToCompare[0];
           wordsToCompare.splice(0, 1);
           wordsToCompare.push(t)
@@ -338,13 +343,13 @@ terminal_input.addEventListener('keydown', (e) => {
         case 'clear':
           clearLog();
           break;
-            
-          default:
+          default: {
             let CmdEvent = new CustomEvent('cmd', { 
               detail: { value: cmd }
             });
             terminal_input.dispatchEvent(CmdEvent);
-          // addToLog(cmd);
+            // addToLog(cmd);
+          }
         }
         clearInput();
         return;
@@ -355,7 +360,17 @@ terminal_input.addEventListener('keydown', (e) => {
 // TERMINAL IO FUNCTIONS
 
 function addToLog(output) {
-  // console.log(getTotalChildrenHeights(terminal_container), 'vs', document.getElementById("phaser_container").clientHeight);
+  let id = `logId-${logId}`
+  let wrap = document.createElement('div');
+  if(terminal_log.getElementsByClassName(id).length) {
+    wrap = terminal_log.getElementsByClassName(id)[0];
+  } else {
+    wrap.classList.add(id)
+    wrap.classList.add('logSegment');
+    terminal_log.appendChild(wrap);
+  }
+
+  // console.debug(getTotalChildrenHeights(terminal_container), 'vs', document.getElementById("phaser_container").clientHeight);
   let div = document.createElement('div');
   if(!(output instanceof HTMLDivElement) ) {
     // if output is already a stringified div, don't create a nested one.
@@ -369,20 +384,37 @@ function addToLog(output) {
   else {
     div = output;
   }
+  let logDiv = terminal_log /*;
+  if(div.classList.contains('input')) {
+    logDiv = terminal_log_input;
+  } else {
+    logDiv = terminal_log_output;
+  }*/
+
   div.classList.add(`logEntry`);
-  if(terminal_log.lastChild && div.innerHTML == terminal_log.lastChild.innerHTML) {
-    blink(terminal_log.lastChild);
-  }
-  else {
-    terminal_log.appendChild(div);
+  div.classList.add(id)
+  try {
+    if(div.innerHTML == logDiv.lastChild.lastChild.innerHTML) {
+      blink(logDiv.lastChild);
+    } else {
+      wrap.appendChild(div);
+      logCount++;
+    }
+  } catch (error) {
+    console.debug(error)
+    wrap.appendChild(div);
     logCount++;
-  }/*
+  }
+/*
   while(getTotalChildrenHeights(terminal_container) > getCanvasHeight() && logCount > 0 && terminal_container.children.length) {
-    terminal_log.firstChild.remove();
-    // console.log('trimming log to make room! bigger than canvas currently')
+    logDiv.firstChild.remove();
+    // console.debug('trimming log to make room! bigger than canvas currently')
     logCount--;
   }*/
-  gotoBottom(terminal_container.id);
+  if(isOverflown(terminal_container)) {
+    // toBottomBtn.style.display = 'block';
+    goToBottom(terminal_container)
+  }
 }
 
 function logOutput(output) {
@@ -504,12 +536,20 @@ function shuffleArray(array) {
 }
 
 function startNewLogSegment() {
-  for(let i = 0; i < terminal_log.children.length; i++) {
-      terminal_log.children[i].classList.add('old');
+  Array.from(terminal_log.children).forEach( e => {
+    if(e.classList.contains('logSegment')) {
+      e.classList.add('old');
+    }
+  })
+  logId++;
+}
+
+function goToBottom(element=terminal_log.lastChild){
+  if(isOverflown(element)) {
+    element.scrollTop = element.scrollHeight - element.clientHeight;
   }
 }
 
-function gotoBottom(id){
-  var element = document.getElementById(id);
-  element.scrollTop = element.scrollHeight - element.clientHeight;
+function isOverflown(element) {
+  return element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth;
 }
