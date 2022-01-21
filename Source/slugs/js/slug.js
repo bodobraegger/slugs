@@ -75,7 +75,7 @@ class Slug extends Phaser.GameObjects.Container {
       this.scene.events.on('postupdate', function(time, delta) {
         this.timer += delta;
         while(this.timer > 600/this.speedMod) {
-          // console.log('slugtimer')
+          // console.debug('slugtimer')
           this.waveIndex = (this.waveIndex+1) % this.swimStates.length;
           this.timer -= 600/this.speedMod;
         }
@@ -198,7 +198,7 @@ class Slug extends Phaser.GameObjects.Container {
       let s = 0;
       this.list.forEach(e => {
         // s += Phaser.Geom.Circle.Area(e) // Math.PI * circle.radius * circle.radius
-        console.log(e.type, e.radius, e.scaleX)
+        console.debug(e.type, e.radius, e.scaleX)
         s += Math.PI * (e.radius*(e.scaleX))**2
       })
       return s;
@@ -233,15 +233,15 @@ class Slug extends Phaser.GameObjects.Container {
       if(! this.rotationDirection) {
         if(angleSlugTarget > 0 && angleSlugTarget > 50) {
           this.rotationDirection = -1;
-          // console.log('rotating left')
+          // console.debug('rotating left')
         } else if(angleSlugTarget < 0 && angleSlugTarget < -50) {
           this.rotationDirection = 1;
-          // console.log('rotating right')
+          // console.debug('rotating right')
         }
       }
       
       let correctionAngle = DegToRad(40);
-      // console.log(Math.round(angleSlugTarget), this.rotationDirection)
+      // console.debug(Math.round(angleSlugTarget), this.rotationDirection)
       
       if((angleSlugTarget > 0 && angleSlugTarget < 70)||(angleSlugTarget < 0 && angleSlugTarget > -70)){
         headyVec.add(targetVec);
@@ -258,7 +258,7 @@ class Slug extends Phaser.GameObjects.Container {
         }
       }
       else if(this.rotationDirection == -1 && (angleSlugTarget > 50 || angleSlugTarget < -50)) {
-        // console.log('counter clockwise')
+        // console.debug('counter clockwise')
         
         let torsoVec = headyVec.clone().setLength(0.25*speed);
         this.torso.setVelocity(torsoVec.x, torsoVec.y);
@@ -268,7 +268,7 @@ class Slug extends Phaser.GameObjects.Container {
         this.tail0.setVelocity(tail0Vec.x, tail0Vec.y);
       }
       else if(this.rotationDirection == 1 && (angleSlugTarget > 50 || angleSlugTarget < -50)) {
-        // console.log('clockwise (right)')
+        // console.debug('clockwise (right)')
         
         let torsoVec = headyVec.clone().setLength(0.25*speed);
         this.torso.setVelocity(torsoVec.x, torsoVec.y);
@@ -303,7 +303,7 @@ class Slug extends Phaser.GameObjects.Container {
           if(booleanString.includes("being's ")) {
             ATTRIBUTES.forEach( (e,i) => {
               if(booleanString.includes(`being's ${e}`)) {
-                // console.log(booleanString, e)
+                // console.debug(booleanString, e)
                 let replacement = playersBeing[e];
                 if(replacement instanceof Color) {
                   replacement = COLORCATS_HR[getColorCategory(replacement)];
@@ -331,14 +331,14 @@ class Slug extends Phaser.GameObjects.Container {
             if(r.ifTexture) {
               fruit = f.txtr;
             }
-            // console.log(booleanString, 'fruit var:', fruit);
+            // console.debug(booleanString, 'fruit var:', fruit);
             let evaluation = eval(booleanString);
-            // console.log(evaluation);
+            // console.debug(evaluation);
             if(evaluation) {
               foodCurrentlySelected.push(foodSelected[i]);
             }
           }
-          // console.log(foodCurrentlySelected);
+          // console.debug(foodCurrentlySelected);
           foodSelected = foodCurrentlySelected;
         }
         // add to foodmatching outside of condition
@@ -404,7 +404,7 @@ class Slug extends Phaser.GameObjects.Container {
               if(this.chosenFood.group.getChildren('active', true).length && this.food_matching.getMatching('group', this.chosenFood.group).length) {
                 while(closestMatchNew.group != this.chosenFood.group && !closestMatchNew.active) {
                   closestMatchNew = findClosest(this.heady, this.food_matching.getMatching('group', this.chosenFood.group));
-                  // console.log(closestMatchNew)
+                  // console.debug(closestMatchNew)
                 }
               }
             } catch (error) {
@@ -413,7 +413,7 @@ class Slug extends Phaser.GameObjects.Container {
           }
           
           if(!this.chosenFood.active) {
-            // console.log('replacing closest match with', closestMatchNew)
+            // console.debug('replacing closest match with', closestMatchNew)
             this.chosenFood.hunter = null
             this.chosenFood = closestMatchNew;
             this.chosenFood.hunter = this;
@@ -423,7 +423,7 @@ class Slug extends Phaser.GameObjects.Container {
           if(closestMatchNew && this.chosenFood != closestMatchNew) {
             if(Distance.BetweenPoints(this.heady, closestMatchNew) - Distance.BetweenPoints(this.heady, this.chosenFood) < -50*this.scale){
               this.chosenFood.hunter = null;
-              // console.log(closestMatchNew)
+              // console.debug(closestMatchNew)
               this.chosenFood = closestMatchNew;
               this.chosenFood.hunter = this;
               this.rotationDirection = 0;
@@ -443,14 +443,14 @@ class Slug extends Phaser.GameObjects.Container {
       const callback = function(params)  {
         if(!(this.fleeing || this.eating || this.alpha != 1)) {
           this.roamingTarget = this.getRandomPointClose(this.roamingTarget)
-          // console.log('setting new roaming target: ', this.roamingTarget)
+          // console.debug('setting new roaming target: ', this.roamingTarget)
           this.roaming = true;
         }
       }
       this.scene.events.on('postupdate', function(time, delta) {
         if(this.roaming && !(this.fleeing || this.eating || this.alpha != 1)){
-          // console.log(this.rotationDirection)
-          // console.log(this.hunterHeady, dist)
+          // console.debug(this.rotationDirection)
+          // console.debug(this.hunterHeady, dist)
           let target = this.roamingTarget;
           this.moveTo(target, 0.5);
           let distSq = Distance.BetweenPointsSquared(this.heady, this.roamingTarget);
@@ -509,19 +509,18 @@ class Slug extends Phaser.GameObjects.Container {
       }
       
       let dist = Distance.BetweenPoints(this.heady, this.hunterHeady)
-      let hunterPursuitDistance = this.hunter.pursuitDistance; 
-      if(dist > hunterPursuitDistance) {
+      if(dist > this.hunter.pursuitDistance) {
         output += `it thinks there are no angry creatures in reach :).`
         return output;
       } else {
-        output += `it tries to flee from the angry creature!`
+        output += `it tries to flee!`
       }
       this.fleeing = true
       this.scene.events.on('postupdate',function(time, delta) { 
         if(this.fleeing) {
-          if(this.hunter && dist < hunterPursuitDistance){
-            // console.log(this.rotationDirection)
-            // console.log(this.hunterHeady, dist)
+          if(this.hunter && dist < this.hunter.pursuitDistance){
+            // console.debug(this.rotationDirection)
+            // console.debug(this.hunterHeady, dist)
             dist = Distance.BetweenPoints(this.heady, this.hunterHeady)
             if( !ENEMIES.getMatching('active', true).length) {
               let output = `your being does not see any harmful creatures anymore. it will stop trying to flee!`
@@ -533,14 +532,16 @@ class Slug extends Phaser.GameObjects.Container {
             }
 
             let target = new Vector2(this.heady).subtract(this.hunterHeady);
-            this.moveTo(target, 2);
+            this.moveTo(target, 3);
           }
           else {
-            this.stop();
             let output = `it thinks it is far away enough now...`
             if(this == this.scene.pb) {
               logOutput(output)
             }
+            console.debug(this.hunter, dist, this.hunter.pursuitDistance)
+            this.hunter.stop();
+            this.stop();
           }
         }
       }, this);
@@ -635,7 +636,7 @@ class Slug extends Phaser.GameObjects.Container {
         let c = this.scene.cameras.main;
         let mp = c.midPoint;
         let viewRec = new Phaser.Geom.Rectangle(mp.x-c.displayWidth/2, mp.y-c.displayHeight/2, c.displayWidth, c.displayHeight);
-        // console.log(viewRec)
+        // console.debug(viewRec)
         if(Phaser.Geom.Rectangle.Overlaps(viewRec,f.getBounds())) {
           f.visible = true;
           this.visible = true;

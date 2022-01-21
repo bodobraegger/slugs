@@ -121,21 +121,21 @@ class Snake extends Slug {
         }
       }
       this.scene.events.on('postupdate', function(time, delta) {
-        this.hunted.hunter == this;
         if(this.eating && this.hunted.alpha == 1 && this.hunted.color.s > 0.5 && headyToTarget.length() < this.pursuitDistance){
           headyToTarget = new Vector2(this.hunted.torso).subtract(this.heady);
           let len = headyToTarget.length()
           drawVec(headyToTarget, this.heady, this.color.color, Math.min(this.heady.displayWidth, (this.heady.displayWidth+this.hunted.torso.displayWidth)*30/len))
-          // console.log(this.hunted.torso)
+          // console.debug(this.hunted.torso)
           
           let target = this.hunted.torso          
           let speedMod = 1;
           this.moveTo(target, speedMod);
+          this.hunted.hunter = this;
 
         }
         else if(this.eating && this.hunted.hunter == this) {
           if(this.hunted == this.scene.pb) {
-            logOutput('your being is no longer being <u class="enemycolor">hunted</u> :).')
+            // logOutput('your being is no longer being <u class="enemycolor">hunted</u> :).')
           }
           this.stop();
         }
@@ -145,9 +145,14 @@ class Snake extends Slug {
     stop() {
       this.eating = false;
       if(this.hunted) {
-        if(this.hunted.hunter == this) {
-          this.hunted.hunter = null;
+        try {
+          if(this.hunted.hunter == this) {
+            this.hunted.hunter = null;
+          }
+        } catch(error) {
+          console.debug(error, this.hunted, 'already cleared hunter...')
         }
+        this.hunted = null;
       }
     }
 
@@ -155,10 +160,10 @@ class Snake extends Slug {
       BEINGS.getMatching('active', true).forEach(b=>{
         b.bodyparts.forEach(limb => {
           this.heady.setOnCollideWith(limb, pair => {
-            // console.log('snake colliding with', limb, pair)
+            // console.debug('snake colliding with', limb, pair)
             if(this.eating && b==this.hunted && this.hunted.hunter == this) {
-              console.log('collision with', b, b==this.scene.pb, b==this.hunted)
-              if(this.hunted) if(this.hunted.hunter){'IT WORKS', console.log(this.hunted.hunter)}
+              console.debug('collision with', b, b==this.scene.pb, b==this.hunted)
+              if(this.hunted) if(this.hunted.hunter){'IT WORKS', console.debug(this.hunted.hunter)}
               if(this.heady.displayWidth > b.torso.displayWidth) {
                 // successfully ate
                 b.setAlpha(0.8)
