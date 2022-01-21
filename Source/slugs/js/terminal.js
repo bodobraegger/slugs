@@ -5,7 +5,7 @@ const ifWord = 'if',
     andWord = 'and',
     orWord = 'or',
     stopWord = 'stop',
-    showWord = 'show',
+    showWord = 'tell',
     editWord = 'replace',
     deleteWord = 'forget';
 
@@ -19,7 +19,7 @@ const wordsBoolean = [thenWord, andWord, equalWord] //orWord, ;
 
 let wordsLoop1 = ['fruit'];
 let wordsLoop2 = [equalWord];
-let wordsLoop3 = ['on', 'close']
+let wordsLoop3 = ['on', ] // 'close'
 let wordsLoop4 = ['plant']
 
 
