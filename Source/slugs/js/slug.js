@@ -119,8 +119,9 @@ class Slug extends Phaser.GameObjects.Container {
         callbackScope: this,
         loop: true
       });
+      this.moveRandomly();
 
-      this.roam();
+      this.scene.time.delayedCall(20*1000, ()=>{this.roam(); this.scene.mutationObserver.lastLogged = Date.now()})
       
       if(!render) {
         this.bodyparts.forEach(e=> {
@@ -205,7 +206,7 @@ class Slug extends Phaser.GameObjects.Container {
     }
   
     moveRandomly() {
-      this.scene.matter.applyForce(this.heady, {x: FloatBetween(-0.05, 0.05), y: FloatBetween(-0.05, 0.05)})
+      this.scene.matter.applyForce(this.heady, {x: FloatBetween(-0.005, 0.005), y: FloatBetween(-0.0005, 0.0005)})
     }
 
     moveTo(target, speedMod = 1, draw=true) {
