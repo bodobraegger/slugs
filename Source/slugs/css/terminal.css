@@ -19,12 +19,12 @@
     margin-bottom: 10px;
 }
 ::-webkit-scrollbar-thumb {
-    background: rgba(255, 152, 238, 1); 
+    background: rgba(255, 200, 240, 0.6); 
     border-radius: 15px;
     max-height: 80%;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: rgb(255, 205, 247); 
+    background: rgba(255, 200, 240, 1); 
 }
 
 #terminal_container {
@@ -71,20 +71,16 @@
     padding:5px;
     margin-right: 20px;
 }
-#autocomplete_parent div, #autocomplete_parent textarea { 
-    grid-row-start: 1;
-    grid-column-start: 1;
-    background-color: rgba(255, 200, 240, 0.8);
-    resize: none;
-}
-
 
 #terminal_input, #autocomplete {
+    background-color: rgba(255, 200, 240, 0.8);
+    grid-row-start: 1;
+    grid-column-start: 1;
+    resize: none;
     font-family: 'Inconsolata', monospace;
     border: 0; /* HAS TO BE SIMILAR TO #autocomplete */
     font-size:14px; /* HAS TO BE SIMILAR TO #autocomplete */
     padding:10px; /* IMPORTANT */
-    background-color: transparent;
     
     /* FOR DESIGN PURPOSE */
     outline:0;
@@ -92,19 +88,20 @@
     border-top: 1px dotted rgba(255,255,255,0.3);
     /*
     border-bottom:1px solid rgba(255,255,255,0.3);
-     ================== */
+    ================== */
 }
 #terminal_input {
-    padding-top: 9px;
+    padding-top: 10px;
+    background-color: transparent !important;
+    color:rgb(22, 0, 16);
 }
-
 #terminal_input::placeholder {
     color: #1a1a1a; /* FOR DESIGN PURPOSE */
 }
 
 #autocomplete {
     z-index: -1; /* IMPORTANT */
-    color: rgba(204, 0, 255, 0.9);
+    color: rgb(151, 71, 255);
 }
 
 
