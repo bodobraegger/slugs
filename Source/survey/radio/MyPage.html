@@ -1,0 +1,31 @@
+{{ block content }}
+
+<p><i>Radio buttons without labels (visual/analog scale, similar to a slider)</i></p>
+<p>
+    Least &nbsp;
+    {{ for choice in form.f1 }}
+    {{ choice }}
+    {{ endfor }}
+    &nbsp; Most
+</p>
+{{ formfield_errors 'f1' }}
+<br>
+
+<p><i>Labels under radio buttons</i></p>
+<div style="display: flex">
+        {{ for choice in form.f2 }}
+        <div style="flex: 1; text-align: center">
+            {{ choice }}
+            <br>
+            <span style="text-align: center">{{ choice.label }}</span>
+        </div>
+        {{ endfor }}
+</div>
+{{ formfield_errors 'f2' }}
+<br>
+
+{# todo: radio buttons laid out individually, no loop (by index) #}
+
+{{ next_button }}
+
+{{ endblock }}

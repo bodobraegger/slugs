@@ -1,0 +1,34 @@
+{{ block title }}
+    Results
+{{ endblock }}
+
+{{ block content }}
+
+    <p>
+    You gave {{ participant.quiz_num_correct }} correct answers.
+    </p>
+
+    <table class="table">
+        <tr>
+            <th>question</th>
+            <th>optionA</th>
+            <th>optionB</th>
+            <th>optionC</th>
+            <th>Your choice</th>
+            <th>solution</th>
+            <th>correct?</th>
+        </tr>
+        {{ for p in round_players }}
+        <tr>
+            <td>{{ p.question }}</td>
+            <td>{{ p.optionA }}</td>
+            <td>{{ p.optionB }}</td>
+            <td>{{ p.optionC }}</td>
+            <td>{{ p.choice }}</td>
+            <td>{{ p.solution }}</td>
+            <td>{{ p.is_correct }}</td>
+        </tr>
+        {{ endfor }}
+    </table>
+
+{{ endblock }}

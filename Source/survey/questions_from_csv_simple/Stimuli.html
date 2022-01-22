@@ -1,0 +1,12 @@
+{{ block title }}
+    Question {{ player.round_number }} of {{ C.NUM_ROUNDS }}
+{{ endblock }}
+{{ block content }}
+
+<p><b>{{ player.question }}</b></p>
+
+{{ formfields }}
+
+{{ next_button }}
+
+{{ endblock }}

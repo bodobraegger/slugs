@@ -1,0 +1,46 @@
+{{ block title }}
+{{ endblock }}
+{{ block content }}
+
+<p id="question"></p>
+
+<div>
+    <button type="button" onclick="recordResponse(this)" value="A" id="optionA">
+    </button>
+    <button type="button" onclick="recordResponse(this)" value="B" id="optionB">
+    </button>
+    <button type="button" onclick="recordResponse(this)" value="C" id="optionC">
+    </button>
+</div>
+
+<input type="hidden" name="raw_responses" id="raw_responses">
+
+<script>
+
+    let responses = {}
+
+    let trialIndex = 0;
+    let trials = js_vars.trials;
+
+    function updateUI() {
+        for (let item of ['question', 'optionA', 'optionB', 'optionC']) {
+            document.getElementById(item).innerText = trials[trialIndex][item];
+        }
+    }
+
+    function recordResponse(btn) {
+        let trialId = trials[trialIndex].id;
+        responses[trialId] = btn.value;
+        trialIndex++;
+        if (trialIndex === trials.length) {
+            document.getElementById('raw_responses').value = JSON.stringify(responses)
+            document.getElementById('form').submit();
+        } else {
+            updateUI();
+        }
+    }
+
+    updateUI();
+</script>
+
+{{ endblock }}
