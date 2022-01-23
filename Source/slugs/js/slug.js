@@ -487,18 +487,20 @@ class Slug extends Phaser.GameObjects.Container {
     }
   
     flee() {
+      let thisHunterTemp = this.hunter;
       this.stop();
+      this.hunter = thisHunterTemp;
       let output = ``;
       this.rotationDirection = 0;  
       this.timer = 0;
       this.fleeing = 0;
       let enemyHeadys = []
       let enemyHeadyPointers = [];
-      ENEMIES.getMatching('active', true).forEach(e => {
-        enemyHeadyPointers.push({h: e.heady, e});
-        enemyHeadys.push(e.heady);
-      })
-      if(!this.hunter) {
+      if(!(this.rulesParsed.filter(e => e.action == 'flee').length)) {
+        ENEMIES.getMatching('active', true).forEach(e => {
+          enemyHeadyPointers.push({h: e.heady, e});
+          enemyHeadys.push(e.heady);
+        })
         this.hunterHeady = findClosest(this.heady, enemyHeadys);
         enemyHeadyPointers.forEach(ep => {
           if(ep.h == this.hunterHeady) {
@@ -506,7 +508,12 @@ class Slug extends Phaser.GameObjects.Container {
           }
         })
       } else {
-        this.hunterHeady = this.hunter.heady;
+        if(this.hunter) {
+          this.hunterHeady = this.hunter.heady;
+        } else {
+          output += `it does not think it is being hunted right now :).`
+          return output;
+        }
       }
       
       let dist = Distance.BetweenPoints(this.heady, this.hunterHeady)
