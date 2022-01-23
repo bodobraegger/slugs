@@ -222,7 +222,7 @@ class Scene2 extends Phaser.Scene {
                 // console.log(viewRec)
                 let visible = Phaser.Geom.Rectangle.Overlaps(viewRec, new Phaser.Geom.Rectangle(distx-randSize/2, disty-randSize/2, randSize, randSize));
                 
-                tooClose = ( Math.abs(p.x-distx) < Math.max(randSize/tries, 300/tries) && Math.abs(p.y-disty) < Math.max(randSize/tries, 300/tries) ) || visible;
+                tooClose = ( Math.abs(p.x-distx) < Math.max(randSize/tries, 200/tries) && Math.abs(p.y-disty) < Math.max(randSize/tries, 200/tries) ) || visible;
                 // console.log(Math.abs(p.x-distx)+Math.abs(p.y-disty),randSize*3)
                 return tooClose;
               })
@@ -260,7 +260,7 @@ class Scene2 extends Phaser.Scene {
       }
     }
 
-    generate.call(this, [35]);
+    generate.call(this, [45]);
 
     var timer = this.time.addEvent({
       delay: 30 * 1000,
@@ -526,6 +526,10 @@ class Scene2 extends Phaser.Scene {
       }
       case 'eat': {
         output += `you tell your being to eat.`
+        if(cmd.length > 1) {
+          output += `<br>but watch out, it did not understand the words after ${wrapCmd(cmd[0])}: "${cmd.slice(1).join(' ')}"<br>
+          if you want to specify what the being should eat, you need to use an ${wrapCmd('if')} rule :). type ${wrapCmd('help if')} to figure out how!`
+        }
         logInput(output)
         this.pb.eat();
         return;
