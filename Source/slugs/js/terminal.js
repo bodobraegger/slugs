@@ -25,7 +25,7 @@ let wordsLoop4 = ['plant']
 
 let wordsToShow = ATTRIBUTES.concat(EDITABLE);
 
-let wordsAll = wordsFirst.concat(wordsIfConditionLeft, wordsIfConditionRight, equalWord, wordsBoolean, wordsAction, wordsToShow, wordsLoop1, wordsLoop2, wordsLoop3, wordsLoop4);
+let wordsAll = wordsFirst.concat(wordsIfConditionLeft, wordsIfConditionRight, equalWord, wordsBoolean, wordsAction, wordsToShow, wordsLoop1, wordsLoop2, wordsLoop3, wordsLoop4).concat(['hunting']);
 
 let wordsFilter = ['the', 'a', 'my', 'me', 'there']
 
@@ -154,7 +154,7 @@ terminal_input.addEventListener('keyup', (e) => {
           else if(wordsOfInterest.at(-1) == thenWord) {
             wordsToCompare = ['eat'];
             if(wordsOfInterest.at(-4) == 'other_creature') {
-              wordsToCompare.reverse();
+              wordsToCompare = ['flee'];
             }
           } 
         }
@@ -165,13 +165,17 @@ terminal_input.addEventListener('keyup', (e) => {
             // console.debug('// if XX is YY then ...,')
             wordsToCompare = ['eat'];
             if(wordsOfInterest.at(-4) == 'other_creature') {
-              wordsToCompare.reverse();
+              wordsToCompare = ['flee'];
             }
           }
           // if XX is ..., 
           else if(current_word == equalWord) {
             // console.debug('// if XX is ...,')
-            wordsToCompare = wordsIfConditionRight;
+            if(wordsOfInterest.at(-2) == 'fruit') {
+              wordsToCompare = wordsIfConditionRight;
+            } else if(wordsOfInterest.at(-2) == 'other_creature') {
+              wordsToCompare = ['hunting']
+            }
           }
           // OR if XX is YY and ... 
           else if(wordsBoolean.includes(wordsOfInterest.at(-2))) {
@@ -187,7 +191,6 @@ terminal_input.addEventListener('keyup', (e) => {
       let i = 1
       for( ; i < wordsOfInterest.length; i++) {
         if(!wordsAll.includes(wordsOfInterest[i])) {
-          console.debug(wordsOfInterest[i], 'not in list of all words!')
           wordsOfInterest = wordsOfInterest.slice(0, i);
           current_word = wordsOfInterest[i-1];
           break
@@ -205,7 +208,6 @@ terminal_input.addEventListener('keyup', (e) => {
       let i = 1
       for( ; i < wordsOfInterest.length; i++) {
         if(!wordsAll.includes(wordsOfInterest[i])) {
-          console.debug(wordsOfInterest[i], 'not in list of all words!')
           wordsOfInterest = wordsOfInterest.slice(0, i);
           current_word = wordsOfInterest[i-1];
           break
@@ -223,7 +225,6 @@ terminal_input.addEventListener('keyup', (e) => {
       let i = 1
       for( ; i < wordsOfInterest.length; i++) {
         if(!wordsAll.includes(wordsOfInterest[i])) {
-          console.debug(wordsOfInterest[i], 'not in list of all words!')
           wordsOfInterest = wordsOfInterest.slice(0, i);
           current_word = wordsOfInterest[i-1];
           break
@@ -241,7 +242,6 @@ terminal_input.addEventListener('keyup', (e) => {
       let i = 1
       for( ; i < wordsOfInterest.length; i++) {
         if(!wordsAll.includes(wordsOfInterest[i])) {
-          console.debug(wordsOfInterest[i], 'not in list of all words!')
           wordsOfInterest = wordsOfInterest.slice(0, i);
           current_word = wordsOfInterest[i-1];
           break
@@ -260,7 +260,7 @@ terminal_input.addEventListener('keyup', (e) => {
         } else if(current_word == 'on') {
           wordsToCompare = wordsLoop4;
         } else if(wordsLoop4.includes(current_word) || current_word == 'close') {
-          wordsToCompare = wordsAction;
+          wordsToCompare = 'eat'; // wordsAction
         }
         if(current_word == 'eat') {
           return;
