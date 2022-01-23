@@ -540,8 +540,12 @@ class Slug extends Phaser.GameObjects.Container {
             if(this == this.scene.pb) {
               logOutput(output)
             }
-            console.debug(this.hunter, dist, this.hunter.pursuitDistance)
-            this.hunter.stop();
+            try {
+              console.debug(this.hunter, dist, this.hunter.pursuitDistance)
+              this.hunter.stop();
+            } catch(error) {
+              console.debug(error);
+            }
             this.stop();
           }
         }
