@@ -15,7 +15,7 @@ const wordsFirst = wordsAction.concat([ifWord, loopWord, showWord, editWord, del
 const wordsForCmdString = [].concat(wordsFirst.slice(0, 2));
 let wordsIfConditionLeft = [].concat(ENTITY_TYPES);
 let wordsIfConditionRight = [].concat(SIZES, COLORCATS_HR, TEXTURES);
-const wordsBoolean = [thenWord, andWord, equalWord] //orWord, ;
+const wordsBoolean = [thenWord, equalWord] //orWord, ;
 
 let wordsLoop1 = ['fruit'];
 let wordsLoop2 = [equalWord];
@@ -42,6 +42,7 @@ const terminal_log = document.getElementById('terminal_log');
 const terminal_log_input = document.getElementById('terminal_log_input');
 const terminal_log_output = document.getElementById('terminal_log_output');
 const autocomplete = document.getElementById('autocomplete');
+const autocomplete_suggestions = document.getElementById('autocomplete_suggestions');
 const terminal_input = document.getElementById('terminal_input');
 const toBottomBtn = document.getElementById('toBottom');
 
@@ -53,6 +54,7 @@ let rgbaInput = 'rgba(240,160,75)'
 function clearInput() {
   terminal_input.value = '';
   autocomplete.innerHTML = '';
+  autocomplete_suggestions.innerHTML = '';
 }
 
 var createRingBuffer = function(length){
@@ -94,6 +96,8 @@ var createRingBuffer = function(length){
 };
 
 let buffer = createRingBuffer(50);
+let suggestions = []
+let wordsToCompare = []
 
 terminal_input.addEventListener('keyup', (e) => {
   if(terminal_input.value.length > 0 ) {
@@ -105,7 +109,7 @@ terminal_input.addEventListener('keyup', (e) => {
     let input = terminal_input.value;
     let checkAgainst = input;
 
-    let wordsToCompare = wordsFirst;
+    wordsToCompare = wordsFirst;
     
     let wordsInput = input.match(/\w+/g);
     let wordsOfInterest = wordsInput;
@@ -118,7 +122,7 @@ terminal_input.addEventListener('keyup', (e) => {
       let i = 1
       for( ; i < wordsOfInterest.length; i++) {
         if(!wordsAll.includes(wordsOfInterest[i])) {
-          console.debug(wordsOfInterest[i], 'not in list of all words!')
+          // console.debug(wordsOfInterest[i], 'not in list of all words!')
           wordsOfInterest = wordsOfInterest.slice(0, i);
           current_word = wordsOfInterest[i-1];
           break
@@ -140,7 +144,7 @@ terminal_input.addEventListener('keyup', (e) => {
           // if XX is YY..., 
           else if(wordsOfInterest.at(-2) == equalWord) {
             // console.debug('// if XX is YY...,')
-            wordsToCompare = wordsBoolean;
+            wordsToCompare = [thenWord];
           }
           // OR if XX ..., OR if XX is YY and ZZ ... 
           else if(wordsOfInterest.at(-2) == ifWord || wordsBoolean.includes(wordsOfInterest.at(-2))) {
@@ -148,10 +152,8 @@ terminal_input.addEventListener('keyup', (e) => {
             wordsToCompare = [equalWord]; 
           }
           else if(wordsOfInterest.at(-1) == thenWord) {
-            wordsToCompare = [...wordsAction];
-            if(wordsOfInterest.at(-4) == 'fruit') {
-              wordsToCompare.splice(wordsToCompare.indexOf('flee'), 1);
-            } else if(wordsOfInterest.at(-4) == 'other_creature') {
+            wordsToCompare = ['eat'];
+            if(wordsOfInterest.at(-4) == 'other_creature') {
               wordsToCompare.reverse();
             }
           } 
@@ -161,10 +163,8 @@ terminal_input.addEventListener('keyup', (e) => {
           // if XX is YY then ...,
           if(current_word == thenWord) {
             // console.debug('// if XX is YY then ...,')
-            wordsToCompare = [...wordsAction];
-            if(wordsOfInterest.at(-4) == 'fruit') {
-              wordsToCompare.splice(wordsToCompare.indexOf('flee'), 1);
-            } else if(wordsOfInterest.at(-4) == 'other_creature') {
+            wordsToCompare = ['eat'];
+            if(wordsOfInterest.at(-4) == 'other_creature') {
               wordsToCompare.reverse();
             }
           }
@@ -272,6 +272,7 @@ terminal_input.addEventListener('keyup', (e) => {
     
     
     autocomplete.innerHTML = input;
+    let nextWord = '';
     let regex = new RegExp(`^${escapeRegExp(checkAgainst)}.*`, 'igm');
     for(let i = 0; i < wordsToCompare.length; i++){
       if(wordsToCompare[i].match(regex)){
@@ -281,8 +282,8 @@ terminal_input.addEventListener('keyup', (e) => {
         else {
           autocomplete.innerHTML = autocomplete.innerHTML.trimEnd();
         }
-      	autocomplete.innerHTML += wordsToCompare[i].slice(checkAgainst.length, wordsToCompare[i].length);
-        
+        nextWord = wordsToCompare[i].slice(checkAgainst.length, wordsToCompare[i].length);
+      	autocomplete.innerHTML += nextWord;
         if(wordsToCompare != wordsIfConditionLeft && wordsToCompare != wordsAction && wordsToCompare != wordsBoolean && wordsToCompare != wordsToShow) {
           /*
           console.debug('shuffling', wordsToCompare)
@@ -290,10 +291,30 @@ terminal_input.addEventListener('keyup', (e) => {
           wordsToCompare.splice(0, 1);
           wordsToCompare.push(t)
           */
-          shuffleArray(wordsToCompare)
+        shuffleArrayButFirst(wordsToCompare)
         }
         break;
       }
+    }
+    suggestions = [];
+    // if a next word is suggested, also suggest other possibilities
+    if(autocomplete.innerHTML.includes(nextWord) && nextWord != '' && wordsToCompare.includes(nextWord)) {
+      let r = new RegExp(`(?:(?!${nextWord}).)*`);
+      let m = r.exec(autocomplete.innerHTML)
+      let t = [...wordsToCompare]
+      t.splice(wordsToCompare.indexOf(nextWord), 1);
+      suggestions = t;
+      let suggestion_block = ``;
+      suggestions.forEach(e => {
+        suggestion_block += `<span class='suggestion'>${'&nbsp;'.repeat(m[0].trim().length-(checkAgainst.length-1))}${e}</span><br>`
+      })
+      if(suggestions.length < wordsToCompare.length-1) {
+        suggestion_block += `<span class='suggestion'>${'&nbsp;'.repeat(m[0].trim().length-(checkAgainst.length-1))}...</span><br>`
+      }
+      autocomplete_suggestions.innerHTML = suggestion_block
+      goToBottom(terminal_container);
+    } else {
+      autocomplete_suggestions.innerHTML = ''
     }
 	}
 })
@@ -303,29 +324,35 @@ terminal_input.addEventListener('keydown', (e) => {
     case 'Backspace':
     case 'Delete':
       autocomplete.innerHTML = '';
+      autocomplete_suggestions.innerHTML = ''
       return;
+    case 'ArrowRight':
+      if(autocomplete.innerText.length >= terminal_input.value.length) {
+        e.preventDefault();
+      }
     case 'Tab':
       e.preventDefault();
       terminal_input.value = autocomplete.innerText;
       return;
+    case 'ArrowLeft':
+      if(autocomplete.innerText.length >= terminal_input.value.length && terminal_input.value.split(' ').length>1) {
+        e.preventDefault();
+        terminal_input.value = terminal_input.value.split(' ').slice(0, -1).join(' ');
+      }
+      return;
     /*
     case 'ArrowUp':
       e.preventDefault();
-      let prev = buffer.prev();
-      if(prev!==undefined){
-        terminal_input.value = prev.join(' ');
-    }
-      return;
+      if(suggestions.length) {
+        terminal_input.value = autocomplete.innerText.split(' ').slice(0,-1).join(' ')+ ' ' + suggestions.at(1);
+        return;
+      }
     case 'ArrowDown':
       e.preventDefault();
-      let next = buffer.next();
-      if(next!==undefined){
-        terminal_input.value = next.join(' ');
+      if(suggestions.length) {
+        terminal_input.value = autocomplete.innerText.split(' ').slice(0,-1).join(' ')+ ' ' + suggestions.at(0);
+        return;
       }
-      else {
-        clearInput();
-      }
-      return;
     */
     case ' ': {
       if(terminal_input.value.at(-1) == ' ') {
@@ -533,8 +560,8 @@ async function blink(e = document.getElementById('id')) {
   }, 800);
 }
 
-function shuffleArray(array) {
-  for (let i = array.length - 1; i > 0; i--) {
+function shuffleArrayButFirst(array) {
+  for (let i = array.length - 1; i > 1; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [array[i], array[j]] = [array[j], array[i]];
   }

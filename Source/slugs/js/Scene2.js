@@ -278,13 +278,13 @@ class Scene2 extends Phaser.Scene {
     terminal_input.addEventListener('cmd', (e) => {
       // WE HAVE A HOOK INTO THE TERMINAL
       this.processCommand(e.detail.value);
-    });
+    });/*
     let controlConfig = {
       camera: this.cameras.main,
-      left: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT),
-      right: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT),
-      up: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP),
-      down: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN),
+      left: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
+      right: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D),
+      up: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
+      down: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
       // zoomIn: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.PLUS),
       // zoomOut: this.input.mouse.onMouseWheel() ,
       acceleration: 0.03,
@@ -293,12 +293,13 @@ class Scene2 extends Phaser.Scene {
     };
     this.controls = new Phaser.Cameras.Controls.SmoothedKeyControl(controlConfig);
     this.input.keyboard.preventDefault = false;    
-
-    // NARRATION
-    NARRATION.intro();
-
+    */
+   // NARRATION
+   NARRATION.intro();
+   
   }
   update(time, delta) {
+    //this.controls.update(delta)
     this.graphics.clear()
     // console.log(constraints)
     BEINGS.getMatching('active', true).forEach(e => {
@@ -349,7 +350,6 @@ class Scene2 extends Phaser.Scene {
       NARRATION.hunted();
       this.enemy.eat('player');
     }
-    this.controls.update(delta)
     let vecTorsoHeady = velocityToTarget(this.pb.torso, this.pb.heady);
     if(Angle.ShortestBetween(RadToDeg(vecTorsoHeady.angle()), this.pb.heady.angle) > 40)
     this.pb.heady.setAngle(RadToDeg(vecTorsoHeady.angle()))

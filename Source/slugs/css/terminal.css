@@ -17,14 +17,15 @@
 ::-webkit-scrollbar-track {
     margin-top: 10px;
     margin-bottom: 10px;
+    background: rgba(255, 152, 238, 0.1);
 }
 ::-webkit-scrollbar-thumb {
-    background: rgba(255, 200, 240, 0.6); 
+    background: rgba(255, 200, 240, 1); 
     border-radius: 15px;
     max-height: 80%;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 200, 240, 1); 
+    background: rgb(255, 228, 248); 
 }
 
 #terminal_container {
@@ -103,15 +104,21 @@
     z-index: -1; /* IMPORTANT */
     color: rgb(151, 71, 255);
 }
-#autocomplete-suggestions {
+#autocomplete_suggestions {
+    background-color: rgba(255, 152, 238, 0.1);
+    user-select: none;
     grid-row-start: 1;
     grid-column-start: 1;
     font-family: 'Inconsolata', monospace;
     border: 0; /* HAS TO BE SIMILAR TO #autocomplete */
     font-size:14px; /* HAS TO BE SIMILAR TO #autocomplete */
-    padding:10px; /* IMPORTANT */
-    margin: 17px 0px;
+    padding: 0 10px;
+    margin: 27px 0px;
     color: rgb(151, 71, 255);
+    overflow-y: auto;
+    max-height: calc(17px * 4);
+    width: fit-content;
+    scroll-margin: 17px;
 }
 
 .logEntry {
@@ -175,7 +182,7 @@
     color: #50fa7b !important;
 }
 
-u, span {
+u, span.cmd {
     padding: 0 6px;
 }
 
