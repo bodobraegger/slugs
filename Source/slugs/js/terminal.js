@@ -362,12 +362,13 @@ terminal_input.addEventListener('keydown', (e) => {
 function addToLog(output) {
   let id = `logId-${logId}`
   let wrap = document.createElement('div');
-  if(terminal_log.getElementsByClassName(id).length) {
-    wrap = terminal_log.getElementsByClassName(id)[0];
+  let logDiv = terminal_log 
+  let lastChild = logDiv.lastChild;
+  if(logDiv.getElementsByClassName(id).length) {
+    wrap = logDiv.getElementsByClassName(id)[0];
   } else {
     wrap.classList.add(id)
     wrap.classList.add('logSegment');
-    terminal_log.appendChild(wrap);
   }
 
   // console.debug(getTotalChildrenHeights(terminal_container), 'vs', document.getElementById("phaser_container").clientHeight);
@@ -384,7 +385,7 @@ function addToLog(output) {
   else {
     div = output;
   }
-  let logDiv = terminal_log /*;
+  /*;
   if(div.classList.contains('input')) {
     logDiv = terminal_log_input;
   } else {
@@ -394,15 +395,21 @@ function addToLog(output) {
   div.classList.add(`logEntry`);
   div.classList.add(id)
   try {
-    if(div.innerHTML == logDiv.lastChild.lastChild.innerHTML) {
-      blink(logDiv.lastChild);
-    } else {
+    let divText = div.innerText.replaceAll(/\s/g, "")
+    let lastChildText = lastChild.innerText.replaceAll(/\s/g, "")
+    let lastLastChildText = lastChild.lastChild.innerText.replaceAll(/\s/g, "")
+    if(divText == lastChildText || divText == lastLastChildText) {
+      blink(lastChild);
+    }
+    else {
       wrap.appendChild(div);
+      logDiv.appendChild(wrap);
       logCount++;
     }
   } catch (error) {
     console.debug(error)
     wrap.appendChild(div);
+    logDiv.appendChild(wrap);
     logCount++;
   }
 /*
@@ -515,16 +522,14 @@ function parseEncased(parentheses, input_arr) {
 
 
 async function blink(e = document.getElementById('id')) {
-  let borderOriginal = (e.style.border ? e.style.border : ``);
-  let border = `thin solid rgba(255, 165, 0, 0.8)`
   e.classList.remove('old')
   setTimeout(function() {
      // e.style.display = (e.style.display == 'none' ? '' : 'none');
-     e.style.border = (e.style.border == border ? borderOriginal : border);
+     e.classList.add('blink');
   }, 200);
   setTimeout(function() {
      // e.style.display = (e.style.display == 'none' ? '' : 'none');
-     e.style.border = (e.style.border == border ? borderOriginal : border);
+     e.classList.remove('blink')
   }, 800);
 }
 
