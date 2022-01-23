@@ -86,26 +86,27 @@ class Snake extends Slug {
     }
     
     eat(foodType='any') {
-      // having found our food stuff, move to it until you're close!
       this.eating = true  
       this.timer = 0;
-      if(foodType=='any' || foodType =='healthy') {
-        let possible_victims = []
+      let possible_victims = []
+      if(foodType == 'any') {
+        possible_victims = BEINGS.getMatching('active', true);
+      } else if(foodType =='healthy') {
         BEINGS.getMatching('active', true).forEach(b => {
-          if(sameColorCategory(b.color, this.color), b.torso.displayWidth < this.heady.displayWidth) {
+          if(sameColorCategory(b.color, this.color) && b.torso.displayWidth < this.heady.displayWidth) {
             possible_victims.push(b);
           }
         });
-        if(!possible_victims.length) {
-          return;
-        }
-        this.hunted = possible_victims[0];
-        possible_victims.forEach(v => {
-          if(Distance.BetweenPointsSquared(this.heady, v.torso) < Distance.BetweenPointsSquared(this.heady, this.hunted.torso)) {
-            this.hunted = v;
-          }
-        }) 
       }
+      if(!possible_victims.length) {
+        return;
+      }
+      this.hunted = possible_victims[0];
+      possible_victims.forEach(v => {
+        if(Distance.BetweenPointsSquared(this.heady, v.torso) < Distance.BetweenPointsSquared(this.heady, this.hunted.torso)) {
+          this.hunted = v;
+        }
+      }) 
       if(foodType=='player'){
         this.hunted = this.scene.pb
       }
@@ -142,6 +143,7 @@ class Snake extends Slug {
             // logOutput('your being is no longer being <u class="enemycolor">hunted</u> :).')
           }
           this.stop();
+          this.roam();
         }
       }, this);
     }

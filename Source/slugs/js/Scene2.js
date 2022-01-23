@@ -830,7 +830,8 @@ class Scene2 extends Phaser.Scene {
               if(!(o.shape == s.shape)) {
                 output += `<br>perhaps it did not like its shape ⚪⬜`
               }
-              output +='...<br>'
+              output +=`...
+              you should try to get it to eat something that's good for it and matches its characteristics to get it vibrant and healthy again!`
               s.eating = false;
             }
             if(o.joints) {
