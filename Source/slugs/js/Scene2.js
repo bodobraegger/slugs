@@ -793,7 +793,7 @@ class Scene2 extends Phaser.Scene {
     }
     beings.forEach(s=> {
       o.setOnCollideWith(s.heady, pair => {
-        if(o == s.chosenFood) {
+        if(o == s.chosenFood && s.eating) {
           if(o.displayWidth <= s.heady.displayWidth) {
             let output = ``
             if(sameColorCategory(o.color, s.color) && o.txtr == s.txtr && o.shape == s.shape) {
