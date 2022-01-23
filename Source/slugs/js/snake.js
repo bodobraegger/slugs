@@ -97,9 +97,9 @@ class Snake extends Slug {
             possible_victims.push(b);
           }
         });
-      }
-      if(!possible_victims.length) {
-        return;
+        if(!possible_victims.length) {
+          return;
+        }
       }
       this.hunted = possible_victims[0];
       possible_victims.forEach(v => {
@@ -148,6 +148,7 @@ class Snake extends Slug {
           }
         } catch(error) {
           console.debug(error, 'this.hunted no longer exists probably!');
+          this.stop();
         }
       }, this);
     }
