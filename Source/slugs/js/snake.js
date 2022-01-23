@@ -126,24 +126,28 @@ class Snake extends Slug {
         }
       }
       this.scene.events.on('postupdate', function(time, delta) {
-        if(this.eating && this.hunted.alpha == 1 && this.hunted.color.s > 0.5 && headyToTarget.length() < this.pursuitDistance){
-          headyToTarget = new Vector2(this.hunted.torso).subtract(this.heady);
-          let len = headyToTarget.length()
-          drawVec(headyToTarget, this.heady, this.color.color, Math.min(this.heady.displayWidth, (this.heady.displayWidth+this.hunted.torso.displayWidth)*30/len))
-          // console.debug(this.hunted.torso)
-          
-          let target = this.hunted.torso          
-          let speedMod = 1;
-          this.moveTo(target, speedMod);
-          this.hunted.hunter = this;
-
-        }
-        else if(this.eating && this.hunted.hunter == this) {
-          if(this.hunted == this.scene.pb) {
-            // logOutput('your being is no longer being <u class="enemycolor">hunted</u> :).')
+        try {
+          if(this.eating && this.hunted.alpha == 1 && this.hunted.color.s > 0.5 && headyToTarget.length() < this.pursuitDistance){
+            headyToTarget = new Vector2(this.hunted.torso).subtract(this.heady);
+            let len = headyToTarget.length()
+            drawVec(headyToTarget, this.heady, this.color.color, Math.min(this.heady.displayWidth, (this.heady.displayWidth+this.hunted.torso.displayWidth)*30/len))
+            // console.debug(this.hunted.torso)
+            
+            let target = this.hunted.torso          
+            let speedMod = 1;
+            this.moveTo(target, speedMod);
+            this.hunted.hunter = this;
+  
           }
-          this.stop();
-          this.roam();
+          else if(this.eating && this.hunted.hunter == this) {
+            if(this.hunted == this.scene.pb) {
+              // logOutput('your being is no longer being <u class="enemycolor">hunted</u> :).')
+            }
+            this.stop();
+            this.roam();
+          }
+        } catch(error) {
+          console.debug(error, 'this.hunted no longer exists probably!');
         }
       }, this);
     }
