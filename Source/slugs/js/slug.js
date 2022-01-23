@@ -440,7 +440,7 @@ class Slug extends Phaser.GameObjects.Container {
     roam() {
       this.stop()
       this.roaming = true;
-      this.roamingTarget = this.getRandomPointClose(this.torso);
+      this.roamingTarget = this.getRandomPointClose(findClosest(this.torso, FRUIT.getMatching('active', true)) );
       const callback = function(params)  {
         if(!(this.fleeing || this.eating || this.alpha != 1)) {
           this.roamingTarget = this.getRandomPointClose(this.roamingTarget)
