@@ -260,7 +260,7 @@ terminal_input.addEventListener('keyup', (e) => {
         } else if(current_word == 'on') {
           wordsToCompare = wordsLoop4;
         } else if(wordsLoop4.includes(current_word) || current_word == 'close') {
-          wordsToCompare = 'eat'; // wordsAction
+          wordsToCompare = ['eat']; // wordsAction
         }
         if(current_word == 'eat') {
           return;
