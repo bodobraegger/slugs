@@ -121,7 +121,12 @@ class Slug extends Phaser.GameObjects.Container {
       });
       this.moveRandomly();
 
-      this.scene.time.delayedCall(20*1000, ()=>{this.roam(); this.scene.mutationObserver.lastLogged = Date.now()})
+      this.scene.time.delayedCall(20*1000, ()=>{ 
+        if(this.scene.mutationObserver.lastLogged > Date.now() - 20 * 1000) {
+          this.roam()
+        }; 
+        this.scene.mutationObserver.lastLogged = Date.now()
+      })
       
       if(!render) {
         this.bodyparts.forEach(e=> {
@@ -348,6 +353,9 @@ class Slug extends Phaser.GameObjects.Container {
           logOutput(`none of the ${wrapCmd('rules')} tell your being what to eat, so it will try to eat anything!`)
         }
       }
+      if(this.plantLoop && this == this.scene.pb) {
+        logOutput(`it also takes the ${wrapCmd('while routine')} into account :).`)
+      }
       if(foodType == 'healthy') {
         foodSelected = []
         /*
@@ -438,30 +446,32 @@ class Slug extends Phaser.GameObjects.Container {
       }, this);
     }
     roam() {
-      this.stop()
-      this.roaming = true;
-      this.roamingTarget = this.getRandomPointClose(findClosest(this.torso, FRUIT.getMatching('active', true)) );
-      const callback = function(params)  {
-        if(!(this.fleeing || this.eating || this.alpha != 1)) {
-          this.roamingTarget = this.getRandomPointClose(this.roamingTarget)
-          // console.debug('setting new roaming target: ', this.roamingTarget)
-          this.roaming = true;
-        }
-      }
-      this.scene.events.on('postupdate', function(time, delta) {
-        if(this.roaming && !(this.fleeing || this.eating || this.alpha != 1)){
-          // console.debug(this.rotationDirection)
-          // console.debug(this.hunterHeady, dist)
-          let target = this.roamingTarget;
-          this.moveTo(target, 0.5);
-          let distSq = Distance.BetweenPointsSquared(this.heady, this.roamingTarget);
-          if(distSq < this.heady.displayWidth**2 * 4) {
-            this.roaming = false;
-            let delay = Between(5, 10) * 1000
-            var timer = this.scene.time.delayedCall(delay, callback, undefined, this);  // delay in ms
+      if(!(this.eating || this.fleeing)) {
+        this.stop()
+        this.roaming = true;
+        this.roamingTarget = this.getRandomPointClose(findClosest(this.torso, FRUIT.getMatching('active', true)) );
+        const callback = function(params)  {
+          if(!(this.fleeing || this.eating || this.alpha != 1)) {
+            this.roamingTarget = this.getRandomPointClose(this.roamingTarget)
+            // console.debug('setting new roaming target: ', this.roamingTarget)
+            this.roaming = true;
           }
         }
-      }, this);
+        this.scene.events.on('postupdate', function(time, delta) {
+          if(this.roaming && !(this.fleeing || this.eating || this.alpha != 1)){
+            // console.debug(this.rotationDirection)
+            // console.debug(this.hunterHeady, dist)
+            let target = this.roamingTarget;
+            this.moveTo(target, 0.5);
+            let distSq = Distance.BetweenPointsSquared(this.heady, this.roamingTarget);
+            if(distSq < this.heady.displayWidth**2 * 4) {
+              this.roaming = false;
+              let delay = Between(5, 10) * 1000
+              var timer = this.scene.time.delayedCall(delay, callback, undefined, this);  // delay in ms
+            }
+          }
+        }, this);
+      }
     }
 
     getRandomPointClose(point) {

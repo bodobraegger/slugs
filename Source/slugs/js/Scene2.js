@@ -43,7 +43,7 @@ const { Vector2, Angle, Distance, DegToRad, RadToDeg, Between, FloatBetween } = 
 const { Color } = Phaser.Display;
 const { GameObjects } = Phaser; 
 const ifExample = 'if fruit is red then eat';
-const loopExample = 'while fruit on plant eat';
+const loopExample = 'while fruit is on plant eat';
 const editExample = `replace rule 1 with ${ifExample}`;
 const deleteExample = 'forget rule 1'
 
@@ -222,7 +222,7 @@ class Scene2 extends Phaser.Scene {
                 // console.log(viewRec)
                 let visible = Phaser.Geom.Rectangle.Overlaps(viewRec, new Phaser.Geom.Rectangle(distx-randSize/2, disty-randSize/2, randSize, randSize));
                 
-                tooClose = ( Math.abs(p.x-distx) < Math.max(randSize/tries, 200/tries) && Math.abs(p.y-disty) < Math.max(randSize/tries, 200/tries) ) || visible;
+                tooClose = ( Math.abs(p.x-distx) < Math.max(randSize/tries, 250/tries) && Math.abs(p.y-disty) < Math.max(randSize/tries, 250/tries) ) || visible;
                 // console.log(Math.abs(p.x-distx)+Math.abs(p.y-disty),randSize*3)
                 return tooClose;
               })
@@ -260,7 +260,7 @@ class Scene2 extends Phaser.Scene {
       }
     }
 
-    generate.call(this, [45]);
+    generate.call(this, [40]);
 
     var timer = this.time.addEvent({
       delay: 30 * 1000,
@@ -337,6 +337,9 @@ class Scene2 extends Phaser.Scene {
       this.stage++;
       this.cameras.main.zoomTo(1/this.stage, 2000, 'Sine.easeInOut');
     }
+    if(this.stage == 2 && !(this.pb.plantLoop) && !(NARRATION.loopNudged)) {
+      NARRATION.loopNudge();
+    }
     if(this.stage == 4 && !this.enemySpawned) {
       this.pb.stop();
       this.enemySpawned = true;
@@ -346,8 +349,6 @@ class Scene2 extends Phaser.Scene {
       this.enemy.name = 'enemy'
       ENEMIES.add(this.enemy);
       console.log(`spawned enemy at`, this.enemy.x, this.enemy.y, this.enemy);
-      changeStylesheetRule(document.styleSheets[0], '.enemycolor', `background-color`, `#${this.enemy.color.color.toString(16)}`)
-      NARRATION.hunted();
       this.enemy.eat('player');
     }
     let vecTorsoHeady = velocityToTarget(this.pb.torso, this.pb.heady);
@@ -655,7 +656,7 @@ class Scene2 extends Phaser.Scene {
               output += `you can use the ${wrapCmd('flee')} command to tell your being to flee from an ${wrapCmd('other_creature')}. if you give it rules using the ${wrapCmd(ifWord)} about the creatures it should flee from, then it won't just flee from anything.`
               break;
             case ifWord:
-              output += `with the ${wrapCmd('if')} keyword you can give rules to your being! your being will use these rules to figure out what to ${wrapCmd('eat')} and what to ${wrapCmd('action')} :). An if rule needs to be of the form ${wrapCmd('if <i>condition</i> then <i>action</i>')}, for example: ${wrapCmd(ifExample)}!`;
+              output += `with the ${wrapCmd('if')} keyword you can give rules to your being! your being will use these rules to figure out what to ${wrapCmd('eat')} and from what to ${wrapCmd('flee')} :). An if rule needs to be of the form ${wrapCmd('if <i>condition</i> then <i>action</i>')}, for example: ${wrapCmd(ifExample)}! the being will take all food rules into account when choosing food.`;
               break;
             case loopWord:
               output += `to make your being more efficient in eating, you can give it a ${wrapCmd('routine')} to follow so it can do things automatically. for example: ${wrapCmd(loopExample)}.`

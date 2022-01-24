@@ -87,9 +87,9 @@ const config = {
       matter: {
         debug: false,
         gravity: { y: 0 },
-        //positionIterations: 1.5,
-        //velocityIterations: 1,
-        //constraintIterations: 0.5,
+        positionIterations: 1,
+        velocityIterations: 0.5,
+        constraintIterations: 0.5,
         enableSleeping: true,
         plugins: {
           attractors: true,
