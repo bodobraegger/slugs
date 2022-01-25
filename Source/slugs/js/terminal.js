@@ -271,7 +271,7 @@ terminal_input.addEventListener('keyup', (e) => {
     // console.debug(checkAgainst, wordsToCompare);
     
     
-    autocomplete.innerHTML = input;
+    autocomplete.innerHTML = wrapCmd(input);
     let nextWord = '';
     let regex = new RegExp(`^${escapeRegExp(checkAgainst)}.*`, 'igm');
     for(let i = 0; i < wordsToCompare.length; i++){
@@ -283,7 +283,7 @@ terminal_input.addEventListener('keyup', (e) => {
           autocomplete.innerHTML = autocomplete.innerHTML.trimEnd();
         }
         nextWord = wordsToCompare[i].slice(checkAgainst.length, wordsToCompare[i].length);
-      	autocomplete.innerHTML += nextWord;
+      	autocomplete.innerHTML += wrapCmd(nextWord);
         if(wordsToCompare != wordsIfConditionLeft && wordsToCompare != wordsAction && wordsToCompare != wordsBoolean && wordsToCompare != wordsToShow) {
           /*
           console.debug('shuffling', wordsToCompare)
@@ -291,22 +291,26 @@ terminal_input.addEventListener('keyup', (e) => {
           wordsToCompare.splice(0, 1);
           wordsToCompare.push(t)
           */
-        shuffleArrayButFirst(wordsToCompare)
+        shuffleArray(wordsToCompare)
         }
         break;
       }
     }
     suggestions = [];
     // if a next word is suggested, also suggest other possibilities
-    if(autocomplete.innerHTML.includes(nextWord) && nextWord != '' && wordsToCompare.includes(nextWord)) {
+    if(autocomplete.innerText.includes(nextWord) && nextWord != '' && wordsToCompare.includes(nextWord)) {
       let r = new RegExp(`(?:(?!${nextWord}).)*`);
-      let m = r.exec(autocomplete.innerHTML)
+      let m = r.exec(autocomplete.innerText)
       let t = [...wordsToCompare]
       t.splice(wordsToCompare.indexOf(nextWord), 1);
       suggestions = t;
       let suggestion_block = ``;
       suggestions.forEach(e => {
-        suggestion_block += `<span class='suggestion'>${'&nbsp;'.repeat(m[0].trim().length-(checkAgainst.length-1))}${e}</span><br>`
+        let span = document.createElement('span');
+        span.innerHTML=wrapCmd(e);
+        span.firstChild.classList += 'suggestion'
+        let spanString=span.innerHTML;
+        suggestion_block += `${'&nbsp;'.repeat(m[0].trim().length-(checkAgainst.length-1))}${spanString}<br>`
       })
       if(suggestions.length < wordsToCompare.length-1) {
         suggestion_block += `<span class='suggestion'>${'&nbsp;'.repeat(m[0].trim().length-(checkAgainst.length-1))}...</span><br>`
@@ -333,11 +337,13 @@ terminal_input.addEventListener('keydown', (e) => {
     case 'Tab':
       e.preventDefault();
       terminal_input.value = autocomplete.innerText;
+      terminal_input.dispatchEvent(new KeyboardEvent('keyup',{'key':''}));
       return;
     case 'ArrowLeft':
       if(autocomplete.innerText.length >= terminal_input.value.length && terminal_input.value.split(' ').length>1) {
         e.preventDefault();
         terminal_input.value = terminal_input.value.split(' ').slice(0, -1).join(' ');
+        terminal_input.dispatchEvent(new KeyboardEvent('keyup',{'key':''}));
       }
       return;
     /*
@@ -491,10 +497,6 @@ function getTotalChildrenHeights(element) {
   return totalHeight;
 }
 
-function colorize(output, color) {
-  return `<div class='colorized' style="background-color: ${color}">${output}</div>`
-}
-
 function wrapCmd(cmd) {
   let cmdArr = cmd.split(' ')
   if(cmdArr.length > 1) {
@@ -516,7 +518,18 @@ function wrapCmd(cmd) {
         break;
       }
   }
-  return `<span class='${classList}'>${cmd}</span>`
+  return wrapWords(cmd, `<span class='${classList}'>$&</span>`)
+}
+
+/**
+ * Wraps a string around each word
+ *
+ * @param {string} str The string to transform
+ * @param {string} tmpl Template that gets interpolated
+ * @returns {string} The given input splitted by words
+ */
+ function wrapWords(str, tmpl="<span>$&</span>") {
+  return str.replace(/\w+/g, tmpl || "<span>$&</span>");
 }
 
 // STRING HELPERS
@@ -560,8 +573,8 @@ async function blink(e = document.getElementById('id')) {
   }, 800);
 }
 
-function shuffleArrayButFirst(array) {
-  for (let i = array.length - 1; i > 1; i--) {
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [array[i], array[j]] = [array[j], array[i]];
   }
