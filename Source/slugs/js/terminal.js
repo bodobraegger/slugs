@@ -518,18 +518,7 @@ function wrapCmd(cmd) {
         break;
       }
   }
-  return wrapWords(cmd, `<span class='${classList}'>$&</span>`)
-}
-
-/**
- * Wraps a string around each word
- *
- * @param {string} str The string to transform
- * @param {string} tmpl Template that gets interpolated
- * @returns {string} The given input splitted by words
- */
- function wrapWords(str, tmpl="<span>$&</span>") {
-  return str.replace(/\w+/g, tmpl || "<span>$&</span>");
+  return `<span class='${classList}'>${cmd}</span>`
 }
 
 // STRING HELPERS
