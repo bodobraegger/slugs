@@ -32,14 +32,15 @@
 
 #terminal_container {
     float:right;    
-    position:relative; /* IMPORTANT */
+    position:absolute; /* IMPORTANT */
     /*border-style: solid;
     border-color: rgba(237, 165, 255, 0.9);
     border-radius: 10px;
     padding: 12px; */
     height: 98%;
-    margin-right:1%;
-    width: 19%;
+    margin-left:74%;
+    margin-right: 1%;
+    width: 25%;
 }
 #toBottom {
     border-radius: 100%;
@@ -76,7 +77,6 @@
 }
 
 #terminal_input, #autocomplete {
-    background-color: rgba(255,150,70, 0.8);
     grid-row-start: 1;
     grid-column-start: 1;
     resize: none;
@@ -94,8 +94,9 @@
     ================== */
 }
 #terminal_input {
+    z-index: 1;
     padding-top: 10px;
-    background-color: transparent !important;
+    background-color: transparent;
     color:rgba(22, 0, 16, 0.2);
 }
 #terminal_input::placeholder {
@@ -103,7 +104,7 @@
 }
 
 #autocomplete {
-    z-index: -1; /* IMPORTANT */
+    background-color: rgba(255,150,70, 0.8);
     color: rgb(0, 145, 255);
 }
 
@@ -136,7 +137,7 @@
     background-color: rgba(255,150,70, 0.8);
 }
 .output {
-    background-color: rgb(175, 143, 233);
+    background-color: rgba(175, 143, 233,0.8);
     color: ivory;   
 }
 .error {
