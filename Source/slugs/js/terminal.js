@@ -15,7 +15,7 @@ const wordsFirst = wordsAction.concat([ifWord, loopWord, showWord, editWord, del
 const wordsForCmdString = [].concat(wordsFirst.slice(0, 2));
 let wordsIfConditionLeft = [].concat(ENTITY_TYPES);
 let wordsIfConditionRight = [].concat(SIZES, COLORCATS_HR, TEXTURES);
-const wordsBoolean = [thenWord, equalWord] //orWord, ;
+const wordsBoolean = [thenWord, equalWord, `${equalWord} not`] //orWord, ;
 
 let wordsLoop1 = ['fruit'];
 let wordsLoop2 = [equalWord];
@@ -25,7 +25,7 @@ let wordsLoop4 = ['plant']
 
 let wordsToShow = ATTRIBUTES.concat(EDITABLE);
 
-let wordsAll = wordsFirst.concat(wordsIfConditionLeft, wordsIfConditionRight, equalWord, wordsBoolean, wordsAction, wordsToShow, wordsLoop1, wordsLoop2, wordsLoop3, wordsLoop4).concat(['hunting']);
+let wordsAll = wordsFirst.concat(wordsIfConditionLeft, wordsIfConditionRight, equalWord, wordsBoolean, wordsAction, wordsToShow, wordsLoop1, wordsLoop2, wordsLoop3, wordsLoop4).concat(['hunting']).concat(['not']);
 
 let wordsFilter = ['the', 'a', 'my', 'me', 'there']
 
@@ -135,31 +135,33 @@ terminal_input.addEventListener('keyup', (e) => {
       if(wordsOfInterest.length > 1) {
         // TODO: FIX AUTOCOMPLETE RENDER WITH WHITESPACE IN MIDDLE
         // IF even number of words, then we have...
-        if(wordsOfInterest.length % 2 == 0) {
-          // if xx is yy then zz ... 
-          if(wordsAction.includes(current_word)) {
-            // console.debug('// if xx is yy then zz')
-            return;
-          }
-          // if XX is YY..., 
-          else if(wordsOfInterest.at(-2) == equalWord) {
-            // console.debug('// if XX is YY...,')
-            wordsToCompare = [thenWord];
-          }
-          // OR if XX ..., OR if XX is YY and ZZ ... 
-          else if(wordsOfInterest.at(-2) == ifWord || wordsBoolean.includes(wordsOfInterest.at(-2))) {
-            // console.debug('// OR if XX ..., OR if XX is YY and ZZ ...')
-            wordsToCompare = [equalWord]; 
-          }
-          else if(wordsOfInterest.at(-1) == thenWord) {
-            wordsToCompare = ['eat'];
-            if(wordsOfInterest.at(-4) == 'other_creature') {
-              wordsToCompare = ['flee'];
-            }
-          } 
+        // if xx is yy then zz ... 
+        if(wordsAction.includes(current_word)) {
+          // console.debug('// if xx is yy then zz')
+          return;
         }
+        // if XX is YY..., 
+        else if(current_word == 'not') {
+          // console.debug('// if XX is not YY...,')
+          wordsToCompare = wordsIfConditionRight;
+        }
+        else if(wordsIfConditionRight.includes(current_word) || wordsOfInterest.at(-2) == equalWord) {
+          // console.debug('// if XX is YY...,')
+          wordsToCompare = [thenWord];
+        }
+        // OR if XX ..., OR if XX is YY and ZZ ... 
+        else if(wordsOfInterest.at(-2) == ifWord || wordsBoolean.includes(wordsOfInterest.at(-2))) {
+          // console.debug('// OR if XX ..., OR if XX is YY and ZZ ...')
+          wordsToCompare = [equalWord, `${equalWord} not`]; 
+        }
+        else if(current_word == thenWord) {
+          wordsToCompare = ['eat'];
+          if(wordsOfInterest.at(-4) == 'other_creature') {
+            wordsToCompare = ['flee'];
+          }
+        } 
         // ELSE we have ...
-        else if(wordsBoolean.concat(equalWord).includes(current_word)) {
+        if(wordsBoolean.includes(current_word)) {
           // if XX is YY then ...,
           if(current_word == thenWord) {
             // console.debug('// if XX is YY then ...,')
@@ -169,9 +171,9 @@ terminal_input.addEventListener('keyup', (e) => {
             }
           }
           // if XX is ..., 
-          else if(current_word == equalWord) {
+          else if(current_word == equalWord || current_word == `not`) {
             // console.debug('// if XX is ...,')
-            if(wordsOfInterest.at(-2) == 'fruit') {
+            if(wordsOfInterest.includes('fruit')) {
               wordsToCompare = wordsIfConditionRight;
             } else if(wordsOfInterest.at(-2) == 'other_creature') {
               wordsToCompare = ['hunting']
