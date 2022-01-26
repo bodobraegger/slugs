@@ -321,6 +321,10 @@ class Slug extends Phaser.GameObjects.Container {
 
       // having found our food stuff, move to it until you're close!
       this.chosenFood = findClosest(this.heady, this.food_matching.getMatching('active', true));
+      if(!(this.chosenFood)) {
+        logOutput(`your being thinks there is no food that matches the rules you gave it :(. try typing the ${wrapCmd(deleteWord)} command to make your being forget a rule and try again :).`)
+          return;
+      }
       if(this.chosenFood) {
         this.chosenFood.hunter = this;
       }
