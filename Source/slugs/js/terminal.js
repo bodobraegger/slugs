@@ -152,7 +152,10 @@ terminal_input.addEventListener('keyup', (e) => {
         // OR if XX ..., OR if XX is YY and ZZ ... 
         else if(wordsOfInterest.at(-2) == ifWord || wordsBoolean.includes(wordsOfInterest.at(-2))) {
           // console.debug('// OR if XX ..., OR if XX is YY and ZZ ...')
-          wordsToCompare = [equalWord, `${equalWord} not`]; 
+          wordsToCompare = [equalWord]; 
+          if(current_word == 'fruit') {
+            wordsToCompare.push(`${equalWord} not`)
+          }
         }
         else if(current_word == thenWord) {
           wordsToCompare = ['eat'];
