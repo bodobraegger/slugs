@@ -378,61 +378,7 @@ class Scene2 extends Phaser.Scene {
     if(RULES.length != this.rulesLength || this.triggerFoodUpdate || this.activeFoodlength != FRUIT.getMatching('active', true).length) {
       this.rulesLength = RULES.length;
       this.pb.food_matching.clear();
-      let foodSelected = FRUIT.getMatching('active', true);
-      let rulesFood = this.pb.rulesParsed.filter(e => e.action == 'eat')
-      for(let i = 0; i < rulesFood.length; i++) {
-        let foodCurrentlySelected = [ ];
-        let r = rulesFood[i]; 
-        // console.log('adapting matching fruit! -> rule', r)
-        let booleanExpr = r.booleanExpr;
-        let booleanString = booleanExpr.join(' '); // .splice(1, 0, '(').push(')')
-        booleanString = booleanString.replaceAll(equalWord, '==').replaceAll(andWord, '&&').replaceAll(` ${orWord}`, ` ||`);
-        if(booleanString.includes('beings ')) {
-          ATTRIBUTES.forEach( (e,i) => {
-            if(booleanString.includes(`beings ${e}`)) {
-              // console.log(booleanString, e)
-              let replacement = playersBeing[e];
-              if(replacement instanceof Phaser.Display.Color) {
-                replacement = COLORCATS_HR[getColorCategory(replacement)];
-              }
-              booleanString = booleanString.replaceAll(`beings ${e}`, `'${replacement}'`)
-            }
-          })
-        }
-
-        for(let i = 0; i < foodSelected.length; i++) {
-          let f = foodSelected[i];
-          // VARIABLE NAME NEEDS TO BE SAME AS INPUT!!
-          let fruit = '';
-          if(r.ifColor) {
-            fruit = COLORCATS_HR[getColorCategory(f.color)];
-          }
-          if(r.ifSize) {
-            if(booleanString.includes('beings size')) {
-              booleanString.replaceAll('beings size', `'beings size'`);
-              fruit = (this.pb.heady.displayWidth > f.displayWidth - 5*this.pb.scale || this.pb.heady.displayWidth < f.displayWidth - 5*this.pb.scale ? "beings size":"not same size" );
-            } else{
-              fruit = (this.pb.heady.displayWidth < f.displayWidth ? 'bigger':'smaller' )
-            }
-          }
-          if(r.ifTexture) {
-            fruit = f.txtr;
-          }
-          // console.log(booleanString, 'fruit var:', fruit);
-          let evaluation;
-          try {
-            evaluation = eval(booleanString);
-            // console.log(booleanString, fruit, evaluation);
-          } catch (error) {
-            console.error(error);
-          }
-          if(evaluation) {
-            foodCurrentlySelected.push(foodSelected[i]);
-          }
-        }
-        // console.log(foodCurrentlySelected);
-        foodSelected = foodCurrentlySelected;
-      }
+      let foodSelected = this.pb.evaluateFoodRules(false);
       // this.pb.food_matching = foodSelected;
       this.pb.food_matching.addMultiple(foodSelected.filter(e => (e.displayWidth > this.pb.heady.displayWidth/4 && e.displayWidth < this.pb.heady.displayWidth*3)));
 
@@ -489,7 +435,6 @@ class Scene2 extends Phaser.Scene {
         }
         else {
           this.pb.addRule(ruleString);
-          
           output += `your being learned the rule you gave it!`
         }
         logInput(output);

@@ -387,19 +387,19 @@ class Slug extends Phaser.GameObjects.Container {
         }
       }, this);
     }
-    evaluateFoodRules() {
+    evaluateFoodRules(logging = true) {
       let foodSelected = FRUIT.getMatching('active', true);
       let rulesFoodPositive = this.rulesParsed.filter(e => e.action == 'eat');
       if(rulesFoodPositive.length) {
-        logOutput(`it remembers the following food ${wrapCmd('rules')} about things it should eat:`)
+        if(logging) logOutput(`it remembers the following food ${wrapCmd('rules')} about things it should eat:`)
         
         for(let i = 0; i < rulesFoodPositive.length; i++) {
           let foodCurrentlySelected = [ ];
           let r = rulesFoodPositive[i]; 
           let booleanExpr = r.booleanExpr;
           let booleanString = booleanExpr.join(' '); // .splice(1, 0, '(').push(')')
-          logOutput(`${i+1}. ${wrapCmd(booleanString.replaceAll("'", ""))} ${i<rulesFoodPositive.length-1 ? 'and' : ''}`)
-          booleanString = booleanString.replaceAll(equalWord, '==').replaceAll(andWord, '&&').replaceAll(` ${orWord}`, ` ||`);
+          if(logging) logOutput(`${i+1}. ${wrapCmd(booleanString.replaceAll("'", ""))} ${i<rulesFoodPositive.length-1 ? 'and' : ''}`)
+          booleanString = booleanString.replaceAll(`${equalWord} not`, '!=').replaceAll(equalWord, '==').replaceAll(andWord, '&&').replaceAll(` ${orWord}`, ` ||`);
           if(booleanString.includes("beings ")) {
             ATTRIBUTES.forEach( (e,i) => {
               if(booleanString.includes(`beings ${e}`)) {
@@ -444,7 +444,7 @@ class Slug extends Phaser.GameObjects.Container {
         // add to foodmatching outside of condition
       } 
       if(this == this.scene.pb && !(rulesFoodPositive.length)) {
-        logOutput(`none of the ${wrapCmd('rules')} tell your being what to eat or not, so it will try to eat anything!`)
+        if(logging) logOutput(`none of the ${wrapCmd('rules')} tell your being what to eat, so it will try to eat anything!`)
       }
       return foodSelected;
     }
