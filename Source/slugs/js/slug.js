@@ -432,10 +432,14 @@ class Slug extends Phaser.GameObjects.Container {
               fruit = f.txtr;
             }
             // console.debug(booleanString, 'fruit var:', fruit);
-            let evaluation = eval(booleanString);
-            // console.debug(evaluation);
-            if(evaluation) {
-              foodCurrentlySelected.push(foodSelected[i]);
+            try {
+              let evaluation = eval(booleanString);
+              // console.debug(evaluation);
+              if(evaluation) {
+                foodCurrentlySelected.push(foodSelected[i]);
+              }
+            } catch(error) {
+              console.info(error, booleanString)
             }
           }
           // console.debug(foodCurrentlySelected);
@@ -598,11 +602,6 @@ class Slug extends Phaser.GameObjects.Container {
       let ifShape = false;
       let r = ruleString.split(" ");
       let type = r.at(1);
-      
-      if(r.at(-2) == 'dont') {
-        r[r.length-2] = r.at(-2)+r.at(-1);
-        r = r.slice(0, -1);
-      }
       let action = r.at(-1);
       let booleanExpr = r.slice(1,r.length-2);
       
