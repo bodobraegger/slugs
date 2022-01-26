@@ -293,68 +293,10 @@ class Slug extends Phaser.GameObjects.Container {
       if(this.rulesParsed.length) {
         logOutput(`first, the being thinks of the ${wrapCmd('rules')} you gave it.`)
       }
-      let foodSelected = FRUIT.getMatching('active', true);
+      let foodSelected = this.evaluateFoodRules()
 
-      let rulesFood = this.rulesParsed.filter(e => e.action == 'eat')
-      if(rulesFood.length) {
-        logOutput(`it remembers the following food ${wrapCmd('rules')}:`)
-        
-        for(let i = 0; i < rulesFood.length; i++) {
-          let foodCurrentlySelected = [ ];
-          let r = rulesFood[i]; 
-          let booleanExpr = r.booleanExpr;
-          let booleanString = booleanExpr.join(' '); // .splice(1, 0, '(').push(')')
-          logOutput(`${i+1}. ${wrapCmd(booleanString.replaceAll("'", ""))} ${i<rulesFood.length-1 ? 'and' : ''}`)
-          booleanString = booleanString.replaceAll(equalWord, '==').replaceAll(andWord, '&&').replaceAll(` ${orWord}`, ` ||`);
-          if(booleanString.includes("being's ")) {
-            ATTRIBUTES.forEach( (e,i) => {
-              if(booleanString.includes(`being's ${e}`)) {
-                // console.debug(booleanString, e)
-                let replacement = playersBeing[e];
-                if(replacement instanceof Color) {
-                  replacement = COLORCATS_HR[getColorCategory(replacement)];
-                }
-                booleanString = booleanString.replaceAll(`being's ${e}`, `'${replacement}'`)
-              }
-            })
-          }
-  
-          for(let i = 0; i < foodSelected.length; i++) {
-            let f = foodSelected[i];
-            // VARIABLE NAME NEEDS TO BE SAME AS INPUT!!
-            let fruit = '';
-            if(r.ifColor) {
-              fruit = COLORCATS_HR[getColorCategory(f.color)];
-            }
-            if(r.ifSize) {
-              if(booleanString.includes(`being's size`)) {
-                booleanString.replaceAll(`being's size`, `"being's size"`);
-                fruit = (this.heady.displayWidth > f.displayWidth - 5*this.scale || this.heady.displayWidth < f.displayWidth - 5*this.scale ? "being's size":"not same size" );
-              } else{
-                fruit = (this.heady.displayWidth < f.displayWidth ? 'bigger':'smaller' )
-              }
-            }
-            if(r.ifTexture) {
-              fruit = f.txtr;
-            }
-            // console.debug(booleanString, 'fruit var:', fruit);
-            let evaluation = eval(booleanString);
-            // console.debug(evaluation);
-            if(evaluation) {
-              foodCurrentlySelected.push(foodSelected[i]);
-            }
-          }
-          // console.debug(foodCurrentlySelected);
-          foodSelected = foodCurrentlySelected;
-        }
-        // add to foodmatching outside of condition
-      } else {
-        if(this == this.scene.pb) {
-          logOutput(`none of the ${wrapCmd('rules')} tell your being what to eat, so it will try to eat anything!`)
-        }
-      }
       if(this.plantLoop && this == this.scene.pb) {
-        logOutput(`it also takes the ${wrapCmd('while routine')} into account :).`)
+        logOutput(`it takes the ${wrapCmd('while routine')} into account :).`)
       }
       if(foodType == 'healthy') {
         foodSelected = []
@@ -444,6 +386,67 @@ class Slug extends Phaser.GameObjects.Container {
           }
         }
       }, this);
+    }
+    evaluateFoodRules() {
+      let foodSelected = FRUIT.getMatching('active', true);
+      let rulesFoodPositive = this.rulesParsed.filter(e => e.action == 'eat');
+      if(rulesFoodPositive.length) {
+        logOutput(`it remembers the following food ${wrapCmd('rules')} about things it should eat:`)
+        
+        for(let i = 0; i < rulesFoodPositive.length; i++) {
+          let foodCurrentlySelected = [ ];
+          let r = rulesFoodPositive[i]; 
+          let booleanExpr = r.booleanExpr;
+          let booleanString = booleanExpr.join(' '); // .splice(1, 0, '(').push(')')
+          logOutput(`${i+1}. ${wrapCmd(booleanString.replaceAll("'", ""))} ${i<rulesFoodPositive.length-1 ? 'and' : ''}`)
+          booleanString = booleanString.replaceAll(equalWord, '==').replaceAll(andWord, '&&').replaceAll(` ${orWord}`, ` ||`);
+          if(booleanString.includes("beings ")) {
+            ATTRIBUTES.forEach( (e,i) => {
+              if(booleanString.includes(`beings ${e}`)) {
+                // console.debug(booleanString, e)
+                let replacement = playersBeing[e];
+                if(replacement instanceof Color) {
+                  replacement = COLORCATS_HR[getColorCategory(replacement)];
+                }
+                booleanString = booleanString.replaceAll(`beings ${e}`, `'${replacement}'`)
+              }
+            })
+          }
+  
+          for(let i = 0; i < foodSelected.length; i++) {
+            let f = foodSelected[i];
+            // VARIABLE NAME NEEDS TO BE SAME AS INPUT!!
+            let fruit = '';
+            if(r.ifColor) {
+              fruit = COLORCATS_HR[getColorCategory(f.color)];
+            }
+            if(r.ifSize) {
+              if(booleanString.includes(`beings size`)) {
+                booleanString.replaceAll(`beings size`, `"beings size"`);
+                fruit = (this.heady.displayWidth > f.displayWidth - 5*this.scale || this.heady.displayWidth < f.displayWidth - 5*this.scale ? "beings size":"not same size" );
+              } else{
+                fruit = (this.heady.displayWidth < f.displayWidth ? 'bigger':'smaller' )
+              }
+            }
+            if(r.ifTexture) {
+              fruit = f.txtr;
+            }
+            // console.debug(booleanString, 'fruit var:', fruit);
+            let evaluation = eval(booleanString);
+            // console.debug(evaluation);
+            if(evaluation) {
+              foodCurrentlySelected.push(foodSelected[i]);
+            }
+          }
+          // console.debug(foodCurrentlySelected);
+          foodSelected = foodCurrentlySelected;
+        }
+        // add to foodmatching outside of condition
+      } 
+      if(this == this.scene.pb && !(rulesFoodPositive.length)) {
+        logOutput(`none of the ${wrapCmd('rules')} tell your being what to eat or not, so it will try to eat anything!`)
+      }
+      return foodSelected;
     }
     roam() {
       if(!(this.eating || this.fleeing)) {
@@ -596,6 +599,10 @@ class Slug extends Phaser.GameObjects.Container {
       let r = ruleString.split(" ");
       let type = r.at(1);
       
+      if(r.at(-2) == 'dont') {
+        r[r.length-2] = r.at(-2)+r.at(-1);
+        r = r.slice(0, -1);
+      }
       let action = r.at(-1);
       let booleanExpr = r.slice(1,r.length-2);
       
