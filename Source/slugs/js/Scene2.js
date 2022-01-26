@@ -138,7 +138,7 @@ class Scene2 extends Phaser.Scene {
     this.xBorderRight = this.xBorderLeft+this.gameWidth;
     this.yBorderHigh = -5000;
     this.yBorderLow = this.yBorderHigh + this.gameHeight;
-    this.matter.world.setBounds(this.xBorderLeft, this.yBorderHigh, this.gameWidth, this.gameHeight, 512)
+    //this.matter.world.setBounds(this.xBorderLeft, this.yBorderHigh, this.gameWidth*2, this.gameHeight*2, 512)
 
     this.beingCounter = 0;
     
