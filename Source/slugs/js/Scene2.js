@@ -424,9 +424,9 @@ class Scene2 extends Phaser.Scene {
     switch (cmd[0]) {
       case ifWord: {
         const ifError = `uh oh, an if rule needs to be of the form ${wrapCmd('if <i>condition</i> then <i>action</i>')}, for example: ${wrapCmd(ifExample)}!`
-        if(cmd.length < 6 || !(cmd.at(-2) == thenWord) || !(wordsAction.includes(cmd.at(-1))) || !(cmd.includes(ENTITY_TYPES[0])||cmd.includes(ENTITY_TYPES.at(-1))) ) { 
+        if(cmd.length < 6 || !(cmd.at(-2) == thenWord) || !(wordsAction.includes(cmd.at(-1))) || !(cmd.includes(ENTITY_TYPES[0])||cmd.includes(ENTITY_TYPES.at(-1))) || cmd.length != new Set(cmd).size) { 
           logInput(output);
-          logOutput(ifError);
+          logError(ifError);
           return;
         }
         let ruleString = cmd.join(' ');
