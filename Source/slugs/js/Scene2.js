@@ -761,7 +761,7 @@ class Scene2 extends Phaser.Scene {
                 } else if(o.group.getChildren('active', true).length && s == this.pb) { logOutput(`no more fruits on this plant match the beings rules`) } 
                 else if(s == this.pb) { logOutput(`your being ate all of the fruit on this plant!🌴`) }
               } else {
-                output += `it is done eating now...`
+                output += `it is done eating now...but you can tell it to eat again to help it grow more :).`
                 s.eating = false;
               }
             } else {
