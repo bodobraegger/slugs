@@ -538,7 +538,7 @@ class Slug extends Phaser.GameObjects.Container {
         output += `it thinks there are no angry creatures in reach :).`
         return output;
       } else {
-        output += `it tries to flee!`
+        output += `<u class='beingscolor' style='filter: invert(1);'>it tries to flee!</u>`
       }
       this.fleeing = true
       this.scene.events.on('postupdate',function(time, delta) { 
@@ -546,7 +546,8 @@ class Slug extends Phaser.GameObjects.Container {
           if(this.hunter && dist < this.hunter.pursuitDistance){
             // console.debug(this.rotationDirection)
             // console.debug(this.hunterHeady, dist)
-            dist = Distance.BetweenPoints(this.heady, this.hunterHeady)
+            let vecFromEnemy = new Vector2(this.heady).subtract(this.hunterHeady);
+            dist = vecFromEnemy.length();
             if( !ENEMIES.getMatching('active', true).length) {
               let output = `your being does not see any harmful creatures anymore. it will stop trying to flee!`
               if(this == this.scene.pb) {
@@ -555,12 +556,12 @@ class Slug extends Phaser.GameObjects.Container {
               this.stop();
               return;
             }
-
-            let target = new Vector2(this.heady).subtract(this.hunterHeady);
-            this.moveTo(target, 3);
+            let inverse = this.color.clone().setTo(255-this.color.r, 255-this.color.g, 255-this.color.b).color
+            drawVec(vecFromEnemy, this.hunterHeady,inverse, Math.min(this.heady.displayWidth, (this.heady.displayWidth+this.hunter.torso.displayWidth)*30/dist + this.heady.displayWidth/4))
+            this.moveTo(vecFromEnemy, 3);
           }
           else {
-            let output = `it thinks it is far away enough now...`
+            let output = `it thinks it doesn't see the dangerous creature closeby now, so it stops fleeing ...`
             if(this == this.scene.pb) {
               logOutput(output)
             }
