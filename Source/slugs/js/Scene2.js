@@ -429,6 +429,11 @@ class Scene2 extends Phaser.Scene {
           logError(ifError);
           return;
         }
+        if(cmd.at(-1) == 'eat' && cmd.at(1) == 'other_creature') { 
+          logInput(output);
+          logError("your being doesn't understand why it should eat another creature, it is vegan!");
+          return;
+        }
         let ruleString = cmd.join(' ');
         if(RULES.includes(ruleString)) {
           output += `your being already learned that rule :)`
