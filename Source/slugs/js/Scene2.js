@@ -318,10 +318,14 @@ class Scene2 extends Phaser.Scene {
     let constraints = [ ]
     PLANTS.getMatching('active', true).forEach(p => {
       let visible = p.getVisible();
-      if( !visible.length && p.circle && p.width < this.pb.torso.displayWidth*1.5) {
-        let f = this.addFruit(p.getFirstAlive().x, p.getFirstAlive().y, p.width/2, p.color, 'flower');
-        console.log('replacing',p,'with',f)
-        p.destroy(true, true);
+      if( !(visible.length) && p.circle && p.width < this.pb.torso.displayWidth*1.5) {
+        try {
+          let f = this.addFruit(p.getFirstAlive().x, p.getFirstAlive().y, p.width/2, p.color, 'flower');
+          console.info('replacing',p,'with',f)
+          p.destroy(true, true);
+        } catch(error) {
+          console.warn(error, 'error on trying to replace on growth, none alive in plant?')
+        }
         return;
       }
       if(visible.length && (this.pb.scale <= 10 || (p.circle && (p.fruitsNumber < 16 || p.fruitsRadius > this.pb.heady.displayWidth/2-50))) ) {
