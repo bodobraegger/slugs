@@ -174,7 +174,6 @@ class Snake extends Slug {
             // console.debug('snake colliding with', limb, pair)
             if(this.eating && b==this.hunted && this.hunted.hunter == this) {
               console.debug('collision with', b, b==this.scene.pb, b==this.hunted)
-              if(this.hunted) if(this.hunted.hunter){'IT WORKS', console.debug(this.hunted.hunter)}
               if(this.heady.displayWidth > b.torso.displayWidth) {
                 // successfully ate
                 b.setAlpha(0.8)

@@ -86,7 +86,7 @@ class Slug extends Phaser.GameObjects.Container {
         if(!(this.fleeing || this.eating)) {
           let c = Between(0, 19);
           let player = ( this == this.scene.pb )
-          let playerNotPassive = ( player && (this.alpha != 1 || this.hunter || this.scene.mutationObserver.lastLogged > Date.now() - 20 * 1000) )
+          let playerNotPassive = ( player && (this.alpha != 1 || this.hunter || this.scene.mutationObserver.lastLogged > Date.now() - 30 * 1000) )
           if(playerNotPassive) {
             return;
           }
