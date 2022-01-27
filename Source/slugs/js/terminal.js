@@ -517,7 +517,7 @@ function logError(error) {
   // div = div.firstElementChild;
   div.classList.add('error');
   addToLog(div);
-  blink(terminal_log.lastChild)
+  blink(div)
 }
 
 function clearLog() {
