@@ -150,8 +150,8 @@ class Scene2 extends Phaser.Scene {
     let slug_y = getCanvasHeight()/2;
     let playersBeingColor = getRandomColorInCat([ COLORCATS_DICT['purple'], COLORCATS_DICT['blue'], COLORCATS_DICT['orange'] ]);
     changeStylesheetRule(document.styleSheets[0], '.beingscolor', `background-color`, `#${playersBeingColor.color.toString(16)}`)
-    changeStylesheetRule(document.styleSheets[0], `.${COLORCATS_HR[getColorCategory(playersBeingColor)]}`, `color`, `#${playersBeingColor.color.toString(16)}`)
-    changeStylesheetRule(document.styleSheets[0], `.color`, `color`, `#${playersBeingColor.color.toString(16)} !important`)
+    changeStylesheetRule(document.styleSheets[0], `.${COLORCATS_HR[getColorCategory(playersBeingColor)]}`, `background-color`, `#${playersBeingColor.color.toString(16)}`)
+    changeStylesheetRule(document.styleSheets[0], `.color`, `background-color`, `#${playersBeingColor.color.toString(16)} !important`)
     let otherColors = COLORCATS.filter((c, i) => i != getColorCategory(playersBeingColor))
     
     this.pb = new Slug(this, slug_x, slug_y, slug_r, playersBeingColor);
@@ -296,7 +296,7 @@ class Scene2 extends Phaser.Scene {
     this.input.keyboard.preventDefault = false;    
     */
    // NARRATION
-   NARRATION.intro();
+   NARRATION.intro_0();
    
   }
   update(time, delta) {
@@ -543,7 +543,7 @@ class Scene2 extends Phaser.Scene {
         var index = cmd[2]-1;
         logInput(`you ask your being to ${wrapCmd(deleteWord)} the ${ruleOrRoutine} with the number ${cmd[2]}...`)
         if(cmd.length < 3 || !EDITABLE_withSingular.includes(cmd[1])) {
-          logError(`to make your being ${wrapCmd(deleteWord)} a rule, simply write ${wrapCmd('forget rule <i>number</i>')}, like  ${deleteExample} :)`);
+          logError(`to make your being ${wrapCmd(deleteWord)} a rule, simply write ${wrapCmd('forget rule <i>number</i>')}, like  ${wrapCmd(deleteExample)} :)`);
           return;
         }
         if(index >= RULESorROUTINES.length) {
@@ -640,7 +640,16 @@ class Scene2 extends Phaser.Scene {
       }
 
       case 'intro':{
-        NARRATION.intro();
+        if(cmd.length > 1) {
+          if(cmd[1] == 0) NARRATION.intro_0();
+          else if(cmd[1] == 1) NARRATION.intro_1();
+          else if(cmd[1] == 2) NARRATION.intro_2();
+          else {
+            logError(`this intro section does not exist, only 0, 1 and 2 do.`)
+          }
+        } else {
+          logError(`you forgot to supply a number, which intro message to you want to see?`)
+        }
         return;
       }
       case 'fizzbuzz': {

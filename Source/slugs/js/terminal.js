@@ -11,7 +11,7 @@ const ifWord = 'if',
 
 let wordsAction = ['eat', stopWord, 'flee']
 
-const wordsFirst = wordsAction.concat([ifWord, loopWord, showWord, editWord, deleteWord, 'help', 'clear'])
+let wordsFirst = wordsAction.concat(['intro', ifWord, loopWord, showWord, editWord, deleteWord, 'help', 'clear'])
 const wordsForCmdString = [].concat(wordsFirst.slice(0, 2));
 let wordsIfConditionLeft = [].concat(ENTITY_TYPES);
 let wordsIfConditionRight = [].concat(SIZES, COLORCATS_HR, TEXTURES);
@@ -25,7 +25,7 @@ let wordsLoop4 = ['plant']
 
 let wordsToShow = ATTRIBUTES.concat(EDITABLE);
 
-let wordsAll = wordsFirst.concat(wordsIfConditionLeft, wordsIfConditionRight, equalWord, wordsBoolean, wordsAction, wordsToShow, wordsLoop1, wordsLoop2, wordsLoop3, wordsLoop4).concat(['hunting']).concat(['not']);
+let wordsAll = wordsFirst.concat(wordsIfConditionLeft, wordsIfConditionRight, equalWord, wordsBoolean, wordsAction, wordsToShow, wordsLoop1, wordsLoop2, wordsLoop3, wordsLoop4).concat(['hunting', 'not', 'rule', 'routine', 1, 2, 3, 4, 5, 7, 8, 9]);
 
 let wordsFilter = ['the', 'a', 'my', 'me', 'there']
 
@@ -99,7 +99,9 @@ let buffer = createRingBuffer(50);
 let suggestions = []
 let wordsToCompare = []
 
-terminal_input.addEventListener('keyup', (e) => {
+let eventTypes = ['keyup'];
+eventTypes.forEach(t => {
+ terminal_input.addEventListener(t, (e) => {
   if(terminal_input.value.length > 0 ) {
     // clean up input
     if(e.key==' ' && (terminal_input.value.at(e.target.Selectionstart-1) == ' ' )) {
@@ -132,13 +134,16 @@ terminal_input.addEventListener('keyup', (e) => {
         checkAgainst = '';
       }
       // parse condition
-      if(wordsOfInterest.length > 1) {
+      if(wordsOfInterest.length > 0) {
         // TODO: FIX AUTOCOMPLETE RENDER WITH WHITESPACE IN MIDDLE
         // IF even number of words, then we have...
         // if xx is yy then zz ... 
         if(wordsAction.includes(current_word)) {
           // console.debug('// if xx is yy then zz')
           return;
+        }
+        else if(current_word == 'intro') {
+          wordsToCompare = [1, 2, 3, 4]
         }
         // if XX is YY..., 
         else if(current_word == 'not') {
@@ -290,13 +295,7 @@ terminal_input.addEventListener('keyup', (e) => {
         nextWord = wordsToCompare[i].slice(checkAgainst.length, wordsToCompare[i].length);
       	autocomplete.innerHTML += wrapCmd(nextWord);
         if(wordsToCompare != wordsIfConditionLeft && wordsToCompare != wordsAction && wordsToCompare != wordsBoolean && wordsToCompare != wordsToShow) {
-          /*
-          console.debug('shuffling', wordsToCompare)
-          let t = wordsToCompare[0];
-          wordsToCompare.splice(0, 1);
-          wordsToCompare.push(t)
-          */
-        shuffleArray(wordsToCompare)
+          // permuteArray(wordsToCompare)
         }
         break;
       }
@@ -325,7 +324,15 @@ terminal_input.addEventListener('keyup', (e) => {
     } else {
       autocomplete_suggestions.innerHTML = ''
     }
+    if(wordsAll.includes(autocomplete.innerText.split(' ').at(-1))) {
+      let t = autocomplete.innerText
+      autocomplete.innerHTML = '';
+      t.split(' ').forEach(e => {
+        autocomplete.innerHTML += wrapCmd(e) + ' ';
+      })
+    }
 	}
+ })
 })
 
 terminal_input.addEventListener('keydown', (e) => {
@@ -351,23 +358,35 @@ terminal_input.addEventListener('keydown', (e) => {
         terminal_input.dispatchEvent(new KeyboardEvent('keyup',{'key':''}));
       }
       return;
-    /*
-    case 'ArrowUp':
+    
+    case 'ArrowUp': {
       e.preventDefault();
-      if(suggestions.length) {
-        terminal_input.value = autocomplete.innerText.split(' ').slice(0,-1).join(' ')+ ' ' + suggestions.at(1);
-        return;
+      if(autocomplete_suggestions.childElementCount) {
+        permuteArray(wordsToCompare, -1);
+      } else {
+        let prev = buffer.prev();
+        if(prev!==undefined){
+            terminal_input.value = prev.join(' ');
+        }
       }
-    case 'ArrowDown':
+      break;
+    }
+    case 'ArrowDown': {
       e.preventDefault();
-      if(suggestions.length) {
-        terminal_input.value = autocomplete.innerText.split(' ').slice(0,-1).join(' ')+ ' ' + suggestions.at(0);
-        return;
+      if(autocomplete_suggestions.childElementCount) {
+        permuteArray(wordsToCompare, 1);
+      } else {
+        let next = buffer.next();
+        if(next!==undefined){
+            terminal_input.value = next.join(' ');
+        }
       }
-    */
+      break;
+    }
     case ' ': {
-      if(terminal_input.value.at(-1) == ' ') {
+      if(terminal_input.value.at(-1) == ' ' || ! (wordsAll.includes(terminal_input.value.split(' ').at(-1)))) {
         e.preventDefault();
+        blink(terminal_input);
       }
       break;
     } 
@@ -394,6 +413,17 @@ terminal_input.addEventListener('keydown', (e) => {
       }
   }
 })
+
+terminal_container.onclick = function(event) {
+  if(event.target == autocomplete || event.target == autocomplete_suggestions) {
+    terminal_input.focus();
+  }
+  if(!(event.target.classList.contains('cmd'))) {
+    return;
+  }
+  appendToInput(event.target.innerText);
+}
+
 
 // TERMINAL IO FUNCTIONS
 
@@ -487,6 +517,7 @@ function logError(error) {
   // div = div.firstElementChild;
   div.classList.add('error');
   addToLog(div);
+  blink(terminal_log.lastChild)
 }
 
 function clearLog() {
@@ -503,6 +534,9 @@ function getTotalChildrenHeights(element) {
 }
 
 function wrapCmd(cmd) {
+  if(!(cmd.trim())) {
+    return '';
+  }
   let cmdArr = cmd.split(' ')
   if(cmdArr.length > 1) {
     let r = ''
@@ -567,10 +601,13 @@ async function blink(e = document.getElementById('id')) {
   }, 800);
 }
 
-function shuffleArray(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
+function permuteArray(array, down=1) {
+  if(down==1) {
+    let temp = array.shift();
+    array.push(temp);
+  } else {
+    let temp = array.pop();
+    array.unshift(temp);
   }
 }
 
@@ -591,4 +628,19 @@ function goToBottom(element=terminal_log.lastChild){
 
 function isOverflown(element) {
   return element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth;
+}
+
+function appendToInput(text) {
+  if(terminal_input.value.includes(text)) {
+    return;
+  }
+  if(text.includes(terminal_input.value.split(' ').at(-1))) {
+    text = text.slice(terminal_input.value.split(' ').at(-1).length)
+  }
+  if(terminal_input.value.length && terminal_input.value.at(-1) != ' ' && text.at(0) != ' ' && wordsAll.includes(text)) {
+    text = ' ' + text;
+  }
+  terminal_input.value += text;
+  terminal_input.dispatchEvent(new KeyboardEvent('keyup',{'key':''}));
+  terminal_input.focus()
 }

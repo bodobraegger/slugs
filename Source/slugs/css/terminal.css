@@ -88,16 +88,16 @@
     /* FOR DESIGN PURPOSE */
     outline:0;
     width: 100%;
-    border-top: 1px dotted rgba(255,255,255,0.3);
-    /*
-    border-bottom:1px solid rgba(255,255,255,0.3);
-    ================== */
 }
 #terminal_input {
     z-index: 1;
     padding-top: 10px;
     background-color: transparent;
-    color:rgba(22, 0, 16, 0.2);
+    max-height: 17px;
+    color:black;
+    font-weight: bold;
+    padding-bottom: 0px;
+    margin-bottom: 0px;
 }
 #terminal_input::placeholder {
     color: #1a1a1a; /* FOR DESIGN PURPOSE */
@@ -106,10 +106,11 @@
 #autocomplete {
     background-color: rgba(255,150,70, 0.8);
     color: rgb(0, 145, 255);
+    padding-top: 27px;
 }
 
 #autocomplete_parent > * > span.cmd {
-    padding:0 0px;
+    margin: 0 -6px;
 }
 
 #autocomplete_suggestions {
@@ -121,7 +122,7 @@
     border: 0; /* HAS TO BE SIMILAR TO #autocomplete */
     font-size:14px; /* HAS TO BE SIMILAR TO #autocomplete */
     padding: 0 10px;
-    margin: 27px 0px;
+    margin: 44px 0px;
     overflow-y: auto;
     max-height: calc(17px * 4);
     width: fit-content;
@@ -143,7 +144,6 @@
 .error {
     background-color: rgba(255,70,82, 0.8);
     color: white;
-    word-break: break-all;
 }
 .old {
  opacity: 0.7;  
@@ -158,36 +158,39 @@
 .blink {
     box-shadow: inset 0px 0px 10px 10px rgba(255,102,0, 1);
     filter:saturate(3);
+    animation: shake 0.5s;
+    animation-iteration-count: 1;
 }
 
 .cmd {
     font-weight: bold;
-    color: black;
-    background-color:rgba(255, 255, 255, 0.4);
+    /* mix-blend-mode: darken; */ 
+    background-color: rgb(90, 90, 90);
+    color: white;
     padding: 0 6px;
 }
 
 .wordsAction {
-    color: #d82f39;
+    background-color: #d82f39;
 }
 .wordsFirst {
-    color: #8be9fd;
+    background-color: rgb(12 168 147);
 }
 .wordsIfConditionLeft {
-    color: #008504;
+    background-color: #008504;
 }
 .wordsIfConditionRight {
-    color: #008504;
+    background-color: #008504;
 }
 .wordsBoolean {
-    color: #6272a4;
+    background-color: #6272a4;
 }
 .wordsToShow {
-    color: #ff79c6;
+    background-color: #ff79c6;
 }
 
 .eat {
-    color: #50fa7b !important;
+    background-color: #467a64 !important;
 }
 
 u {
@@ -236,23 +239,37 @@ BGDarker
 
 
 .red {
-    color: red;
+    background-color: red;
 }
 .blue {
-    color: blue;
+    background-color: blue;
 }
 .green, .plant {
-    color: #006400;
+    background-color: #006400;
 }
 .yellow {
-    color: yellow;
+    background-color: rgb(136, 116, 0);
 } 
 .orange {
-    color: orangered;
+    background-color: orangered;
 }
 .purple {
-    color: purple;
+    background-color: purple;
 }
 .pink {
-    color: magenta;
+    background-color: magenta;
 }
+
+@keyframes shake {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    10% { transform: translate(-1px, -2px) rotate(-1deg); }
+    20% { transform: translate(-3px, 0px) rotate(1deg); }
+    30% { transform: translate(3px, 2px) rotate(0deg); }
+    40% { transform: translate(1px, -1px) rotate(1deg); }
+    50% { transform: translate(-1px, 2px) rotate(-1deg); }
+    60% { transform: translate(-3px, 1px) rotate(0deg); }
+    70% { transform: translate(3px, 1px) rotate(-1deg); }
+    80% { transform: translate(-1px, -1px) rotate(1deg); }
+    90% { transform: translate(1px, 2px) rotate(0deg); }
+    100% { transform: translate(1px, -2px) rotate(-1deg); }
+  }
