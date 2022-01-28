@@ -407,7 +407,7 @@ class Slug extends Phaser.GameObjects.Container {
           let booleanExpr = r.booleanExpr;
           let booleanString = booleanExpr.join(' '); // .splice(1, 0, '(').push(')')
           if(logging) logOutput(`${i+1}. ${wrapCmd(booleanString.replaceAll("'", ""))} ${i<rulesFoodPositive.length-1 ? 'and' : ''}`)
-          booleanString = booleanString.replaceAll(`${equalWord} not`, '!=').replaceAll(equalWord, '==').replaceAll(andWord, '&&').replaceAll(` ${orWord}`, ` ||`);
+          booleanString = booleanString.replaceAll(notEqualWord, '!=').replaceAll(equalWord, '==').replaceAll(andWord, '&&').replaceAll(` ${orWord}`, ` ||`);
           if(booleanString.includes("beings ")) {
             ATTRIBUTES.forEach( (e,i) => {
               if(booleanString.includes(`beings ${e}`)) {
@@ -433,7 +433,7 @@ class Slug extends Phaser.GameObjects.Container {
                 booleanString.replaceAll(`beings size`, `"beings size"`);
                 fruit = (this.heady.displayWidth > f.displayWidth - 5*this.scale || this.heady.displayWidth < f.displayWidth - 5*this.scale ? "beings size":"not same size" );
               } else{
-                fruit = (this.heady.displayWidth < f.displayWidth ? 'bigger':'smaller' )
+                fruit = (this.heady.displayWidth < f.displayWidth ? 'bigger_than_head':'smaller_than_head' )
               }
             }
             if(r.ifTexture) {

@@ -1,6 +1,7 @@
 const ifWord = 'if',
     loopWord = 'while',
     equalWord = 'is',
+    notEqualWord = 'is_not',
     thenWord = 'then',
     andWord = 'and',
     orWord = 'or',
@@ -15,7 +16,7 @@ let wordsFirst = wordsAction.concat(['intro', ifWord, loopWord, showWord, editWo
 const wordsForCmdString = [].concat(wordsFirst.slice(0, 2));
 let wordsIfConditionLeft = [].concat(ENTITY_TYPES);
 let wordsIfConditionRight = [].concat(SIZES, COLORCATS_HR, TEXTURES);
-const wordsBoolean = [thenWord, equalWord, `${equalWord} not`] //orWord, ;
+const wordsBoolean = [thenWord, equalWord, notEqualWord] //orWord, ;
 
 let wordsLoop1 = ['fruit'];
 let wordsLoop2 = [equalWord];
@@ -25,7 +26,7 @@ let wordsLoop4 = ['plant']
 
 let wordsToShow = ATTRIBUTES.concat(EDITABLE);
 
-let wordsAll = wordsFirst.concat(wordsIfConditionLeft, wordsIfConditionRight, equalWord, wordsBoolean, wordsAction, wordsToShow, wordsLoop1, wordsLoop2, wordsLoop3, wordsLoop4).concat(['hunting', 'not', 'rule', 'routine', 1, 2, 3, 4, 5, 7, 8, 9]);
+let wordsAll = wordsFirst.concat(wordsIfConditionLeft, wordsIfConditionRight, equalWord, notEqualWord, wordsBoolean, wordsAction, wordsToShow, wordsLoop1, wordsLoop2, wordsLoop3, wordsLoop4).concat(['hunting', , 'rule', 'routine', 1, 2, 3, 4, 5, 7, 8, 9]);
 
 let wordsFilter = ['the', 'a', 'my', 'me', 'there']
 
@@ -146,7 +147,7 @@ eventTypes.forEach(t => {
           wordsToCompare = [1, 2, 3, 4]
         }
         // if XX is YY..., 
-        else if(current_word == 'not') {
+        else if(current_word == notEqualWord) {
           // console.debug('// if XX is not YY...,')
           wordsToCompare = wordsIfConditionRight;
         }
@@ -159,7 +160,7 @@ eventTypes.forEach(t => {
           // console.debug('// OR if XX ..., OR if XX is YY and ZZ ...')
           wordsToCompare = [equalWord]; 
           if(current_word == 'fruit') {
-            wordsToCompare.push(`${equalWord} not`)
+            wordsToCompare.push(notEqualWord)
           }
         }
         else if(current_word == thenWord) {
@@ -179,7 +180,7 @@ eventTypes.forEach(t => {
             }
           }
           // if XX is ..., 
-          else if(current_word == equalWord || current_word == `not`) {
+          else if(current_word == equalWord || current_word == notEqualWord) {
             // console.debug('// if XX is ...,')
             if(wordsOfInterest.includes('fruit')) {
               wordsToCompare = wordsIfConditionRight;
@@ -294,9 +295,9 @@ eventTypes.forEach(t => {
         }
         nextWord = wordsToCompare[i].slice(checkAgainst.length, wordsToCompare[i].length);
       	autocomplete.innerHTML += wrapCmd(nextWord);
-        if(wordsToCompare != wordsIfConditionLeft && wordsToCompare != wordsAction && wordsToCompare != wordsBoolean && wordsToCompare != wordsToShow) {
+        // if(wordsToCompare != wordsIfConditionLeft && wordsToCompare != wordsAction && wordsToCompare != wordsBoolean && wordsToCompare != wordsToShow) {
           // permuteArray(wordsToCompare)
-        }
+        // }
         break;
       }
     }
@@ -312,7 +313,7 @@ eventTypes.forEach(t => {
       suggestions.forEach(e => {
         let span = document.createElement('span');
         span.innerHTML=wrapCmd(e);
-        span.firstChild.classList += 'suggestion'
+        span.firstChild.classList.add('suggestion')
         let spanString=span.innerHTML;
         suggestion_block += `${'&nbsp;'.repeat(m[0].trim().length-(checkAgainst.length-1))}${spanString}<br>`
       })
