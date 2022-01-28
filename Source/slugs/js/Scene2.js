@@ -198,16 +198,17 @@ class Scene2 extends Phaser.Scene {
       coordinates.push({x, y})
     })
     
-    const generate = function(iterations) {
+    this.generate = function(iterations) {
       if(FRUIT.getChildren('active', true).length < 100) {
         if(i==iterations-1) { console.log('generate loop, ran', iterations, 'times') }
-
-        for(var i = 0; i < iterations; i++) {
-          if((i+1)%5 == 0) {this.updateLoadingBar.call({newGraphics:this.newGraphics,loadingText:this.loadingText}, [1+1/25*(i+1)]); }
+      let scalingFactor = this.pb.torso.displayWidth*.025
+      for(var i = 0; i < iterations; i++) {
+        if(i==iterations-1) { console.log('generate loop, ran', iterations, 'times') }
+        if((i+1)%5 == 0) {this.updateLoadingBar.call({newGraphics:this.newGraphics,loadingText:this.loadingText}, [1+1/25*(i+1)]); }
           let yesOrNo = Between(0, 3)
-          let randFN = Between(3, 15) 
-          let randFS = Between(15, 150)
-          let randSize = Between(randFN*randFS+10, randFN*randFS+10)
+          let randFN = Between(scalingFactor*3, scalingFactor*15) 
+          let randFS = Between(scalingFactor*15, scalingFactor*150)
+          let randSize = Between(randFN*randFS-10, randFN*randFS+10)
           let tooClose = false;
           let distx, disty;
           let tries = 1;
@@ -260,12 +261,47 @@ class Scene2 extends Phaser.Scene {
       }
     }
 
-    generate.call(this, [40]);
+    this.updateEdible = function() {
+        let healthyFood = [];
+        FRUIT.getMatching('active', true).forEach( f => {
+          if(sameColorCategory(this.pb.color, f.color) && this.pb.heady.displayWidth > f.displayWidth && this.pb.shape == f.shape && this.pb.txtr == f.txtr) {
+            healthyFood.push(f)
+          }
+        });
 
-    var timer = this.time.addEvent({
+        if(healthyFood.filter(e => (e.displayWidth > this.pb.heady.displayWidth/4 && e.displayWidth < this.pb.heady.displayWidth*3)).length < 5) {
+          console.info('not enough healthy food, generating');
+          let randFN = Between(10, 20) 
+          let randFS = Math.max(10, Between(this.pb.heady.displayWidth/2-20, this.pb.heady.displayWidth/2))
+          let randSize = Between(randFN*randFS-10, randFN*randFS+10)
+          let c = this.cameras.main;
+          let mp = c.midPoint;
+          let distx = Between(mp.x-c.displayWidth/2-randSize, mp.x+c.displayWidth/2+randSize)
+          let disty = Math.random() < 0.5 ? mp.y-c.displayHeight/2-randSize : mp.y+c.displayHeight/2+randSize;
+          let p = new Plant(this, distx, disty, getRandomColorInCat(playersBeingColor), randSize, randFS, randFN, true)
+          PLANTS.add(p);
+          console.info('added', randFN, 'fruits on plant', p)
+          let playerCouldntEatRecently = false;
+          [...terminal_log.childNodes].slice(-5).some(e=>{
+            if(e.innerText.includes('there is no food')) {
+              playerCouldntEatRecently = true;
+              return true;
+            }
+          })
+          if(playerCouldntEatRecently) {
+            addToLog('your being thinks new fruit have grown somewhere, perhaps try eating again :)')
+          }
+          this.generate(2);
+        }
+
+    }
+
+    this.generate(40);
+
+    this.generateTimer = this.time.addEvent({
       delay: 30 * 1000,
-      callback: generate,
-      args: [2],
+      callback: this.updateEdible,
+      args: [],
       callbackScope: this,
       loop: true,
 
@@ -324,6 +360,7 @@ class Scene2 extends Phaser.Scene {
           p.destroy(true, true);
         } catch(error) {
           console.warn(error, 'error on trying to replace on growth, none alive in plant?')
+          p.destroy(true, true)
         }
         return;
       }
@@ -359,24 +396,6 @@ class Scene2 extends Phaser.Scene {
     if(Angle.ShortestBetween(RadToDeg(vecTorsoHeady.angle()), this.pb.heady.angle) > 40)
     this.pb.heady.setAngle(RadToDeg(vecTorsoHeady.angle()))
     
-    let healthyCount = 0;
-    
-    FRUIT.getMatching('active', true).forEach(f => {
-      if(sameColorCategory(f.color, f.color) && f.txtr == this.pb.txtr && f.shape == this.pb.shape && f.radius < this.pb.heady.displayWidth/2) {
-        healthyCount++;
-      }
-      /*if(f.displayWidth*15 < this.pb.heady.displayWidth/2 && !f.group) {
-          let fruit = this.addFruit(
-            this.pb.x+(Math.random()<0.5 ? Between(-3000*this.pb.scale, -1000*this.pb.scale):Between(1000*this.pb.scale, 3000*this.pb.scale)), 
-            this.pb.y+(Math.random()<0.5 ? Between(-3000*this.pb.scale, -1000*this.pb.scale):Between(1000*this.pb.scale, 3000*this.pb.scale)),
-            this.pb.displayWidth/2-5,
-            f.color,
-            f.txtr  
-          )
-          console.log('replacing', f, 'with', fruit);
-          f.destroy();
-      }*/
-    })
 
     if(RULES.length != this.rulesLength || this.triggerFoodUpdate || this.activeFoodlength != FRUIT.getMatching('active', true).length) {
       this.rulesLength = RULES.length;
@@ -397,18 +416,7 @@ class Scene2 extends Phaser.Scene {
         drawVec(headyToTarget, this.pb.heady, this.pb.color.color, Math.min(this.pb.heady.displayWidth/2.5, (this.pb.heady.displayWidth+f.displayWidth)*10/len), Math.min(alpha, 0.5))
       }
     })
-    // console.log(healthyCount)
-    if(healthyCount<FOOD_MINIMUM) {
-      let x = this.pb.x+(Math.random()<0.5 ? Between(-1000*this.pb.scale, -500*this.pb.scale):Between(500*this.pb.scale, 1000*this.pb.scale)), 
-      y = this.pb.y+(Math.random()<0.5 ? Between(-1000*this.pb.scale, -500*this.pb.scale):Between(500*this.pb.scale, 1000*this.pb.scale));
-      let f = this.addFruit(
-        x, y,
-        this.pb.displayWidth/2-5,
-        getRandomColorInCat(this.pb.color),
-        'flower'  
-      )
-      console.log('new fruit because not enough healthy! at', x, y, f)
-    }
+
 
   }
 

@@ -322,7 +322,8 @@ class Slug extends Phaser.GameObjects.Container {
       // having found our food stuff, move to it until you're close!
       this.chosenFood = findClosest(this.heady, this.food_matching.getMatching('active', true));
       if(!(this.chosenFood) && this == this.scene.pb) {
-        logOutput(`your being thinks there is no food that matches the rules you gave it :(. try typing the ${wrapCmd(deleteWord)} command to make your being forget a rule and try again :).`)
+        logOutput(`your being thinks there is no food that matches the rules you gave it :(. if you think your rules are ok, maybe you just have to try again in a second! if you are not sure, try typing the ${wrapCmd(deleteWord)} command to make your being forget a rule and try again :).`)
+          this.scene.updateEdible();
           return;
       }
       if(this.chosenFood) {
@@ -333,7 +334,9 @@ class Slug extends Phaser.GameObjects.Container {
       
 
       this.scene.events.on('postupdate', function(time, delta) {
+        try {
         if(this.eating && this.food_matching.getChildren('active', true).length){
+          
           this.food_matching.getMatching('active', true).forEach((e, i) => {
             try {
               if(!e.active) {
@@ -359,41 +362,41 @@ class Slug extends Phaser.GameObjects.Container {
           }
           let closestMatchNew = findClosest(this.heady, this.food_matching.getMatching('active', true));
           if(this.chosenFood.group) {
-            try {
               if(this.chosenFood.group.getChildren('active', true).length && this.food_matching.getMatching('group', this.chosenFood.group).length) {
                 while(closestMatchNew.group != this.chosenFood.group && !closestMatchNew.active) {
                   closestMatchNew = findClosest(this.heady, this.food_matching.getMatching('group', this.chosenFood.group));
                   // console.debug(closestMatchNew)
                 }
               }
-            } catch (error) {
-              console.warn(error)
             }
-          }
-          
-          if(!this.chosenFood.active) {
-            // console.debug('replacing closest match with', closestMatchNew)
-            this.chosenFood.hunter = null
-            this.chosenFood = closestMatchNew;
-            this.chosenFood.hunter = this;
-          }
-          this.moveTo(this.chosenFood, 1);
-
-          if(closestMatchNew && this.chosenFood != closestMatchNew) {
-            if(Distance.BetweenPoints(this.heady, closestMatchNew) - Distance.BetweenPoints(this.heady, this.chosenFood) < -50*this.scale){
-              this.chosenFood.hunter = null;
-              // console.debug(closestMatchNew)
+            
+            if(!this.chosenFood.active) {
+              // console.debug('replacing closest match with', closestMatchNew)
+              this.chosenFood.hunter = null
               this.chosenFood = closestMatchNew;
               this.chosenFood.hunter = this;
-              this.rotationDirection = 0;
-            } 
+            }
+            this.moveTo(this.chosenFood, 1);
+            
+            if(closestMatchNew && this.chosenFood != closestMatchNew) {
+              if(Distance.BetweenPoints(this.heady, closestMatchNew) - Distance.BetweenPoints(this.heady, this.chosenFood) < -50*this.scale){
+                this.chosenFood.hunter = null;
+                // console.debug(closestMatchNew)
+                this.chosenFood = closestMatchNew;
+                this.chosenFood.hunter = this;
+                this.rotationDirection = 0;
+              } 
+            }
+            let plant = this.chosenFood.group;
+            if(!closestMatchNew && plant && this.plantLoop) {
+              this.food_matching.addMultiple(plant.getMatching('visible', true));
+            }
           }
-          let plant = this.chosenFood.group;
-          if(!closestMatchNew && plant && this.plantLoop) {
-            this.food_matching.addMultiple(plant.getMatching('visible', true));
-          }
+        } catch (error) {
+          console.warn(error)
+          this.stop()
         }
-      }, this);
+        }, this);
     }
     evaluateFoodRules(logging = true) {
       let foodSelected = FRUIT.getMatching('active', true);
