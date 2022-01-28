@@ -151,7 +151,6 @@ class Scene2 extends Phaser.Scene {
     let playersBeingColor = getRandomColorInCat([ COLORCATS_DICT['purple'], COLORCATS_DICT['blue'], COLORCATS_DICT['orange'] ]);
     changeStylesheetRule(document.styleSheets[0], '.beingscolor', `background-color`, `#${playersBeingColor.color.toString(16)}`)
     changeStylesheetRule(document.styleSheets[0], `.${COLORCATS_HR[getColorCategory(playersBeingColor)]}`, `background-color`, `#${playersBeingColor.color.toString(16)}`)
-    changeStylesheetRule(document.styleSheets[0], `.color`, `background-color`, `#${playersBeingColor.color.toString(16)} !important`)
     let otherColors = COLORCATS.filter((c, i) => i != getColorCategory(playersBeingColor))
     
     this.pb = new Slug(this, slug_x, slug_y, slug_r, playersBeingColor);
