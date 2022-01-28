@@ -338,8 +338,8 @@ class Slug extends Phaser.GameObjects.Container {
             if(!e.active) {
               this.food_matching.remove(e);
             }
-            if(this.plantLoop && this.chosenFood.group && e.group != this.chosenFood.group) {
-              this.food_matching.remove(e);
+            if(this.plantLoop && this.chosenFood.group) {
+              if(e.group != this.chosenFood.group) this.food_matching.remove(e);
             }
           })
           if( !this.food_matching.getMatching('active', true).length) {
