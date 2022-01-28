@@ -34,7 +34,8 @@ class Narration {
         startNewLogSegment()
         logError(`uh oh, a larger creature is angry and hungry and wants to <u style="background-color: #${SCENE.pb.hunter.color.color.toString(16)}">eat your being, it is projecting a line to it!</u>`)
         logOutput(`you must tell your being to ${wrapCmd('flee')}!`)
-        blink(terminal_log.lastChild);
+        tagWithClass(terminal_log.lastChild, 'blink');
+        tagWithClass(terminal_log.lastChild, 'shake');
         if(!(SCENE.pb.rulesParsed.filter(e => e.action =='flee').length)) {
             logOutput(`to make sure your being flees from the right creature, you need to create a flee rule! for example ${wrapCmd('if other_creature is <i>condition</i> then <i>flee</i>')}, and then tell your being to ${wrapCmd('flee')} again! the autocomplete will help you :)`)
 
