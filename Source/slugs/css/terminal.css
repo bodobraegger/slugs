@@ -10,6 +10,7 @@
     scroll-behavior: smooth;
 }
 
+/* chrome, edge, safari - blink, webkit */
 ::-webkit-scrollbar {
     width: 10px;
     border-radius: 15px;
@@ -29,7 +30,12 @@
 ::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 151, 71, 0.8);
 }
-
+/* Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,150,70, 0.8) rgba(70, 175, 255, 0.5);
+}
+  
 #terminal_container {
     float:right;    
     position:absolute; /* IMPORTANT */
@@ -69,7 +75,6 @@
 }
 
 #autocomplete_parent {
-    word-break: break-all;
     display: grid;
     grid-template-columns: 1fr;
     padding:5px;
@@ -127,6 +132,8 @@
     max-height: calc(17px * 4);
     width: fit-content;
     scroll-margin: 17px;
+    /* firefox hack */
+    scrollbar-width: none; 
 }
 
 .logEntry {
