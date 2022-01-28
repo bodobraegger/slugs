@@ -22,7 +22,7 @@ let ENTITY_TYPES = ['fruit', 'other_creature']
 
 let TEXTURES = ['smooth', 'spiky']
 
-let SIZES = ['smaller', 'bigger']
+let SIZES = ['smaller_than_head', 'bigger_than_head']
 
 let SHAPES = ['round', 'edgy']
 
