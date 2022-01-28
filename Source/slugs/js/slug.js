@@ -335,11 +335,15 @@ class Slug extends Phaser.GameObjects.Container {
       this.scene.events.on('postupdate', function(time, delta) {
         if(this.eating && this.food_matching.getChildren('active', true).length){
           this.food_matching.getMatching('active', true).forEach((e, i) => {
-            if(!e.active) {
-              this.food_matching.remove(e);
-            }
-            if(this.plantLoop && this.chosenFood.group) {
-              if(e.group != this.chosenFood.group) this.food_matching.remove(e);
+            try {
+              if(!e.active) {
+                this.food_matching.remove(e);
+              }
+              if(this.plantLoop && this.chosenFood.group) {
+                if(e.group != this.chosenFood.group) this.food_matching.remove(e);
+              }
+            } catch(error) {
+              console.warn(error, 'this.chosenfood probably no longer exists!')
             }
           })
           if( !this.food_matching.getMatching('active', true).length) {
