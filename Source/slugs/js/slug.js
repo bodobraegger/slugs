@@ -452,7 +452,7 @@ class Slug extends Phaser.GameObjects.Container {
         // add to foodmatching outside of condition
       } 
       if(this == this.scene.pb && !(rulesFoodPositive.length)) {
-        if(logging) logOutput(`none of the ${wrapCmd('rules')} tell your being what to eat, so it will try to eat anything!`)
+        if(logging) logOutput(`none of the ${wrapCmd('rules')} tell your being what to ${wrapCmd('eat')}, so it will try to ${wrapCmd('eat')} anything! perhaps you should try to give it a rule to make sure it eats good food. try using the ${wrapCmd('help if')} commands :)`)
       }
       return foodSelected;
     }
