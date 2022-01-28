@@ -100,7 +100,7 @@
     margin-bottom: 0px;
 }
 #terminal_input::placeholder {
-    color: #1a1a1a; /* FOR DESIGN PURPOSE */
+    color: rgba(26, 26, 26, 0.4); /* FOR DESIGN PURPOSE */
 }
 
 #autocomplete {
@@ -110,7 +110,7 @@
 }
 
 #autocomplete_parent > * > span.cmd {
-    margin: 0 -6px;
+    margin: 0 -4px;
 }
 
 #autocomplete_suggestions {
@@ -156,9 +156,15 @@
     text-overflow: ellipsis; 
 }
 .blink {
-    box-shadow: inset 0px 0px 10px 10px rgba(255,102,0, 1);
+    box-shadow: inset 0px 0px 10px 10px rgba(127, 255, 170, 0.4);
     filter:saturate(3);
+}
+.shake {
     animation: shake 0.5s;
+    animation-iteration-count: 1;
+}
+.bounce {
+    animation: bounce 0.5s;
     animation-iteration-count: 1;
 }
 
@@ -167,7 +173,7 @@
     /* mix-blend-mode: darken; */ 
     background-color: rgb(90, 90, 90);
     color: white;
-    padding: 0 6px;
+    padding: 0 4px;
 }
 
 .wordsAction {
@@ -194,7 +200,7 @@
 }
 
 u {
-    padding: 0 6px;
+    padding: 0 4px;
 }
 
 /*
@@ -261,15 +267,28 @@ BGDarker
 }
 
 @keyframes shake {
-    0% { transform: translate(1px, 1px) rotate(0deg); }
-    10% { transform: translate(-1px, -2px) rotate(-1deg); }
-    20% { transform: translate(-3px, 0px) rotate(1deg); }
-    30% { transform: translate(3px, 2px) rotate(0deg); }
-    40% { transform: translate(1px, -1px) rotate(1deg); }
-    50% { transform: translate(-1px, 2px) rotate(-1deg); }
-    60% { transform: translate(-3px, 1px) rotate(0deg); }
-    70% { transform: translate(3px, 1px) rotate(-1deg); }
-    80% { transform: translate(-1px, -1px) rotate(1deg); }
-    90% { transform: translate(1px, 2px) rotate(0deg); }
+    0%   { transform: translate(1px, 1px) rotate(0deg); }
+    10%  { transform: translate(-1px, -2px) rotate(-1deg); }
+    20%  { transform: translate(-3px, 0px) rotate(1deg); }
+    30%  { transform: translate(3px, 2px) rotate(0deg); }
+    40%  { transform: translate(1px, -1px) rotate(1deg); }
+    50%  { transform: translate(-1px, 2px) rotate(-1deg); }
+    60%  { transform: translate(-3px, 1px) rotate(0deg); }
+    70%  { transform: translate(3px, 1px) rotate(-1deg); }
+    80%  { transform: translate(-1px, -1px) rotate(1deg); }
+    90%  { transform: translate(1px, 2px) rotate(0deg); }
     100% { transform: translate(1px, -2px) rotate(-1deg); }
+  }
+@keyframes bounce {
+    0%   { transform: translate(0px, 2px) rotate(0deg); }
+    10%  { transform: translate(0px, 2px) rotate(0deg); }
+    20%  { transform: translate(0px, 0px) rotate(0deg); }
+    30%  { transform: translate(0px, 0px) rotate(0deg); }
+    40%  { transform: translate(0px, 1px) rotate(0deg); }
+    50%  { transform: translate(0px, 1px) rotate(0deg); }
+    60%  { transform: translate(0px, 0px) rotate(0deg); }
+    70%  { transform: translate(0px, 0px) rotate(0deg); }
+    80%  { transform: translate(0px, 2px) rotate(0deg); }
+    90%  { transform: translate(0px, 2px) rotate(0deg); }
+    100% { transform: translate(0px, 0px) rotate(0deg); }
   }

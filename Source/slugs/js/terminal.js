@@ -386,7 +386,8 @@ terminal_input.addEventListener('keydown', (e) => {
     case ' ': {
       if(terminal_input.value.at(-1) == ' ' || ! (wordsAll.includes(terminal_input.value.split(' ').at(-1)))) {
         e.preventDefault();
-        blink(terminal_input);
+        tagWithClass(terminal_input, 'blink');
+        tagWithClass(terminal_input, 'shake');
       }
       break;
     } 
@@ -467,7 +468,8 @@ function addToLog(output) {
     let lastChildText = lastChild.innerText.replaceAll(/\s/g, "")
     let lastLastChildText = lastChild.lastChild.innerText.replaceAll(/\s/g, "")
     if(divText == lastChildText || divText == lastLastChildText) {
-      blink(lastChild);
+      tagWithClass(lastChild, 'blink');
+      tagWithClass(lastChild, 'bounce');
     }
     else {
       wrap.appendChild(div);
@@ -517,7 +519,8 @@ function logError(error) {
   // div = div.firstElementChild;
   div.classList.add('error');
   addToLog(div);
-  blink(div)
+  tagWithClass(div, 'blink');
+  tagWithClass(div, 'shake');
 }
 
 function clearLog() {
@@ -589,15 +592,13 @@ function parseEncased(parentheses, input_arr) {
 }
 
 
-async function blink(e = document.getElementById('id')) {
+async function tagWithClass(e = document.getElementById('id'), className='blink') {
   e.classList.remove('old')
   setTimeout(function() {
-     // e.style.display = (e.style.display == 'none' ? '' : 'none');
-     e.classList.add('blink');
+     e.classList.add(className);
   }, 200);
   setTimeout(function() {
-     // e.style.display = (e.style.display == 'none' ? '' : 'none');
-     e.classList.remove('blink')
+     e.classList.remove(className)
   }, 800);
 }
 
