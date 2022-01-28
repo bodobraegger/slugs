@@ -147,7 +147,7 @@
 }
 .old {
  opacity: 0.7;  
- filter: saturate(0.7);
+ filter: saturate(0.5);
 }
 
 .collapsed {
