@@ -223,7 +223,7 @@ class Scene2 extends Phaser.Scene {
                 // console.log(viewRec)
                 let visible = Phaser.Geom.Rectangle.Overlaps(viewRec, new Phaser.Geom.Rectangle(distx-randSize/2, disty-randSize/2, randSize, randSize));
                 
-                tooClose = ( Math.abs(p.x-distx) < Math.max(randSize/tries, 250/tries) && Math.abs(p.y-disty) < Math.max(randSize/tries, 250/tries) ) || visible;
+                tooClose = ( Math.abs(p.x-distx) < Math.max(randSize/tries, 250/tries) && Math.abs(p.y-disty) < Math.max(randSize/tries, 250/tries) ) || visible || tries<2;
                 // console.log(Math.abs(p.x-distx)+Math.abs(p.y-disty),randSize*3)
                 return tooClose;
               })
