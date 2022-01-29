@@ -4,7 +4,7 @@ class Snake extends Slug {
       this.color = color
       this.txtr = 'smooth';
       this.shape = 'round';
-      this.pursuitDistance = this.torso.displayWidth * 40; 
+      this.pursuitDistance = this.torso.displayWidth * 20; 
       let headyColor = getRandomColorInCat(color);
       let tailColor =  getRandomColorInCat(color);
       
@@ -134,7 +134,7 @@ class Snake extends Slug {
             // console.debug(this.hunted.torso)
             
             let target = this.hunted.torso          
-            let speedMod = 1;
+            let speedMod = 1.5;
             this.moveTo(target, speedMod);
             this.hunted.hunter = this;
   
