@@ -393,7 +393,7 @@ class Slug extends Phaser.GameObjects.Container {
             }
           }
         } catch (error) {
-          console.warn(error)
+          console.warn(error, 'error in slug.eat()')
           this.stop()
         }
         }, this);
