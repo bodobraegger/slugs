@@ -282,12 +282,16 @@ class Scene2 extends Phaser.Scene {
           PLANTS.add(p);
           console.info('added', randFN, 'fruits on plant', p)
           let playerCouldntEatRecently = false;
-          [...terminal_log.childNodes].slice(-5).some(e=>{
-            if(e.innerText.includes('there is no food')) {
-              playerCouldntEatRecently = true;
-              return true;
-            }
-          })
+          try {
+            [...terminal_log.childNodes].slice(-5).some(e=>{
+              if(e.innerText.includes('there is no food')) {
+                playerCouldntEatRecently = true;
+                return true;
+              }
+            })
+          } catch (error) {
+            console.info(error, 'terminal_log.childNodes too smoll');
+          }
           if(playerCouldntEatRecently) {
             addToLog('your being thinks new fruit have grown somewhere, perhaps try eating again :)')
           }
