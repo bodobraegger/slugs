@@ -142,8 +142,8 @@ class Scene2 extends Phaser.Scene {
 
     this.beingCounter = 0;
     
-    ENEMIES = new Phaser.GameObjects.Group(this, []);
-    BEINGS = new Phaser.GameObjects.Group(this, []);
+    ENEMIES = new Phaser.GameObjects.Group(this, [], {maxSize: 100})
+    BEINGS = new Phaser.GameObjects.Group(this, [], {maxSize: 100})
     // PLAYERSBEING
     let slug_r = 20;
     let slug_x = getCanvasWidth()/2;
@@ -172,7 +172,7 @@ class Scene2 extends Phaser.Scene {
     // this.companion = this.add.sprite(300, 300, 'jelly').setScale(10);
     // this.companion = this.matter.add.gameObject(this.companion, this.matter.add.rectangle(0, 0, this.companion.displayWidth/3, this.companion.displayHeight/2))
     
-    FRUIT = new Phaser.GameObjects.Group(this, []);
+    FRUIT = new Phaser.GameObjects.Group(this, [], {maxSize: 1000});
 
     let foodsInitial = [ 
       this.addFruit(0, 0, 10, getRandomColorInCat(playersBeingColor), 'flower'),
@@ -183,9 +183,9 @@ class Scene2 extends Phaser.Scene {
       this.addFruit(0, getCanvasHeight(), 25, getRandomColorInCat(playersBeingColor), 'circle_spiky'),
     ];
     
-    // FRUIT.maxSize = 15;
+    // FRUIT.maxSize: 15;
     let planty = new Plant(this, 800, 40, getRandomColorInCat(4), 400, 15, 5);
-    PLANTS = new Phaser.GameObjects.Group(this, [planty])
+    PLANTS = new Phaser.GameObjects.Group(this, [planty], {maxSize:250});
     PLANTS.add(new Plant(this, 300, 300, getRandomColorInCat(5), 400, 24, 10, true))
     PLANTS.add(new Plant(this, getCanvasWidth(), 300, getRandomColorInCat(getColorCategory(playersBeingColor)), 300, 15, 5, false))
     PLANTS.add(new Plant(this, getCanvasWidth(), getCanvasHeight(), getRandomColorInCat(getColorCategory(playersBeingColor)), 600, 19, 20, true))
@@ -769,6 +769,7 @@ class Scene2 extends Phaser.Scene {
     }
     beings.forEach(s=> {
       o.setOnCollideWith(s.heady, pair => {
+        try { 
         if(o == s.chosenFood && s.eating) {
           if(o.displayWidth <= s.heady.displayWidth) {
             let output = ``
@@ -852,6 +853,10 @@ class Scene2 extends Phaser.Scene {
               logOutput(output)
             }
           }
+        }
+        }
+        catch(error) {
+          console.warn(error, 'error in setOnCollidesWithFruit')
         }
       })
     })
