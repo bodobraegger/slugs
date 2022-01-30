@@ -12,7 +12,7 @@ const ifWord = 'if',
 
 let wordsAction = ['eat', stopWord, 'flee']
 
-let wordsFirst = wordsAction.concat(['intro', ifWord, loopWord, showWord, editWord, deleteWord, 'help', 'clear'])
+let wordsFirst = ['intro', 'start'].concat(wordsAction).concat([ifWord, loopWord, showWord, editWord, deleteWord, 'help', 'clear'])
 const wordsForCmdString = [].concat(wordsFirst.slice(0, 2));
 let wordsIfConditionLeft = [].concat(ENTITY_TYPES);
 let wordsIfConditionRight = [].concat(SIZES, COLORCATS_HR, TEXTURES);

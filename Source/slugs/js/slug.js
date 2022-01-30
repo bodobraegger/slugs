@@ -39,7 +39,6 @@ class Slug extends Phaser.GameObjects.Container {
         { pointA: {x: -this.tail0.radius/2, y: 0}, 
           pointB: {x: this.tail1.radius/2, y: 0} }
         );
-        this.headyjoint.angularStiffness = 0.2;
         
         this.jointsBody = [
           this.headyjoint,
@@ -83,7 +82,7 @@ class Slug extends Phaser.GameObjects.Container {
       
 
       const callback = function(params)  {
-        if(!(this.fleeing || this.eating)) {
+        if(!(this.fleeing || this.eating) && this.scene.started) {
           let c = Between(0, 19);
           let player = ( this == this.scene.pb )
           let playerNotPassive = ( player && (this.alpha != 1 || this.hunter || this.scene.mutationObserver.lastLogged > Date.now() - 30 * 1000) )
@@ -121,13 +120,6 @@ class Slug extends Phaser.GameObjects.Container {
       });
       this.moveRandomly();
 
-      this.scene.time.delayedCall(20*1000, ()=>{ 
-        if(this.scene.mutationObserver.lastLogged > Date.now() - 20 * 1000) {
-          this.roam()
-        }; 
-        this.scene.mutationObserver.lastLogged = Date.now()
-      })
-      
       if(!render) {
         this.bodyparts.forEach(e=> {
           e.destroy();

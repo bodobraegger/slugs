@@ -159,9 +159,9 @@ class Scene2 extends Phaser.Scene {
     this.rulesLength = 0;
     
     // let s1 = new Slug(this, slug_x-280, slug_y-5, 10);
+    this.cameras.main.startFollow(this.pb.torso, false, 0.03, 0.03);
     this.cameras.main.setZoom(1000);
-    this.cameras.main.zoomTo(1, 4000, 'Cubic');
-    this.cameras.main.startFollow(this.pb.torso, true, 0.03, 0.03);
+    this.cameras.main.zoomTo(10, 4000, 'Cubic');
 
     this.stage = 1;
     this.slugs = [this.pb];
@@ -295,7 +295,9 @@ class Scene2 extends Phaser.Scene {
           if(playerCouldntEatRecently) {
             addToLog('your being thinks new fruit have grown somewhere, perhaps try eating again :)')
           }
-          this.generate(2);
+          if(this.stage > 5) {
+            this.generate(2);
+          }
         }
 
     }
@@ -421,9 +423,26 @@ class Scene2 extends Phaser.Scene {
       }
     })
 
+    if(this.stage == 15 && this.pb.plantLoop && this.pb.rulesParsed.length) {
+      // clearLog();
+      startNewLogSegment();
+      logOutput(`THANK YOU FOR PLAYING! you reached the end of the game :).`)
+      terminal_container.style.background = 'linear-gradient(180deg, rgba(177,174,238,0.6870098381149334) 0%, rgba(45,155,45,0.846673703661152) 50%)'
+      this.cameras.main.zoomTo(0.0001, 4000, 'Cubic');
+      this.time.delayedCall(4000, this.matter.pause(), this)
+      terminal_input.disabled = true;
+      terminal_input.value = 'thanks for playing!'
+      this.stage = 99;
+    }
 
   }
-
+  start() {
+    NARRATION.startNarration();
+    if(!(this.started)) {
+      this.cameras.main.zoomTo(1, 4000, 'Cubic');
+    }
+    this.started = true;
+  }
   processCommand(input = [], newSegment=true) {
     let cmd = input;
     let output = `${wrapCmd(cmd.join(' '))}: `
@@ -670,6 +689,10 @@ class Scene2 extends Phaser.Scene {
         } else {
           logError(`you forgot to supply a number, which intro message to you want to see?`)
         }
+        return;
+      }
+      case 'start':{
+        this.start();
         return;
       }
       case 'fizzbuzz': {
