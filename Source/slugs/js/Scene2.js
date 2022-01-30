@@ -423,7 +423,7 @@ class Scene2 extends Phaser.Scene {
       }
     })
 
-    if(this.stage == 20 && this.pb.plantLoop && this.pb.rulesParsed.length) {
+    if(this.stage == 25 && this.pb.plantLoop && this.pb.rulesParsed.length) {
       // clearLog();
       startNewLogSegment();
       logOutput(`THANK YOU FOR PLAYING! you reached the end of the game :).`)
