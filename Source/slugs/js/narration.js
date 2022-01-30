@@ -4,14 +4,14 @@ class Narration {
     intro_0() {
         startNewLogSegment()
         logOutput(`welcome. on the left side of the screen you see a little being. its ${wrapCmd('color')} is ${wrapCmd(COLORCATS_HR[getColorCategory(playersBeing.color)])}.`)
-        logOutput(`on the bottom right, below this text, you find an input box. type ${wrapCmd('intro 1')} and press enter to learn more.`)
+        logOutput(`on the bottom right, below this text, you find an input box. type ${wrapCmd('intro 1')} and press enter to learn your goal :)`)
     }
     intro_1() {
         logOutput(`great work!`)
         logOutput(`your goal is to enable your being to grow! it is not very clever on its own. you should communicate with it using commands and tell it how to grow properly by commanding it to ${wrapCmd('eat')}.`)
         logOutput(`whenever the being is close to fruit it thinks it could ${wrapCmd('eat')}, it will show you by <u class='beingscolor'>projecting a line to the fruit</u> :). other beings might do the same! when you leave the being alone for a while, it will do things on its own...`)
         logOutput(`it grows by eating fruit that's good for it - if it is hurt or eats fruit that is bad for it, it will become seethrough until it can find some good fruit again. to figure out what the being likes, it will have to try interacting with the world.`)
-        logOutput(`once you have read this, type ${wrapCmd('intro 2')} to learn your objective!`)
+        logOutput(`once you have read this, type ${wrapCmd('intro 2')} to learn the controls!`)
     }
     intro_2() {
         startNewLogSegment()
