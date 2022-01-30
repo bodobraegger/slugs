@@ -24,7 +24,7 @@ let wordsLoop3 = ['on', ] // 'close'
 let wordsLoop4 = ['plant']
 
 
-let wordsToShow = ATTRIBUTES.concat(EDITABLE);
+let wordsToShow = ATTRIBUTES.concat(EDITABLE_withSingular);
 
 let wordsAll = wordsFirst.concat(wordsIfConditionLeft, wordsIfConditionRight, equalWord, notEqualWord, wordsBoolean, wordsAction, wordsToShow, wordsLoop1, wordsLoop2, wordsLoop3, wordsLoop4).concat(['hunting', , 'rule', 'routine', 1, 2, 3, 4, 5, 7, 8, 9]);
 
@@ -232,6 +232,9 @@ eventTypes.forEach(t => {
       }
     } else if(wordsOfInterest[0] == deleteWord || wordsOfInterest[0] == editWord) {
       wordsToCompare = EDITABLE_withSingular;
+      if(wordsOfInterest[0] == deleteWord) {
+        wordsToCompare = ['rule', 'routine']
+      }
       checkAgainst = wordsOfInterest.at(-1);
       let i = 1
       for( ; i < wordsOfInterest.length; i++) {
