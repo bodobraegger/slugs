@@ -423,13 +423,18 @@ class Scene2 extends Phaser.Scene {
       }
     })
 
-    if(this.stage == 15 && this.pb.plantLoop && this.pb.rulesParsed.length) {
+    if(this.stage == 20 && this.pb.plantLoop && this.pb.rulesParsed.length) {
       // clearLog();
       startNewLogSegment();
       logOutput(`THANK YOU FOR PLAYING! you reached the end of the game :).`)
       terminal_container.style.background = 'linear-gradient(180deg, rgba(177,174,238,0.6870098381149334) 0%, rgba(45,155,45,0.846673703661152) 50%)'
       this.cameras.main.zoomTo(0.0001, 4000, 'Cubic');
-      this.time.delayedCall(4000, this.matter.pause(), this)
+      this.time.delayedCall(4000, () => {
+        startNewLogSegment();
+        logOutput(`THANK YOU FOR PLAYING! you reached the end of the game :).`);
+        terminal_container.style.background = 'linear-gradient(180deg, rgba(177,174,238,0.6870098381149334) 0%, rgba(45,155,45,0.846673703661152) 50%)'
+        this.matter.pause();
+      }, this)
       terminal_input.disabled = true;
       terminal_input.value = 'thanks for playing!'
       this.stage = 99;
