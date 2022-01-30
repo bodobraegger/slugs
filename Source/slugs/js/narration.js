@@ -10,7 +10,7 @@ class Narration {
         logOutput(`great work!`)
         logOutput(`your goal is to enable your being to grow! it is not very clever on its own. you should communicate with it using commands and tell it how to grow properly by commanding it to ${wrapCmd('eat')}.`)
         logOutput(`whenever the being is close to fruit it thinks it could ${wrapCmd('eat')}, it will show you by <u class='beingscolor'>projecting a line to the fruit</u> :). other beings might do the same! when you leave the being alone for a while, it will do things on its own...`)
-        logOutput(`it grows by eating fruit that's good for it - if it is hurt or eats fruit that is bad for it, it will become seethrough until it can find some good fruit again. to figure out what the being likes, it will have to try interacting with the world. to find out what commands you can use to talk to the being, you can enter the ${wrapCmd('help')} command.`)
+        logOutput(`it grows by eating fruit that's good for it - if it is hurt or eats fruit that is bad for it, it will become seethrough until it can find some good fruit again. to figure out what the being likes, it will have to try interacting with the world.`)
         logOutput(`once you have read this, type ${wrapCmd('intro 2')} to learn your objective!`)
     }
     intro_2() {
@@ -18,13 +18,13 @@ class Narration {
         logOutput(`well done! this is how you can interact with the game, by typing in commands in the box below. when you start typing, suggestions will appear.`)
         logOutput(`to help make it a bit quicker, there are a few tricks: when you press the right arrow ➡️, the first suggestion will be typed out for you. when you press the left arrow ⬅️, it will be deleted again. the up and down arrow ⬆️⬇️ keys cycle through the suggestions if there are multiple, or cycle through the last commands if there aren't any suggestions.`)
         logError(`when you type something that the game does not understand, the box will shake a little, but don't worry, that's just to help you notice! it might also shake if a message is repeated, or there is another reason why you should look at this part of the game.`)
-        logOutput(`the last way you can interact with the game is by dragging and pinching the beings in the world by clicking on them if you need to. try this now :)`) //you can change what you see on the left using the ⬅️⬆️⬇️➡️ arrow keys,
+        logOutput(`the last way you can interact with the game is by dragging and pinching the beings in the world by clicking on them if you need to. try this now on your being on the left :)`) //you can change what you see on the left using the ⬅️⬆️⬇️➡️ arrow keys,
         
         logOutput(`once you are familiar with the controls, you can type ${wrapCmd('start')} and press enter to start the game! if you want to view the intro again, you can just type ${wrapCmd('intro 0')} instead :) (hint: you can do this at any point in the game!).`)
         if(wordsToCompare.indexOf('intro') != -1) wordsToCompare.splice(wordsToCompare.indexOf('intro'), 1);
     }
     startNarration() {
-        logOutput(`congratulations! you now know how to play the game. have fun! if you don't know what to do, are confused, or need inspiration, try using the ${wrapCmd('help')} command! to learn more about your being, try the ${wrapCmd(showWord)} command. if you just want it to go eat something, type ${wrapCmd('eat')}!`)
+        logOutput(`congratulations! you now know how to play the game. have fun! to find out what commands you can use to talk to the being, you can enter the ${wrapCmd('help')} command. also do this if you don't know what to do, are confused, or need inspiration! to learn more about your being, try the ${wrapCmd(showWord)} command. if you just want it to go eat something, type ${wrapCmd('eat')}!`)
         if(wordsToCompare.indexOf('start') != -1) wordsToCompare.splice(wordsToCompare.indexOf('start'), 1);
     }
     loopNudge() {
