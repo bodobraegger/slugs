@@ -78,6 +78,7 @@ const config = {
     width: 800,
     height: 600,
     pixelArt: false,
+    renderer: { mipmapFilter: 'NEAREST' },
     scale: {
       mode: Phaser.Scale.RESIZE,
       autoCenter: Phaser.Scale.CENTER_BOTH,
