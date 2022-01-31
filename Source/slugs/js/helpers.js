@@ -33,3 +33,9 @@ function changeStylesheetRule(stylesheet, selector, property, value) {
 	stylesheet.insertRule(selector + " { " + property + ": " + value + "; }", 0);
     // console.log(stylesheet)
 }
+
+function nearestPowerOf2(n=0) {
+	if(n<1) return 1;
+	else if(n>2147483647) return 1073741824;
+	return 1 << 31 - Math.clz32(n);
+}

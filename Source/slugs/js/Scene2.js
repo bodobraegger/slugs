@@ -54,7 +54,7 @@ let SCENE;
 let NARRATION = new Narration();
 
 const flowerTextures = ['flower_1', 'flower_2']
-const spikyTextures = ['circle_spiky_1','circle_spiky_2', 'circle_spiky_3']
+const spikyTextures = ['circle_spiky_1'] // ,'circle_spiky_2', 'circle_spiky_3'
 
 class Scene2 extends Phaser.Scene {
   constructor() {
@@ -76,9 +76,9 @@ class Scene2 extends Phaser.Scene {
 
     this.load.setBaseURL(document.getElementById('phaser_container').getAttribute('data-assets-baseURL')); 
     this.load.image('circle', 'assets/circle.png');
-    this.load.image('circle_spiky_1', 'assets/circle_spiky_1.png');
-    this.load.image('circle_spiky_2', 'assets/circle_spiky_2.png');
-    this.load.image('circle_spiky_3', 'assets/circle_spiky_3.png');
+    this.load.image('circle_spiky_1', 'assets/circle_spiky_1.png').mipmap;
+    // this.load.image('circle_spiky_2', 'assets/circle_spiky_2.png');
+    // this.load.image('circle_spiky_3', 'assets/circle_spiky_3.png');
     this.load.image('flower_1', 'assets/flower_1.png');
     this.load.image('flower_2', 'assets/flower_2.png');
     
@@ -175,20 +175,23 @@ class Scene2 extends Phaser.Scene {
     FRUIT = new Phaser.GameObjects.Group(this, [], {maxSize: 1000});
 
     let foodsInitial = [ 
-      this.addFruit(0, 0, 10, getRandomColorInCat(playersBeingColor), 'flower'),
-      this.addFruit(getCanvasWidth(), 0, 15, getRandomColorInCat(playersBeingColor), 'flower'),
-      this.addFruit(getCanvasWidth(), getCanvasHeight(), 20, getRandomColorInCat(playersBeingColor), 'flower'),
-      this.addFruit(getCanvasWidth(), getCanvasHeight()+5, 20, getRandomColorInCat(playersBeingColor), 'flower'),
-      this.addFruit(getCanvasWidth()+5, getCanvasHeight()+5, 20, getRandomColorInCat(playersBeingColor), 'flower'),
-      this.addFruit(0, getCanvasHeight(), 25, getRandomColorInCat(playersBeingColor), 'circle_spiky'),
+      this.addFruit(0, 0, 8, getRandomColorInCat(playersBeingColor), 'flower'),
+      this.addFruit(this.pb.torso.x-16, this.pb.torso.y+16, 16, getRandomColorInCat(playersBeingColor), 'flower'),
+      this.addFruit(this.pb.torso.x, this.pb.torso.y+8, 8, getRandomColorInCat(playersBeingColor), 'flower'),
+      this.addFruit(this.pb.torso.x+4, this.pb.torso.y+4, 4, getRandomColorInCat(playersBeingColor), 'flower'),
+      this.addFruit(getCanvasWidth(), 0, 16, getRandomColorInCat(playersBeingColor), 'flower'),
+      this.addFruit(getCanvasWidth(), getCanvasHeight(), 32, getRandomColorInCat(playersBeingColor), 'flower'),
+      this.addFruit(getCanvasWidth(), getCanvasHeight()+5, 32, getRandomColorInCat(playersBeingColor), 'flower'),
+      this.addFruit(getCanvasWidth()+5, getCanvasHeight()+5, 32, getRandomColorInCat(playersBeingColor), 'flower'),
+      this.addFruit(0, getCanvasHeight(), 32, getRandomColorInCat(playersBeingColor), 'circle_spiky'),
     ];
     
     // FRUIT.maxSize: 15;
-    let planty = new Plant(this, 800, 40, getRandomColorInCat(4), 400, 15, 5);
+    let planty = new Plant(this, 800, 40, getRandomColorInCat(4), 400, nearestPowerOf2(17), 5);
     PLANTS = new Phaser.GameObjects.Group(this, [planty], {maxSize:250});
-    PLANTS.add(new Plant(this, 300, 300, getRandomColorInCat(5), 400, 24, 10, true))
-    PLANTS.add(new Plant(this, getCanvasWidth(), 300, getRandomColorInCat(getColorCategory(playersBeingColor)), 300, 15, 5, false))
-    PLANTS.add(new Plant(this, getCanvasWidth(), getCanvasHeight(), getRandomColorInCat(getColorCategory(playersBeingColor)), 600, 19, 20, true))
+    PLANTS.add(new Plant(this, 300, 300, getRandomColorInCat(5), 400, nearestPowerOf2(24), 10, true))
+    PLANTS.add(new Plant(this, getCanvasWidth(), 300, getRandomColorInCat(getColorCategory(playersBeingColor)), 300, nearestPowerOf2(15), 5, false))
+    PLANTS.add(new Plant(this, getCanvasWidth(), getCanvasHeight(), getRandomColorInCat(getColorCategory(playersBeingColor)), 600, 19, nearestPowerOf2(20), true))
     
     let coordinates = [ ]
     
@@ -207,7 +210,7 @@ class Scene2 extends Phaser.Scene {
         if((i+1)%5 == 0) {this.updateLoadingBar.call({newGraphics:this.newGraphics,loadingText:this.loadingText}, [1+1/25*(i+1)]); }
           let yesOrNo = Between(0, 3)
           let randFN = Between(scalingFactor*3, scalingFactor*15) 
-          let randFS = Between(scalingFactor*15, scalingFactor*150)
+          let randFS = nearestPowerOf2(Between(scalingFactor*15, scalingFactor*150))
           let randSize = Between(randFN*randFS-10, randFN*randFS+10)
           let tooClose = false;
           let distx, disty;
@@ -425,19 +428,7 @@ class Scene2 extends Phaser.Scene {
 
     if(this.stage == 25 && this.pb.plantLoop && this.pb.rulesParsed.length) {
       // clearLog();
-      startNewLogSegment();
-      logOutput(`THANK YOU FOR PLAYING! you reached the end of the game :).`)
-      terminal_container.style.background = 'linear-gradient(180deg, rgba(177,174,238,0.6870098381149334) 0%, rgba(45,155,45,0.846673703661152) 50%)'
-      this.cameras.main.zoomTo(0.0001, 4000, 'Cubic');
-      this.time.delayedCall(4000, () => {
-        startNewLogSegment();
-        logOutput(`THANK YOU FOR PLAYING! you reached the end of the game :).`);
-        terminal_container.style.background = 'linear-gradient(180deg, rgba(177,174,238,0.6870098381149334) 0%, rgba(45,155,45,0.846673703661152) 50%)'
-        this.matter.pause();
-      }, this)
-      terminal_input.disabled = true;
-      terminal_input.value = 'thanks for playing!'
-      this.stage = 99;
+      this.shutdown();
     }
 
   }
@@ -447,6 +438,25 @@ class Scene2 extends Phaser.Scene {
       this.cameras.main.zoomTo(1, 4000, 'Cubic');
     }
     this.started = true;
+  }
+  shutdown() {
+    this.stage = 99;
+    this.started = false;
+    this.pb.stop()
+    this.cameras.main.zoomTo(0.0001, 3000, 'Sine.easeInOut');
+    this.matter.pause();
+    this.time.removeAllEvents()
+    terminal_input.disabled = true;
+    terminal_input.value = 'thanks for playing!'
+    terminal_input.parentNode.removeChild(autocomplete);
+    terminal_input.parentNode.removeChild(terminal_input);
+    startNewLogSegment();
+    logOutput(`THANK YOU FOR PLAYING! you reached the end of the game :).`);
+    terminal_container.style.background = 'radial-gradient(circle at right top, rgb(0, 61, 152), rgba(0, 0, 0, 0)), radial-gradient(circle at 20% 80%, rgb(166, 208, 228), rgba(0, 0, 0, 0))'
+    addToLog = ()=>{}
+    this.time.delayedCall(3000, () => {
+      this.scene.stop()
+    }, this)
   }
   processCommand(input = [], newSegment=true) {
     let cmd = input;
@@ -1080,7 +1090,7 @@ class Plant extends GroupDynVis {
       } else {
         p = pointOnCircle(x, y, width/2, DegToRad(360/fruitsNumber * i));
       }
-      let f = scene.addFruit(p.x, p.y, Between(fruitsRadius-5, fruitsRadius+5), getRandomColorInCat(colorCat), texture);
+      let f = scene.addFruit(p.x, p.y, nearestPowerOf2(Between(fruitsRadius-8, fruitsRadius+8)), getRandomColorInCat(colorCat), texture);
       f.group = this;
       this.add(f)
     }
