@@ -552,7 +552,7 @@ class Slug extends Phaser.GameObjects.Container {
             let vecFromEnemy = new Vector2(this.heady).subtract(this.hunterHeady);
             dist = vecFromEnemy.length();
             if( !ENEMIES.getMatching('active', true).length) {
-              let output = `your being does not see any harmful creatures anymore. it will stop trying to flee!`
+              let output = `your being does not think there are harmful creatures nearby anymore. it will stop trying to flee!`
               if(this == this.scene.pb) {
                 logOutput(output);
               }
@@ -564,13 +564,13 @@ class Slug extends Phaser.GameObjects.Container {
             this.moveTo(vecFromEnemy, 3);
           }
           else {
-            let output = `it thinks it doesn't see the dangerous creature closeby now, so it stops fleeing ...`
+            let output = `it thinks it far enough from the creature it tried to flee from now, so it stops fleeing ...`
             if(this == this.scene.pb) {
               logOutput(output)
             }
             try {
               console.debug(this.hunter, dist, this.hunter.pursuitDistance)
-              this.hunter.stop();
+              if(this.hunterHeady == this.hunter.heady) this.hunter.stop();
             } catch(error) {
               console.debug(error);
             }
@@ -586,8 +586,6 @@ class Slug extends Phaser.GameObjects.Container {
       this.eating = false;
       this.fleeing = false;
       this.roaming = false;
-      let delay = 15 * 1000;
-      
       if(this.chosenFood) {
         this.chosenFood.hunter = null;
         this.chosenFood = null;
@@ -639,7 +637,6 @@ class Slug extends Phaser.GameObjects.Container {
     }
 
     saturate(on=true) {
-      const grayscalePipeline = this.scene.renderer.pipelines.get('Grayscale');
       if(on) {
         this.bodyparts.forEach(e => {
           if(e instanceof GameObjects.Arc) {
