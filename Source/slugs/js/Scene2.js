@@ -10,7 +10,7 @@ let COLORCATS_DICT = {}
 let ATTRIBUTES = ['color', 'texture', 'shape']
 
 let EDITABLE = ['rules', 'routines']
-let EDITABLE_withSingular = ['rule', 'routine'].concat(EDITABLE)
+let EDITABLE_withSingular = EDITABLE.concat(['rule', 'routine'])
 
 for(let i = 0; i < COLORCATS_360.length; i++) {
   COLORCATS[i] = COLORCATS_360[i]/360;
@@ -541,26 +541,21 @@ class Scene2 extends Phaser.Scene {
         break;
       }
       case showWord: {
-        output += `you ask your being to tell you about itself`
-        logInput(output);
+        let inp =  output + `you ask your being to tell you about itself`
         output = `it knows the following: <br>`
         let toShow = wordsToShow;  
         if(cmd.length > 1) {
           toShow = cmd.slice(1);
+          if(!(wordsToShow.includes(cmd[1]))) {
+            logError(`your being did not understand what you want it to ${wrapCmd(showWord)} you!`)
+            return
+          }
+          if(cmd.length == 2 && ['rule', 'routine'].includes(cmd[1])) {
+            logError(`your being did not understand what you want it to ${wrapCmd(showWord)} you! if you want to see a specific rule or routine, you need to supply the number. note that the rule numbers change if you let your being ${wrapCmd(deleteWord)} some again!`)
+          }
         }
-        if(['rules', 'rule'].includes(cmd[1]) && cmd.length == 3) {
-          if(toShow[2]-1 < RULES.length) {
-            logOutput(`this is the rule number ${cmd[2]}.: ${RULES[cmd[2]-1]}.<br>`)
-          } else {
-            logError(`your being knows no rule number ${cmd[2]}<br>`);
-          }
-        } else if(['routines', 'routine'].includes(cmd[1]) && cmd.length == 3) {
-          if(cmd[2]-1 < ROUTINES.length) {
-            logOutput(`this is the routine number ${cmd[1]}.: ${ROUTINES[cmd[1]-1]}.<br>`)
-          } else {
-            logError(`your being knows no routine number ${toShow[1]}<br>`);
-          }
-        } else {
+        if(cmd.length <= 2) {
+          logInput(inp);
           toShow.forEach((e, i) => {
             if(wordsToShow.includes(e)) {
               let RULESorROUTINES = []
@@ -588,7 +583,23 @@ class Scene2 extends Phaser.Scene {
               logError(`${wrapCmd(e)}: is not something your being could know!<br>`);
             }
           })
+        } else if(cmd.length == 3 ) {
+          logInput(inp);
+         if(['rules', 'rule'].includes(cmd[1])) {
+          if(toShow[2]-1 < RULES.length) {
+            logOutput(`this is the rule number ${cmd[2]}.: ${RULES[cmd[2]-1]}.<br>`)
+          } else {
+            logError(`your being knows no rule number ${cmd[2]}<br>`);
+          }
+         } else if(['routines', 'routine'].includes(cmd[1])) {
+          if(cmd[2]-1 < ROUTINES.length) {
+            logOutput(`this is the routine number ${cmd[1]}.: ${ROUTINES[cmd[1]-1]}.<br>`)
+          } else {
+            logError(`your being knows no routine number ${toShow[1]}<br>`);
+          }
+         }
         }
+
         return;
       }
       case deleteWord: {
