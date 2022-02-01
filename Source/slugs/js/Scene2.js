@@ -24,7 +24,7 @@ let TEXTURES = ['smooth', 'spiky']
 
 let SIZES = ['smaller_than_head', 'bigger_than_head']
 
-let SHAPES = ['round', 'square']
+let SHAPES = ['round', 'square', 'triangle']
 
 let RULES = [ ];
 let ROUTINES = [ ];
@@ -53,9 +53,11 @@ let SCENE;
 
 let NARRATION = new Narration();
 
-const flowerTextures = ['flower_1', 'flower_2']
-const spikyTextures = ['circle_spiky_1'] // ,'circle_spiky_2', 'circle_spiky_3'
-const squareTextures = ['square_rounded', 'square']
+const roundSprites = ['flower_round_smooth', 'flower_round_smooth_2', 'flower_round_smooth', 'flower_round_smooth_2', 'flower_round_smooth', 'flower_round_smooth_2', 'flower_round_smooth', 'flower_round_smooth_2', 'flower_round_smooth', 'flower_round_smooth_2', 'flower_round_smooth', 'flower_round_smooth_2', 'flower_round_smooth', 'flower_round_smooth_2', 'flower_round_smooth', 'flower_round_smooth_2', 
+// for better ratio
+'flower_round_spiky', 'flower_round_spiky_2',]
+const squareSprites = ['square_smooth', 'square_spiky']
+const triangleSprites = ['triangle_smooth', 'triangle_spiky']
 
 class Scene2 extends Phaser.Scene {
   constructor() {
@@ -76,15 +78,21 @@ class Scene2 extends Phaser.Scene {
     this.loadingText = this.add.text(250,260,"Generating the world...", { fontSize: '32px', fill: '#F0F' });
 
     this.load.setBaseURL(document.getElementById('phaser_container').getAttribute('data-assets-baseURL')); 
-    this.load.image('circle', 'assets/circle.png');
-    this.load.image('circle_spiky_1', 'assets/circle_spiky_1.png');
-    // this.load.image('circle_spiky_2', 'assets/circle_spiky_2.png');
-    // this.load.image('circle_spiky_3', 'assets/circle_spiky_3.png');
-    this.load.image('flower_1', 'assets/flower_1.png');
-    this.load.image('flower_2', 'assets/flower_2.png');
+    this.load.image('circle_round', 'assets/circle_round.png');
+    this.load.image('circle_round_spiky_1', 'assets/circle_round_spiky_1.png');
+    // this.load.image('circle_round_spiky_2', 'assets/circle_round_spiky_2.png');
+    // this.load.image('circle_round_spiky_3', 'assets/circle_round_spiky_3.png');
+    this.load.image('flower_round_smooth',   'assets/flower_round_smooth.png');
+    this.load.image('flower_round_smooth_2', 'assets/flower_round_smooth_2.png');
+    this.load.image('flower_round_spiky',    'assets/flower_round_spiky.png');
+    this.load.image('flower_round_spiky_2',  'assets/flower_round_spiky_2.png');
     
-    this.load.image('square_rounded', 'assets/square_rounded.png');
-    this.load.image('square', 'assets/square.png');
+    this.load.image('square_smooth', 'assets/square_smooth.png');
+    this.load.image('square_spiky',  'assets/square_spiky.png');
+
+    this.load.image('triangle_smooth', 'assets/triangle_smooth.png');
+    this.load.image('triangle_spiky',  'assets/triangle_spiky.png');
+
     this.load.image('circle_leopard', 'assets/circle_leopard.png');
     // this.load.spritesheet('jelly', 'assets/jellyfish_spritesheet.png', {frameWidth: 32, frameHeight: 32})
 
@@ -172,15 +180,16 @@ class Scene2 extends Phaser.Scene {
     FRUIT = new Phaser.GameObjects.Group(this, [], {maxSize: 1000});
 
     let foodsInitial = [ 
-      this.addFruit(0, 0, 8, getRandomColorInCat(playersBeingColor), 'flower'),
-      this.addFruit(this.pb.torso.x-16, this.pb.torso.y+16, 16, getRandomColorInCat(playersBeingColor), 'flower'),
-      this.addFruit(this.pb.torso.x, this.pb.torso.y+8, 8, getRandomColorInCat(playersBeingColor), 'flower'),
-      this.addFruit(this.pb.torso.x+4, this.pb.torso.y+4, 4, getRandomColorInCat(playersBeingColor), 'flower'),
-      this.addFruit(getCanvasWidth(), 0, 16, getRandomColorInCat(playersBeingColor), 'flower'),
-      this.addFruit(getCanvasWidth(), getCanvasHeight(), 32, getRandomColorInCat(playersBeingColor), 'flower'),
-      this.addFruit(getCanvasWidth(), getCanvasHeight()+5, 32, getRandomColorInCat(playersBeingColor), 'flower'),
-      this.addFruit(getCanvasWidth()+5, getCanvasHeight()+5, 32, getRandomColorInCat(playersBeingColor), 'square'),
-      this.addFruit(0, getCanvasHeight(), 32, getRandomColorInCat(playersBeingColor), 'circle_spiky'),
+      this.addFruit(0, 0, 8, getRandomColorInCat(playersBeingColor), 'flower_round_smooth'),
+      this.addFruit(this.pb.torso.x-16, this.pb.torso.y+16, 16, getRandomColorInCat(playersBeingColor), 'flower_round_smooth'),
+      this.addFruit(this.pb.torso.x, this.pb.torso.y+8, 8, getRandomColorInCat(playersBeingColor), 'flower_round_smooth'),
+      this.addFruit(this.pb.torso.x+4, this.pb.torso.y+4, 4, getRandomColorInCat(playersBeingColor), 'flower_round_smooth'),
+      this.addFruit(getCanvasWidth(), 0, 16, getRandomColorInCat(playersBeingColor), 'flower_round_smooth'),
+      this.addFruit(getCanvasWidth(), getCanvasHeight(), 32, getRandomColorInCat(playersBeingColor), 'flower_round_smooth'),
+      this.addFruit(getCanvasWidth(), getCanvasHeight()+5, 32, getRandomColorInCat(playersBeingColor), 'flower_round_smooth'),
+      this.addFruit(getCanvasWidth()+5, getCanvasHeight()+5, 32, getRandomColorInCat(playersBeingColor), 'square_spiky'),
+      this.addFruit(0, getCanvasHeight(), 32, getRandomColorInCat(playersBeingColor), 'triangle_spiky'),
+      this.addFruit(0, getCanvasHeight(), 32, getRandomColorInCat(playersBeingColor), 'circle_round_spiky'),
     ];
     
     // FRUIT.maxSize: 15;
@@ -778,18 +787,22 @@ class Scene2 extends Phaser.Scene {
     img.radius = radius;
     img.color = Color.IntegerToColor(color);
     img.txtr = texture.includes('spiky') ? 'spiky':'smooth';
-    img.shape = ( texture.includes('circle')||texture.includes('flower') ) ? 'round':'square'
+    SHAPES.forEach(t => {
+      if(texture.includes(t)) {
+        img.shape = t;
+      }
+    })
     return this.matter.add.gameObject(img, matterCircle);
   }
 
 
-  addFruit(x, y, radius, color = getRandomColorInCat(), texture = 'flower') {
-    if(texture == 'flower') {
-      texture = randomElement(flowerTextures);
-    } else if(texture.includes('spiky')) {
-      texture = randomElement(spikyTextures);
+  addFruit(x, y, radius, color = getRandomColorInCat(), texture = 'round') {
+    if(texture.includes('round')) {
+      texture = randomElement(roundSprites);
     } else if(texture.includes('square')) {
-      texture = randomElement(squareTextures);
+      texture = randomElement(squareSprites);
+    } else if(texture.includes('triangle')) {
+      texture = randomElement(triangleSprites);
     }
     let img = new Phaser.GameObjects.Sprite(this, 0, 0, texture);
     img.displayWidth = radius*2;
@@ -807,7 +820,11 @@ class Scene2 extends Phaser.Scene {
     o.radius = radius;
     o.color = color;
     o.txtr= texture.includes('spiky') ? 'spiky':'smooth';
-    o.shape = ( texture.includes('circle')||texture.includes('flower') ) ? 'round':'square'
+    SHAPES.forEach(t => {
+      if(texture.includes(t)) {
+        o.shape = t;
+      }
+    })
     let s = playersBeing;
     this.setOnCollidesWithForFruit(o);
     FRUIT.add(o);
@@ -851,13 +868,13 @@ class Scene2 extends Phaser.Scene {
               output = `oh no, the being did not like what it ate 🤢! it has turned ${wrapCmd('see-through', ['beingscolor'])}<br>the snack's characteristics are: ${wrapCmd(characteristics)}<br>`
               s.setAlpha(0.5);
               if(!sameColorCategory(o.color, s.color)) {
-                output += `<br>perhaps it did not like its color 🍎🍏`
+                output += `<br>perhaps it did not like its color 🍎🍈🍊`
               }
               if(!(o.txtr == s.txtr)) {
-                output += `<br>perhaps it did not like its texture 🌸🌵`
+                output += `<br>perhaps it did not like its texture 🌸🌵🌟`
               }
               if(!(o.shape == s.shape)) {
-                output += `<br>perhaps it did not like its shape ⚪⬜`
+                output += `<br>perhaps it did not like its shape ⚠️⚪⬜`
               }
               output +=`...
               you should try to get it to eat something that's good for it and matches its characteristics to get it vibrant and healthy again!`
@@ -977,7 +994,11 @@ class Scene2 extends Phaser.Scene {
     o.radius = radius;
     o.color = color;
     o.txtr= texture.includes('spiky') ? 'spiky':'smooth';
-    o.shape = ( texture.includes('circle')||texture.includes('flower') ) ? 'round':'square'
+    SHAPES.forEach(t => {
+      if(texture.includes(t)) {
+        o.shape = t;
+      }
+    })
     
     // TO ENSURE CIRCULAR MASKS ON THE TEXTURE FILES, IF PERFORMANCE HOG JUST CUT OUT THE TEXTURES BY HAND
     this.events.on('postupdate', function() {
@@ -1019,7 +1040,7 @@ function findClosest(A, B=[new Phaser.GameObjects.GameObject()]) {
 }
 
 class gameSpriteCircle extends Phaser.GameObjects.GameObject {
-  constructor(scene, x, y, radius, color = getRandomColorInCat().color, texture = 'circle') {
+  constructor(scene, x, y, radius, color = getRandomColorInCat().color, texture = 'circle_round') {
     super(scene, 'Arc')
     let img = new Phaser.GameObjects.Sprite(scene, 0, 0, texture);
     img.displayWidth = radius*2;
@@ -1034,7 +1055,11 @@ class gameSpriteCircle extends Phaser.GameObjects.GameObject {
     this.radius = radius;
     this.color = Color.IntegerToColor(color);
     this.txtr = texture.includes('spiky') ? 'spiky':'smooth';
-    o.shape = ( texture.includes('circle')||texture.includes('flower') ) ? 'round':'square'
+    SHAPES.forEach(t => {
+      if(texture.includes(t)) {
+        o.shape = t;
+      }
+    })
     return scene.matter.add.gameObject(this, matterCircle);
   }
 }
@@ -1094,10 +1119,10 @@ class Plant extends GroupDynVis {
 
     for(let i = 0; i<fruitsNumber; i++) {
       let colorCat = getColorCategory(color);
-      if(Math.random() < 0.2) { colorCat = (colorCat+Between(-1, 1)) % COLORCATS.length }
-      let texture = 'flower'
-      if(Math.random() < 0.2) { texture = 'circle_spiky' }
-      if(Math.random() < 0.2) { texture = 'square' }
+      if(Math.random() < 0.3) { colorCat = (colorCat+Between(-1, 1)) % COLORCATS.length }
+      let texture = 'round'
+      if(Math.random() < 0.05) { texture = 'triangle' }
+      else if(Math.random() < 0.05) { texture = 'square' }
 
       let p;
       if(!circle) {
