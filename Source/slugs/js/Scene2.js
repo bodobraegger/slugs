@@ -202,7 +202,9 @@ class Scene2 extends Phaser.Scene {
     })
     
     this.generate = function(iterations) {
+      // console.log('generating', iterations, 'times?')
       if(FRUIT.getChildren('active', true).length < 100) {
+        // console.log('generating', iterations, 'times!')
         if(i==iterations-1) { console.log('generate loop, ran', iterations, 'times') }
       let scalingFactor = this.pb.torso.displayWidth*.025
       for(var i = 0; i < iterations; i++) {
@@ -386,8 +388,9 @@ class Scene2 extends Phaser.Scene {
     if(this.pb.scale > this.stage+1) {
       this.stage++;
       this.cameras.main.zoomTo(1/this.stage, 2000, 'Sine.easeInOut');
+      NARRATION.loopNudged = false;
     }
-    if(this.stage == 2 && !(this.pb.plantLoop) && !(NARRATION.loopNudged)) {
+    if(this.stage <= 2 && !(this.pb.plantLoop) && !(NARRATION.loopNudged)) {
       NARRATION.loopNudge();
     }
     if(this.stage == 4 && !this.enemySpawned) {
@@ -619,6 +622,8 @@ class Scene2 extends Phaser.Scene {
         logOutput(`your being forgot the ${ruleOrRoutine} with the number ${cmd[2]} :)`)
         if(ruleOrRoutine == 'rule') {
           this.pb.rulesParsed.splice(index, 1);
+        } else {
+          this.pb.plantLoop = false;
         }
         return;
       }
@@ -991,7 +996,8 @@ class Scene2 extends Phaser.Scene {
       this.graphics.clear();
     }
     for(var i=0, n=constraints.length; i<n; i++) {
-      this.matter.world.renderConstraint(constraints[i], this.graphics, lineColor, lineOpacity, lineThickness, pinSize, anchorColor, anchorSize);
+      // this.matter.world.renderConstraint(constraints[i], this.graphics, lineColor, lineOpacity, lineThickness, pinSize, anchorColor, anchorSize);
+      drawVec(new Phaser.Math.Vector2(constraints[i].bodyA.position).subtract(constraints[i].bodyB.position), constraints[i].bodyB.position, lineColor, lineThickness, lineOpacity)
     }
   }
   
