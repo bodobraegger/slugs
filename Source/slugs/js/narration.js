@@ -10,7 +10,8 @@ class Narration {
         logOutput(`great work!`)
         logOutput(`your goal is to enable your being to grow! it is not very clever on its own. you should communicate with it using commands and tell it how to grow properly by commanding it to ${wrapCmd('eat')}.`)
         logOutput(`whenever the being is close to fruit it thinks it could ${wrapCmd('eat')}, it will show you by <u class='beingscolor'>projecting a line to the fruit</u> :). other beings might do the same! when you leave the being alone for a while, it will do things on its own...`)
-        logOutput(`it grows by eating fruit that's good for it - if it is hurt or eats fruit that is bad for it, it will become seethrough until it can find some good fruit again. to figure out what the being likes, it will have to try interacting with the world. your task is to give it rules to be able to find only good food efficiently. the food the being chooses will have to match all of the rules you give it :)`)
+        logOutput(`it grows by eating fruit that's good for it - if it is hurt or eats fruit that is bad for it, it will become ${wrapCmd('see-through', ['beingscolor'])} and maybe even ${wrapCmd('lose its color', ['see-through'])} until it can find some good fruit again.`)
+        logOutput(`to figure out what the being likes, it will have to try interacting with the world. your task is to give it rules to be able to find only good food efficiently. the food the being chooses will have to match all of the rules you give it :)`)
         logOutput(`once you have read this, type ${wrapCmd('intro 2')} to learn the controls!`)
     }
     intro_2() {

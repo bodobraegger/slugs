@@ -15,7 +15,7 @@ let wordsAction = ['eat', stopWord, 'flee']
 let wordsFirst = ['intro', 'start'].concat(wordsAction).concat([ifWord, loopWord, showWord, editWord, deleteWord, 'help', 'clear'])
 const wordsForCmdString = [].concat(wordsFirst.slice(0, 2));
 let wordsIfConditionLeft = [].concat(ENTITY_TYPES);
-let wordsIfConditionRight = [].concat(SIZES, COLORCATS_HR, TEXTURES);
+let wordsIfConditionRight = [].concat(SIZES, COLORCATS_HR, TEXTURES, SHAPES);
 const wordsBoolean = [thenWord, equalWord, notEqualWord] //orWord, ;
 
 let wordsLoop1 = ['fruit'];
@@ -540,7 +540,7 @@ function getTotalChildrenHeights(element) {
   return totalHeight;
 }
 
-function wrapCmd(cmd) {
+function wrapCmd(cmd, classesToAdd = []) {
   if(!(cmd.trim())) {
     return '';
   }
@@ -548,10 +548,11 @@ function wrapCmd(cmd) {
   if(cmdArr.length > 1) {
     let r = ''
     cmdArr.forEach(e => {
-      let wrapped = wrapCmd(e);
-      if(e.at(-1) == ',') {
-        wrapped = `${wrapCmd(e.slice(0, e.length-1))},`;
-      }
+      let wrapped;
+      let delims = [':', ';', '-']
+      if(delims.includes(e)) wrapped = e;
+      else if(e.length>1 && delims.includes(e.at(-1)) ) wrapped = wrapCmd(e.slice(0,-1), classesToAdd)+e.at(-1)
+      else wrapped = wrapCmd(e, classesToAdd);
       r += `${wrapped} `;
     });
     return r.trimEnd();
@@ -560,10 +561,13 @@ function wrapCmd(cmd) {
   let classList = `cmd ${cmd} `
   for(i; i<wordsAllArrays.length; i++) {
       if(wordsAllArrays[i].includes(cmd)) {
-        classList += `${wordsAllArraysStrings[i]}`;
+        classList += `${wordsAllArraysStrings[i]} `;
         break;
       }
   }
+  classesToAdd.forEach(e => {
+    classList += `${e} `
+  })
   return `<span class='${classList}'>${cmd}</span>`
 }
 

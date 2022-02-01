@@ -149,7 +149,7 @@ class Scene2 extends Phaser.Scene {
     let slug_x = getCanvasWidth()/2;
     let slug_y = getCanvasHeight()/2;
     let playersBeingColor = getRandomColorInCat([ COLORCATS_DICT['purple'], COLORCATS_DICT['blue'], COLORCATS_DICT['orange'] ]);
-    changeStylesheetRule(document.styleSheets[0], '.beingscolor', `background-color`, `#${playersBeingColor.color.toString(16)}`)
+    changeStylesheetRule(document.styleSheets[0], '.beingscolor', `background-color`, `#${playersBeingColor.color.toString(16)} !important`)
     changeStylesheetRule(document.styleSheets[0], `.${COLORCATS_HR[getColorCategory(playersBeingColor)]}`, `background-color`, `#${playersBeingColor.color.toString(16)}`)
     let otherColors = COLORCATS.filter((c, i) => i != getColorCategory(playersBeingColor))
     
@@ -819,11 +819,12 @@ class Scene2 extends Phaser.Scene {
     beings.forEach(s=> {
       o.setOnCollideWith(s.heady, pair => {
         try { 
+        let characteristics = `size: ${o.displayWidth<=s.heady.displayWidth?'smaller_than_head':'bigger_than_head'}; color: ${COLORCATS_HR[getColorCategory(o.color)]}; texture: ${o.txtr};  shape: ${o.shape};`
         if(o == s.chosenFood && s.eating) {
           if(o.displayWidth <= s.heady.displayWidth) {
             let output = ``
             if(sameColorCategory(o.color, s.color) && o.txtr == s.txtr && o.shape == s.shape) {
-              output += `the being enjoyed this snack😋<br>`
+              output += `the being enjoyed this snack😋.<br>the snack's characteristics are: ${wrapCmd(characteristics)}<br>`
               if(s.alpha < 1) {
                 s.saturate(1)
                 s.setAlpha(1);
@@ -845,7 +846,7 @@ class Scene2 extends Phaser.Scene {
               }
             } else {
               //console.log(sameColorCategory(o.color, s.color), o.txtr == s.txtr, o.shape == s.shape)
-              output = `oh no, the being did not like what it ate 🤢! it has turned see-through`
+              output = `oh no, the being did not like what it ate 🤢! it has turned ${wrapCmd('see-through', ['beingscolor'])}<br>the snack's characteristics are: ${wrapCmd(characteristics)}<br>`
               s.setAlpha(0.5);
               if(!sameColorCategory(o.color, s.color)) {
                 output += `<br>perhaps it did not like its color 🍎🍏`
@@ -885,7 +886,7 @@ class Scene2 extends Phaser.Scene {
               logOutput(output)
             }
           } else {
-            let output = `the being can't eat anything bigger than its head :0<br>`
+            let output = `the being can't eat anything bigger than its head :0.<br>the snack's characteristics are: ${wrapCmd(characteristics)}<br>`
             if(s.plantLoop && o.group) {
               let oGroupMatchTemp = new Phaser.GameObjects.Group(this, this.pb.food_matching.getMatching('group', o.group));
               if(oGroupMatchTemp.getChildren('active', true).length) {
