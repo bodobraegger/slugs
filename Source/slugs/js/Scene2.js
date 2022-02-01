@@ -24,7 +24,7 @@ let TEXTURES = ['smooth', 'spiky']
 
 let SIZES = ['smaller_than_head', 'bigger_than_head']
 
-let SHAPES = ['round', 'edgy']
+let SHAPES = ['round', 'square']
 
 let RULES = [ ];
 let ROUTINES = [ ];
@@ -55,6 +55,7 @@ let NARRATION = new Narration();
 
 const flowerTextures = ['flower_1', 'flower_2']
 const spikyTextures = ['circle_spiky_1'] // ,'circle_spiky_2', 'circle_spiky_3'
+const squareTextures = ['square_rounded', 'square']
 
 class Scene2 extends Phaser.Scene {
   constructor() {
@@ -83,6 +84,7 @@ class Scene2 extends Phaser.Scene {
     this.load.image('flower_2', 'assets/flower_2.png');
     
     this.load.image('square_rounded', 'assets/square_rounded.png');
+    this.load.image('square', 'assets/square.png');
     this.load.image('circle_leopard', 'assets/circle_leopard.png');
     // this.load.spritesheet('jelly', 'assets/jellyfish_spritesheet.png', {frameWidth: 32, frameHeight: 32})
 
@@ -177,7 +179,7 @@ class Scene2 extends Phaser.Scene {
       this.addFruit(getCanvasWidth(), 0, 16, getRandomColorInCat(playersBeingColor), 'flower'),
       this.addFruit(getCanvasWidth(), getCanvasHeight(), 32, getRandomColorInCat(playersBeingColor), 'flower'),
       this.addFruit(getCanvasWidth(), getCanvasHeight()+5, 32, getRandomColorInCat(playersBeingColor), 'flower'),
-      this.addFruit(getCanvasWidth()+5, getCanvasHeight()+5, 32, getRandomColorInCat(playersBeingColor), 'flower'),
+      this.addFruit(getCanvasWidth()+5, getCanvasHeight()+5, 32, getRandomColorInCat(playersBeingColor), 'square'),
       this.addFruit(0, getCanvasHeight(), 32, getRandomColorInCat(playersBeingColor), 'circle_spiky'),
     ];
     
@@ -776,16 +778,18 @@ class Scene2 extends Phaser.Scene {
     img.radius = radius;
     img.color = Color.IntegerToColor(color);
     img.txtr = texture.includes('spiky') ? 'spiky':'smooth';
-    img.shape = 'round'
+    img.shape = ( texture.includes('circle')||texture.includes('flower') ) ? 'round':'square'
     return this.matter.add.gameObject(img, matterCircle);
   }
 
 
-  addFruit(x, y, radius, color = getRandomColorInCat(), texture = 'circle') {
+  addFruit(x, y, radius, color = getRandomColorInCat(), texture = 'flower') {
     if(texture == 'flower') {
       texture = randomElement(flowerTextures);
     } else if(texture.includes('spiky')) {
       texture = randomElement(spikyTextures);
+    } else if(texture.includes('square')) {
+      texture = randomElement(squareTextures);
     }
     let img = new Phaser.GameObjects.Sprite(this, 0, 0, texture);
     img.displayWidth = radius*2;
@@ -803,8 +807,7 @@ class Scene2 extends Phaser.Scene {
     o.radius = radius;
     o.color = color;
     o.txtr= texture.includes('spiky') ? 'spiky':'smooth';
-    // o.shape = texture.includes('circle') ? 'round':'edgy'
-    o.shape = 'round'
+    o.shape = ( texture.includes('circle')||texture.includes('flower') ) ? 'round':'square'
     let s = playersBeing;
     this.setOnCollidesWithForFruit(o);
     FRUIT.add(o);
@@ -974,9 +977,8 @@ class Scene2 extends Phaser.Scene {
     o.radius = radius;
     o.color = color;
     o.txtr= texture.includes('spiky') ? 'spiky':'smooth';
-    // o.shape = texture.includes('circle') ? 'round':'edgy'
-    o.shape = 'round'
-  
+    o.shape = ( texture.includes('circle')||texture.includes('flower') ) ? 'round':'square'
+    
     // TO ENSURE CIRCULAR MASKS ON THE TEXTURE FILES, IF PERFORMANCE HOG JUST CUT OUT THE TEXTURES BY HAND
     this.events.on('postupdate', function() {
       crcl.copyPosition(rt)
@@ -1032,7 +1034,7 @@ class gameSpriteCircle extends Phaser.GameObjects.GameObject {
     this.radius = radius;
     this.color = Color.IntegerToColor(color);
     this.txtr = texture.includes('spiky') ? 'spiky':'smooth';
-    this.shape = 'round'
+    o.shape = ( texture.includes('circle')||texture.includes('flower') ) ? 'round':'square'
     return scene.matter.add.gameObject(this, matterCircle);
   }
 }
@@ -1095,6 +1097,7 @@ class Plant extends GroupDynVis {
       if(Math.random() < 0.2) { colorCat = (colorCat+Between(-1, 1)) % COLORCATS.length }
       let texture = 'flower'
       if(Math.random() < 0.2) { texture = 'circle_spiky' }
+      if(Math.random() < 0.2) { texture = 'square' }
 
       let p;
       if(!circle) {

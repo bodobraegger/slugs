@@ -434,6 +434,9 @@ class Slug extends Phaser.GameObjects.Container {
             if(r.ifTexture) {
               fruit = f.txtr;
             }
+            if(r.ifShape) {
+              fruit = f.shape;
+            }
             // console.debug(booleanString, 'fruit var:', fruit);
             try {
               let evaluation = eval(booleanString);
@@ -621,7 +624,7 @@ class Slug extends Phaser.GameObjects.Container {
           ifSize = true;
         }
         if(SHAPES.includes(e) || e=='shape') {
-          ifSize = true;
+          ifShape = true;
         }
       });
       this.rulesParsed.push({
