@@ -10,7 +10,7 @@ class Narration {
         logOutput(`great work!`)
         logOutput(`your goal is to enable your being to grow! it is not very clever on its own. you should communicate with it using commands and tell it how to grow properly by commanding it to ${wrapCmd('eat')}.`)
         logOutput(`whenever the being is close to fruit it thinks it could ${wrapCmd('eat')}, it will show you by <u class='beingscolor'>projecting a line to the fruit</u> :). other beings might do the same! when you leave the being alone for a while, it will do things on its own...`)
-        logOutput(`it grows by eating fruit that's good for it - if it is hurt or eats fruit that is bad for it, it will become seethrough until it can find some good fruit again. to figure out what the being likes, it will have to try interacting with the world.`)
+        logOutput(`it grows by eating fruit that's good for it - if it is hurt or eats fruit that is bad for it, it will become seethrough until it can find some good fruit again. to figure out what the being likes, it will have to try interacting with the world. your task is to give it rules to be able to find only good food efficiently. the food the being chooses will have to match all of the rules you give it :)`)
         logOutput(`once you have read this, type ${wrapCmd('intro 2')} to learn the controls!`)
     }
     intro_2() {
@@ -24,7 +24,7 @@ class Narration {
         if(wordsToCompare.indexOf('intro') != -1) wordsToCompare.splice(wordsToCompare.indexOf('intro'), 1);
     }
     startNarration() {
-        logOutput(`congratulations! you now know how to play the game. have fun! to find out what commands you can use to talk to the being, you can enter the ${wrapCmd('help')} command. also do this if you don't know what to do, are confused, or need inspiration! to learn more about your being, try the ${wrapCmd(showWord)} command. if you just want it to go eat something, type ${wrapCmd('eat')}!`)
+        logOutput(`congratulations! you now know how to play the game. have fun! to find out what commands you can use to talk to the being, you can enter the ${wrapCmd('help')} command just by itself. also do this if you don't know what to do, are confused, or need inspiration! to learn more about your being, try the ${wrapCmd(showWord)} command. if you just want it to go eat something, type ${wrapCmd('eat')}!`)
         if(wordsToCompare.indexOf('start') != -1) wordsToCompare.splice(wordsToCompare.indexOf('start'), 1);
     }
     loopNudge() {

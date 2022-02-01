@@ -528,8 +528,8 @@ class Scene2 extends Phaser.Scene {
       case 'eat': {
         output += `you tell your being to eat.`
         if(cmd.length > 1) {
-          output += `<br>but watch out, it did not understand the words after ${wrapCmd(cmd[0])}: "${cmd.slice(1).join(' ')}"<br>
-          if you want to specify what the being should eat, you need to use an ${wrapCmd('if')} rule :). type ${wrapCmd('help if')} to figure out how!`
+          output = `watch out, it did not understand the words after ${wrapCmd(cmd[0])}: "${cmd.slice(1).join(' ')}"<br>
+          if you want to specify what the being should eat, you need to use an ${wrapCmd('if')} rule :). type ${wrapCmd('help if')} to figure out how! if you want your being to look for food and ${wrapCmd(cmd[0])} it, you need to type ${wrapCmd(cmd[0])} without any more words.`
         }
         logInput(output)
         this.pb.eat();
@@ -653,11 +653,11 @@ class Scene2 extends Phaser.Scene {
 
       case 'hello': { }
       case 'help': {
-        output = 'hello! '
+        output += 'hello! '
         if(cmd.length == 1) {
           output += `the commands that are available are ${wrapCmd(wordsFirst.join(', ').replaceAll('(', '...'))}.`
           logOutput(output)
-          logOutput(`to learn more about a specific command, try writing ${wrapCmd('help "command"')}, and replacing "command" with one of the commands above.`)
+          logOutput(`to learn more about a specific command, try writing ${wrapCmd('help "command"')}, and replacing "command" with one of the words above, for example: ${wrapCmd('help if')}`)
         } else {
           switch(cmd[1]) {
             case 'eat':
@@ -667,7 +667,7 @@ class Scene2 extends Phaser.Scene {
               output += `you can use the ${wrapCmd('flee')} command to tell your being to flee from an ${wrapCmd('other_creature')}. if you give it rules using the ${wrapCmd(ifWord)} about the creatures it should flee from, then it won't just flee from anything.`
               break;
             case ifWord:
-              output += `with the ${wrapCmd('if')} keyword you can give rules to your being! your being will use these rules to figure out what to ${wrapCmd('eat')} and from what to ${wrapCmd('flee')} :). An if rule needs to be of the form ${wrapCmd('if <i>condition</i> then <i>action</i>')}, for example: ${wrapCmd(ifExample)}! the being will take all food rules into account when choosing food.`;
+              output += `with the ${wrapCmd(ifWord)} keyword you can give rules to your being! your being will use these rules to figure out what to ${wrapCmd('eat')} and from what to ${wrapCmd('flee')} :). An if rule needs to be of the form ${wrapCmd('if <i>condition</i> then <i>action</i>')}, for example: ${wrapCmd(ifExample)}! the food the being chooses has to fit all the rules you give it!! you have to make sure that your rules don't make it impossible for your being to choose food :).`;
               break;
             case loopWord:
               output += `to make your being more efficient in eating, you can give it a ${wrapCmd('routine')} to follow so it can do things automatically. for example: ${wrapCmd(loopExample)}.`
