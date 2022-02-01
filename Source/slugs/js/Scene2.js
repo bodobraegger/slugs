@@ -510,8 +510,10 @@ class Scene2 extends Phaser.Scene {
         return;
       }
       case loopWord: {
-        if(cmd.length < 5 || !wordsAction.includes(cmd.at(-1))) { 
-          logOutput(`uh oh, a routine needs to be of the form ${wrapCmd(loopWord + ' <i>condition</i> <i>action</i>')}, for example: ${wrapCmd(loopExample)}!`);
+        if(cmd.length < 6 || !(wordsAction.includes(cmd.at(-1))) || cmd.includes('other_creature') || cmd.join(' ') != 'while fruit is on plant eat') {
+          let error = `uh oh, a routine needs to be of the form ${wrapCmd(loopWord + ' <i>condition</i> <i>action</i>')}, for example: ${wrapCmd(loopExample)}!`
+          if(cmd.includes('other_creature')) error += `<br>the being does not understand routines about ${wrapCmd('other_creature')}s.`
+          logOutput(error);
           return;
         }
         let routineString = cmd.join(' ')
