@@ -88,11 +88,6 @@ class Scene2 extends Phaser.Scene {
 
 
     this.matter.add.mouseSpring();
-    // this.anims.create({key: 'jelly_idle', frames: this.anims.generateFrameNumbers('jelly', {start:0, end:4}), frameRate:5, repeat: -1})
-    // this.anims.create({key: 'jelly_jump', frames: this.anims.generateFrameNumbers('jelly', {start:7, end:11}), frameRate:5, repeat: -1})
-    // this.anims.create({key: 'jelly_move', frames: this.anims.generateFrameNumbers('jelly', {start:14, end:18}), frameRate:5, repeat: -1})
-    // this.anims.create({key: 'jelly_expl', frames: this.anims.generateFrameNumbers('jelly', {start:21, end:27}), frameRate:5, repeat: -1})
-    // this.load.svg('antennae', 'assets/antennae-dotgrid.svg')
     SCENE = this;
 
     this.load.on('progress', this.updateLoadingBar, {newGraphics:this.newGraphics,loadingText:this.loadingText});
@@ -112,7 +107,7 @@ class Scene2 extends Phaser.Scene {
     });
   }
   updateLoadingBar(percentage) {
-    percentage = percentage/2;
+    percentage *= .5;
     this.newGraphics.clear();
     this.newGraphics.fillStyle(0x3587e2, 1);
     this.newGraphics.fillRect(205, 205, percentage*390, 40);
@@ -133,10 +128,10 @@ class Scene2 extends Phaser.Scene {
     // SETUP
     this.graphics.destroy();
     this.graphics = this.add.graphics();
-    this.gameWidth = this.gameHeight = 10000;
-    this.xBorderLeft = -5000;
+    this.gameWidth = this.gameHeight = 16384;
+    this.xBorderLeft = -8192;
     this.xBorderRight = this.xBorderLeft+this.gameWidth;
-    this.yBorderHigh = -5000;
+    this.yBorderHigh = -8192;
     this.yBorderLow = this.yBorderHigh + this.gameHeight;
     //this.matter.world.setBounds(this.xBorderLeft, this.yBorderHigh, this.gameWidth*2, this.gameHeight*2, 512)
 
@@ -146,8 +141,8 @@ class Scene2 extends Phaser.Scene {
     BEINGS = new Phaser.GameObjects.Group(this, [], {maxSize: 100})
     // PLAYERSBEING
     let slug_r = 20;
-    let slug_x = getCanvasWidth()/2;
-    let slug_y = getCanvasHeight()/2;
+    let slug_x = getCanvasWidth()*.5;
+    let slug_y = getCanvasHeight()*.5;
     let playersBeingColor = getRandomColorInCat([ COLORCATS_DICT['purple'], COLORCATS_DICT['blue'], COLORCATS_DICT['orange'] ]);
     changeStylesheetRule(document.styleSheets[0], '.beingscolor', `background-color`, `#${playersBeingColor.color.toString(16)} !important`)
     changeStylesheetRule(document.styleSheets[0], `.${COLORCATS_HR[getColorCategory(playersBeingColor)]}`, `background-color`, `#${playersBeingColor.color.toString(16)}`)
@@ -170,7 +165,7 @@ class Scene2 extends Phaser.Scene {
 
     // COMPANION
     // this.companion = this.add.sprite(300, 300, 'jelly').setScale(10);
-    // this.companion = this.matter.add.gameObject(this.companion, this.matter.add.rectangle(0, 0, this.companion.displayWidth/3, this.companion.displayHeight/2))
+    // this.companion = this.matter.add.gameObject(this.companion, this.matter.add.rectangle(0, 0, this.companion.displayWidth/3, this.companion.displayHeight*.5))
     
     FRUIT = new Phaser.GameObjects.Group(this, [], {maxSize: 1000});
 
@@ -196,39 +191,37 @@ class Scene2 extends Phaser.Scene {
     let coordinates = [ ]
     
     PLANTS.getChildren().forEach(e=>{
-      let x = (e.getChildren()[0].x+e.getChildren().at(-1).x)/2;
-      let y = (e.getChildren()[0].y+e.getChildren().at(-1).y)/2;
+      let x = (e.getChildren()[0].x+e.getChildren().at(-1).x)*.5;
+      let y = (e.getChildren()[0].y+e.getChildren().at(-1).y)*.5;
       coordinates.push({x, y})
     })
     
     this.generate = function(iterations) {
-      console.log('generating', iterations, 'times?')
       if(FRUIT.getChildren('active', true).length < 100) {
-        console.log('generating', iterations, 'times!')
         if(i==iterations-1) { console.log('generate loop, ran', iterations, 'times') }
       let scalingFactor = this.pb.torso.displayWidth*.025
       for(var i = 0; i < iterations; i++) {
         if(i==iterations-1) { console.log('generate loop, ran', iterations, 'times') }
-        if((i+1)%5 == 0) {this.updateLoadingBar.call({newGraphics:this.newGraphics,loadingText:this.loadingText}, [1+1/25*(i+1)]); }
+        if((i+1)%5 == 0) {this.updateLoadingBar.call({newGraphics:this.newGraphics,loadingText:this.loadingText}, [1+1*.55*(i+1)]); }
           let yesOrNo = Between(0, 3)
-          let randFN = Between(scalingFactor*3, scalingFactor*15) 
-          let randFS = nearestPowerOf2(Between(scalingFactor*15, scalingFactor*150))
-          let randSize = Between(randFN*randFS-10, randFN*randFS+10)
+          let randFN = Between(scalingFactor*3, scalingFactor*20) 
+          let randFS = nearestPowerOf2(Between(scalingFactor*15, scalingFactor*200))
+          let randSize = Between(randFN*randFS-5*scalingFactor, randFN*randFS+5*scalingFactor)
           let tooClose = false;
           let distx, disty;
           let tries = 1;
           do {
             tries = tries + 0.1
-            distx = this.pb.x+(Math.random()<0.5 ? Between(-5*this.pb.scale, -4000*this.pb.scale):Between(4000*this.pb.scale, 5*this.pb.scale))
-            disty = this.pb.y+(Math.random()<0.5 ? Between(-5*this.pb.scale, -4000*this.pb.scale):Between(4000*this.pb.scale, 5*this.pb.scale))
+            distx = this.pb.x+(Math.random()<0.5 ? Between(-5*this.pb.scale, -this.gameWidth*.5*this.pb.scale):Between(this.gameWidth*.5*this.pb.scale, 5*this.pb.scale))
+            disty = this.pb.y+(Math.random()<0.5 ? Between(-5*this.pb.scale, -this.gameHeight*.5*this.pb.scale):Between(this.gameHeight*.5*this.pb.scale, 5*this.pb.scale))
               coordinates.some(p=> {
                 let c = this.cameras.main;
                 let mp = c.midPoint;
-                let viewRec = new Phaser.Geom.Rectangle(mp.x-c.displayWidth/2, mp.y-c.displayHeight/2, c.displayWidth, c.displayHeight);
+                let viewRec = new Phaser.Geom.Rectangle(mp.x-c.displayWidth*.5, mp.y-c.displayHeight*.5, c.displayWidth, c.displayHeight);
                 // console.log(viewRec)
-                let visible = Phaser.Geom.Rectangle.Overlaps(viewRec, new Phaser.Geom.Rectangle(distx-randSize/2, disty-randSize/2, randSize, randSize));
+                let visible = Phaser.Geom.Rectangle.Overlaps(viewRec, new Phaser.Geom.Rectangle(distx-randSize*.5, disty-randSize*.5, randSize, randSize));
                 
-                tooClose = ( Math.abs(p.x-distx) < Math.max(randSize/tries, 250/tries) && Math.abs(p.y-disty) < Math.max(randSize/tries, 250/tries) ) || visible || tries<2;
+                tooClose = ( ( Math.abs(p.x-distx) < Math.max(randSize/tries, 250/tries) && Math.abs(p.y-disty) < Math.max(randSize/tries, 250/tries) ) || visible ) && tries<3;
                 // console.log(Math.abs(p.x-distx)+Math.abs(p.y-disty),randSize*3)
                 return tooClose;
               })
@@ -264,6 +257,7 @@ class Scene2 extends Phaser.Scene {
           e.setOnCollidesWithBeings();
         })
       }
+      this.updateEdible();
     }
 
     this.updateEdible = function() {
@@ -273,16 +267,16 @@ class Scene2 extends Phaser.Scene {
             healthyFood.push(f)
           }
         });
-
-        if(healthyFood.filter(e => (e.displayWidth > this.pb.heady.displayWidth/4 && e.displayWidth < this.pb.heady.displayWidth*3)).length < 5) {
+        
+        let randFN = Between(5, 20) 
+        if(healthyFood.filter(e => (e.displayWidth > this.pb.heady.displayWidth/4 && e.displayWidth < this.pb.heady.displayWidth*3)).length < 20) {
           console.info('not enough healthy food, generating');
-          let randFN = Between(10, 20) 
-          let randFS = Math.max(10, Between(this.pb.heady.displayWidth/2-20, this.pb.heady.displayWidth/2))
+          let randFS = Math.max(10, Between(this.pb.heady.displayWidth*.5-20, this.pb.heady.displayWidth*.5))
           let randSize = Between(randFN*randFS-10, randFN*randFS+10)
           let c = this.cameras.main;
           let mp = c.midPoint;
-          let distx = Between(mp.x-c.displayWidth/2-randSize, mp.x+c.displayWidth/2+randSize)
-          let disty = Math.random() < 0.5 ? mp.y-c.displayHeight/2-randSize : mp.y+c.displayHeight/2+randSize;
+          let distx = Between(mp.x-c.displayWidth*.5-randSize, mp.x+c.displayWidth*.5+randSize)
+          let disty = Math.random() < 0.5 ? mp.y-c.displayHeight*.5-randSize : mp.y+c.displayHeight*.5+randSize;
           let p = new Plant(this, distx, disty, getRandomColorInCat(playersBeingColor), randSize, randFS, randFN, true)
           PLANTS.add(p);
           console.info('added', randFN, 'fruits on plant', p)
@@ -300,14 +294,14 @@ class Scene2 extends Phaser.Scene {
           if(playerCouldntEatRecently) {
             addToLog('your being thinks new fruit have grown somewhere, perhaps try eating again :)')
           }
-          if(this.stage > 5) {
-            this.generate(2);
-          }
+          // if(this.stage > 5) {
+          //   this.generate(2);
+          // }
         }
 
     }
 
-    this.generate(40);
+    this.generate(100);
 
     this.generateTimer = this.time.addEvent({
       delay: 30 * 1000,
@@ -319,7 +313,7 @@ class Scene2 extends Phaser.Scene {
     });
     
     // RENDER TERMINAL ON TOP OF PHASER
-    // const ph_terminal_container = this.add.dom(0.8*document.getElementById("phaser_container").clientWidth, 0.9*document.getElementById("phaser_container").clientHeight/2, terminal_container)
+    // const ph_terminal_container = this.add.dom(0.8*document.getElementById("phaser_container").clientWidth, 0.9*document.getElementById("phaser_container").clientHeight*.5, terminal_container)
     // const terminal_input = document.getElementById('terminal_input');
     
     terminal_input.addEventListener('cmd', (e) => {
@@ -352,13 +346,13 @@ class Scene2 extends Phaser.Scene {
     BEINGS.getMatching('active', true).forEach(e => {
       // SHOW THE SKELETONS OF THE SLUGS
       if(e.someVisible()) {
-        this.renderConstraint(e.joints, 0xF9F6EE, undefined, e.torso.displayWidth/20);
+        this.renderConstraint(e.joints, 0xF9F6EE, undefined, e.torso.displayWidth*.05);
       }
     })
     ENEMIES.getMatching('active', true).forEach(e => {
       // SHOW THE SKELETONS OF THE SLUGS
       if(e.someVisible()) {
-        this.renderConstraint(e.joints, 0xF9F6EE, undefined, e.heady.displayWidth/20);
+        this.renderConstraint(e.joints, 0xF9F6EE, undefined, e.heady.displayWidth*.05);
       }
     })
     let constraints = [ ]
@@ -366,7 +360,7 @@ class Scene2 extends Phaser.Scene {
       let visible = p.getVisible();
       if( !(visible.length) && p.circle && p.width < this.pb.torso.displayWidth*1.5) {
         try {
-          let f = this.addFruit(p.getFirstAlive().x, p.getFirstAlive().y, p.width/2, p.color, 'flower');
+          let f = this.addFruit(p.getFirstAlive().x, p.getFirstAlive().y, p.width*.5, p.color, 'flower');
           console.info('replacing',p,'with',f)
           p.destroy(true, true);
         } catch(error) {
@@ -375,7 +369,7 @@ class Scene2 extends Phaser.Scene {
         }
         return;
       }
-      if(visible.length && (this.pb.scale <= 10 || (p.circle && (p.fruitsNumber < 16 || p.fruitsRadius > this.pb.heady.displayWidth/2-50))) ) {
+      if(visible.length && (this.pb.scale <= 10 || (p.circle && (p.fruitsNumber < 16 || p.fruitsRadius > this.pb.heady.displayWidth*.5-50))) ) {
         visible.forEach(v => {
           constraints = [... new Set(constraints.concat(v.joints))];
         })
@@ -396,8 +390,8 @@ class Scene2 extends Phaser.Scene {
     if(this.stage == 4 && !this.enemySpawned) {
       this.pb.stop();
       this.enemySpawned = true;
-      let x = this.pb.torso.x+this.pb.torso.scale*getCanvasWidth()/2;
-      let y = this.pb.torso.y+this.pb.torso.scale*getCanvasHeight()/2
+      let x = this.pb.torso.x+this.pb.torso.scale*getCanvasWidth()*.5;
+      let y = this.pb.torso.y+this.pb.torso.scale*getCanvasHeight()*.5
       this.enemy = new Snake(this, x, y, this.pb.torso.displayWidth, getRandomColorInCat(this.pb.color).darken(25));
       this.enemy.name = 'enemy'
       ENEMIES.add(this.enemy);
@@ -425,11 +419,11 @@ class Scene2 extends Phaser.Scene {
       let len = headyToTarget.length();
       if(!(f==this.pb.chosenFood) && len < (this.pb.scale*100+f.displayWidth)*4) {
         let alpha =(this.pb.heady.displayWidth+f.displayWidth)*3/len;
-        drawVec(headyToTarget, this.pb.heady, this.pb.color.color, Math.min(this.pb.heady.displayWidth/2.5, (this.pb.heady.displayWidth+f.displayWidth)*10/len), Math.min(alpha, 0.5))
+        drawVec(headyToTarget, this.pb.heady, this.pb.color.color, Math.min(this.pb.heady.displayWidth*.4, (this.pb.heady.displayWidth+f.displayWidth)*10/len), Math.min(alpha, 0.5))
       }
     })
 
-    if(this.stage == 25 && this.pb.plantLoop && this.pb.rulesParsed.length) {
+    if(this.stage == 20 && this.pb.plantLoop && this.pb.rulesParsed.length) {
       // clearLog();
       this.shutdown();
     }
@@ -443,10 +437,8 @@ class Scene2 extends Phaser.Scene {
     this.started = true;
   }
   shutdown() {
-    this.stage = 99;
     this.started = false;
     this.pb.stop()
-    this.cameras.main.zoomTo(0.0001, 3000, 'Sine.easeInOut');
     this.matter.pause();
     this.time.removeAllEvents()
     terminal_input.disabled = true;
@@ -457,9 +449,18 @@ class Scene2 extends Phaser.Scene {
     logOutput(`THANK YOU FOR PLAYING! you reached the end of the game :).`);
     terminal_container.style.background = 'radial-gradient(circle at right top, rgb(0, 61, 152), rgba(0, 0, 0, 0)), radial-gradient(circle at 20% 80%, rgb(166, 208, 228), rgba(0, 0, 0, 0))'
     addToLog = ()=>{}
+    this.cameras.main.setZoom(1/this.stage);
+    this.cameras.main.zoomTo(0.0001, 3000, 'Sine.easeInOut');
+    this.time.delayedCall(1000, () => {
+      this.cameras.main.zoomTo(0.0001, 3000, 'Sine.easeInOut');
+    })
+    this.time.delayedCall(2000, () => {
+      this.cameras.main.zoomTo(0.0001, 3000, 'Sine.easeInOut');
+    })
     this.time.delayedCall(3000, () => {
-      this.scene.stop()
-    }, this)
+      this.cameras.main.zoomTo(0.0001, 3000, 'Sine.easeInOut');
+    })
+    this.stage = 99;
   }
   processCommand(input = [], newSegment=true) {
     let cmd = input;
@@ -779,14 +780,7 @@ class Scene2 extends Phaser.Scene {
     return this.matter.add.gameObject(img, matterCircle);
   }
 
-  addGameEquiTriangle(x=0, y=0, length=10, color=getRandomColorInCat()) {
-    var p0 = new Vector2(x, y+length/2);
-    var p1 = new Vector2(x+length*Math.sqrt(2), y)
-    var p2 = new Vector2(x, y+length/2) 
-    var triangle = this.add.triangle(x, y, p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, color.color);
-    var o = this.matter.add.gameObject(triangle, this.matter.add.fromVertices(x, y, [p0, p1, p2]))
-    return o;
-  }
+
   addFruit(x, y, radius, color = getRandomColorInCat(), texture = 'circle') {
     if(texture == 'flower') {
       texture = randomElement(flowerTextures);
@@ -1048,7 +1042,7 @@ class GroupDynVis extends GameObjects.Group {
     this.getChildren().some((f, i) => {
       let c = this.scene.cameras.main;
       let mp = c.midPoint;
-      let viewRec = new Phaser.Geom.Rectangle(mp.x-c.displayWidth/2, mp.y-c.displayHeight/2, c.displayWidth, c.displayHeight);
+      let viewRec = new Phaser.Geom.Rectangle(mp.x-c.displayWidth*.5, mp.y-c.displayHeight*.5, c.displayWidth, c.displayHeight);
       // console.log(viewRec)
       if(Phaser.Geom.Rectangle.Overlaps(viewRec,f.getBounds())) {
         f.visible = true;
@@ -1064,7 +1058,7 @@ class GroupDynVis extends GameObjects.Group {
     this.getChildren().forEach((f, i) => {
       let c = this.scene.cameras.main;
       let mp = c.midPoint;
-      let viewRec = new Phaser.Geom.Rectangle(mp.x-c.displayWidth/2, mp.y-c.displayHeight/2, c.displayWidth, c.displayHeight);
+      let viewRec = new Phaser.Geom.Rectangle(mp.x-c.displayWidth*.5, mp.y-c.displayHeight*.5, c.displayWidth, c.displayHeight);
       // console.log(viewRec)
       if(Phaser.Geom.Rectangle.Overlaps(viewRec,f.getBounds())) {
         f.visible = true;
@@ -1106,7 +1100,7 @@ class Plant extends GroupDynVis {
       if(!circle) {
         p = pointOnCircle(x, y, i*width/fruitsNumber*2, angle)
       } else {
-        p = pointOnCircle(x, y, width/2, DegToRad(360/fruitsNumber * i));
+        p = pointOnCircle(x, y, width*.5, DegToRad(360/fruitsNumber * i));
       }
       let f = scene.addFruit(p.x, p.y, nearestPowerOf2(Between(fruitsRadius-8, fruitsRadius+8)), getRandomColorInCat(colorCat), texture);
       f.group = this;
