@@ -202,9 +202,9 @@ class Scene2 extends Phaser.Scene {
     })
     
     this.generate = function(iterations) {
-      // console.log('generating', iterations, 'times?')
+      console.log('generating', iterations, 'times?')
       if(FRUIT.getChildren('active', true).length < 100) {
-        // console.log('generating', iterations, 'times!')
+        console.log('generating', iterations, 'times!')
         if(i==iterations-1) { console.log('generate loop, ran', iterations, 'times') }
       let scalingFactor = this.pb.torso.displayWidth*.025
       for(var i = 0; i < iterations; i++) {
@@ -390,7 +390,7 @@ class Scene2 extends Phaser.Scene {
       this.cameras.main.zoomTo(1/this.stage, 2000, 'Sine.easeInOut');
       NARRATION.loopNudged = false;
     }
-    if(this.stage <= 2 && !(this.pb.plantLoop) && !(NARRATION.loopNudged)) {
+    if(this.stage >= 2 && !(this.pb.plantLoop) && !(NARRATION.loopNudged)) {
       NARRATION.loopNudge();
     }
     if(this.stage == 4 && !this.enemySpawned) {
