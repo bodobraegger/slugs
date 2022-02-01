@@ -76,7 +76,7 @@ class Scene2 extends Phaser.Scene {
 
     this.load.setBaseURL(document.getElementById('phaser_container').getAttribute('data-assets-baseURL')); 
     this.load.image('circle', 'assets/circle.png');
-    this.load.image('circle_spiky_1', 'assets/circle_spiky_1.png').mipmap;
+    this.load.image('circle_spiky_1', 'assets/circle_spiky_1.png');
     // this.load.image('circle_spiky_2', 'assets/circle_spiky_2.png');
     // this.load.image('circle_spiky_3', 'assets/circle_spiky_3.png');
     this.load.image('flower_1', 'assets/flower_1.png');
