@@ -109,7 +109,8 @@ eventTypes.forEach(t => {
       terminal_input.value = terminal_input.value.trimStart()
       return;
     }
-    let input = terminal_input.value;
+    let input = terminal_input.value.replace('is not', 'is_not');
+    terminal_input.value = input;
     let checkAgainst = input;
 
     wordsToCompare = wordsFirst;
