@@ -146,7 +146,7 @@ class Snake extends Slug {
             this.roam();
           }
         } catch(error) {
-          console.debug(error, 'this.hunted no longer exists probably!');
+          // console.debug(error, 'this.hunted no longer exists probably!');
           this.stop();
         }
       }, this);
@@ -160,7 +160,7 @@ class Snake extends Slug {
             this.hunted.hunter = null;
           }
         } catch(error) {
-          console.debug(error, this.hunted, 'already cleared hunter...')
+          // console.debug(error, this.hunted, 'already cleared hunter...')
         }
         this.hunted = null;
       }
@@ -171,7 +171,7 @@ class Snake extends Slug {
         b.bodyparts.forEach(limb => {
           this.heady.setOnCollideWith(limb, pair => {
             if(this.eating && b==this.hunted && this.hunted.hunter == this) {
-              console.debug('collision with', b, b==this.scene.pb, b==this.hunted)
+              // console.debug('collision with', b, b==this.scene.pb, b==this.hunted)
               if(this.heady.displayWidth > b.torso.displayWidth) {
                 // successfully ate
                 b.setAlpha(0.8)

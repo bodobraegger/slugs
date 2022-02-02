@@ -43,7 +43,7 @@ function getRandomColorInCat(cat) {
         chosenCatIndex = COLORCATS.indexOf(cat[v])+1
     } else if(typeof cat == 'number') { 
         chosenCatIndex = cat+1
-        //console.log(cat, Array.isArray(cat), chosenCatIndex, COLORCATS_HR[chosenCatIndex])
+        // console.log(cat, Array.isArray(cat), chosenCatIndex, COLORCATS_HR[chosenCatIndex])
     } else {
         chosenCatIndex = Math.floor(Math.random()*(COLORCATS.length-1))
     }

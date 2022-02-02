@@ -208,10 +208,10 @@ class Scene2 extends Phaser.Scene {
     
     this.generate = function(iterations) {
       if(FRUIT.getChildren('active', true).length < 100) {
-        if(i==iterations-1) { console.log('generate loop, ran', iterations, 'times') }
+        // if(i==iterations-1) { console.log('generate loop, ran', iterations, 'times') }
       let scalingFactor = this.pb.torso.displayWidth*.025
       for(var i = 0; i < iterations; i++) {
-        if(i==iterations-1) { console.log('generate loop, ran', iterations, 'times') }
+        // if(i==iterations-1) { console.log('generate loop, ran', iterations, 'times') }
         if((i+1)%5 == 0) {this.updateLoadingBar.call({newGraphics:this.newGraphics,loadingText:this.loadingText}, [1+1*.55*(i+1)]); }
           let yesOrNo = Between(0, 3)
           let randFN = Between(scalingFactor*3, scalingFactor*20) 
@@ -278,7 +278,7 @@ class Scene2 extends Phaser.Scene {
         
         let randFN = Between(5, 20) 
         if(healthyFood.filter(e => (e.displayWidth > this.pb.heady.displayWidth/4 && e.displayWidth < this.pb.heady.displayWidth*3)).length < 20) {
-          console.info('not enough healthy food, generating');
+          // console.info('not enough healthy food, generating');
           let randFS = Math.max(10, Between(this.pb.heady.displayWidth*.5-20, this.pb.heady.displayWidth*.5))
           let randSize = Between(randFN*randFS-10, randFN*randFS+10)
           let c = this.cameras.main;
@@ -287,7 +287,7 @@ class Scene2 extends Phaser.Scene {
           let disty = Math.random() < 0.5 ? mp.y-c.displayHeight*.5-randSize : mp.y+c.displayHeight*.5+randSize;
           let p = new Plant(this, distx, disty, getRandomColorInCat(playersBeingColor), randSize, randFS, randFN, true)
           PLANTS.add(p);
-          console.info('added', randFN, 'fruits on plant', p)
+          // console.info('added', randFN, 'fruits on plant', p)
           let playerCouldntEatRecently = false;
           try {
             [...terminal_log.childNodes].slice(-5).some(e=>{
@@ -297,7 +297,7 @@ class Scene2 extends Phaser.Scene {
               }
             })
           } catch (error) {
-            console.info(error, 'terminal_log.childNodes too smoll');
+            // console.info(error, 'terminal_log.childNodes too smoll');
           }
           if(playerCouldntEatRecently) {
             addToLog('your being thinks new fruit have grown somewhere, perhaps try eating again :)')
@@ -368,10 +368,10 @@ class Scene2 extends Phaser.Scene {
       if( !(visible.length) && p.circle && p.width < this.pb.torso.displayWidth*1.5) {
         try {
           let f = this.addFruit(p.getFirstAlive().x, p.getFirstAlive().y, p.width*.5, p.color, 'flower');
-          console.info('replacing',p,'with',f)
+          // console.info('replacing',p,'with',f)
           p.destroy(true, true);
         } catch(error) {
-          console.warn(error, 'error on trying to replace on growth, none alive in plant?')
+          // console.warn(error, 'error on trying to replace on growth, none alive in plant?')
           p.destroy(true, true)
         }
         return;
@@ -402,7 +402,7 @@ class Scene2 extends Phaser.Scene {
       this.enemy = new Snake(this, x, y, this.pb.torso.displayWidth, getRandomColorInCat(this.pb.color).darken(25));
       this.enemy.name = 'enemy'
       ENEMIES.add(this.enemy);
-      console.log(`spawned enemy at`, this.enemy.x, this.enemy.y, this.enemy);
+      // console.log(`spawned enemy at`, this.enemy.x, this.enemy.y, this.enemy);
       this.enemy.eat('player');
     }
     let vecTorsoHeady = velocityToTarget(this.pb.torso, this.pb.heady);
@@ -748,7 +748,7 @@ class Scene2 extends Phaser.Scene {
             fizzbuzz()
           } 
         } catch (error) {
-          console.log(error);
+          // console.log(error);
         }
         return;
       }
@@ -923,7 +923,87 @@ class Scene2 extends Phaser.Scene {
         }
         }
         catch(error) {
-          console.warn(error, 'error in setOnCollidesWithFruit')
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          warn(error, 'error in setOnCollidesWithFruit')
         }
       })
     })

@@ -195,7 +195,7 @@ class Slug extends Phaser.GameObjects.Container {
       let s = 0;
       this.list.forEach(e => {
         // s += Phaser.Geom.Circle.Area(e) // Math.PI * circle.radius * circle.radius
-        console.debug(e.type, e.radius, e.scaleX)
+        // console.debug(e.type, e.radius, e.scaleX)
         s += Math.PI * (e.radius*(e.scaleX))**2
       })
       return s;
@@ -329,7 +329,7 @@ class Slug extends Phaser.GameObjects.Container {
                 if(e.group != this.chosenFood.group) this.food_matching.remove(e);
               }
             } catch(error) {
-              console.warn(error, 'this.chosenfood probably no longer exists!')
+              // console.warn(error, 'this.chosenfood probably no longer exists!')
             }
           })
           if( !this.food_matching.getMatching('active', true).length) {
@@ -373,7 +373,7 @@ class Slug extends Phaser.GameObjects.Container {
             }
           }
         } catch (error) {
-          console.warn(error, 'error in slug.eat()')
+          // console.warn(error, 'error in slug.eat()')
           this.stop()
         }
         }, this);
@@ -430,7 +430,7 @@ class Slug extends Phaser.GameObjects.Container {
                 foodCurrentlySelected.push(foodSelected[i]);
               }
             } catch(error) {
-              console.info(error, booleanString)
+              // console.info(error, booleanString)
             }
           }
           foodSelected = foodCurrentlySelected;
@@ -551,10 +551,10 @@ class Slug extends Phaser.GameObjects.Container {
               logOutput(output)
             }
             try {
-              console.debug(this.hunter, dist, this.hunter.pursuitDistance)
+              // console.debug(this.hunter, dist, this.hunter.pursuitDistance)
               if(this.hunterHeady == this.hunter.heady) this.hunter.stop();
             } catch(error) {
-              console.debug(error);
+              // console.debug(error);
             }
             this.stop();
           }

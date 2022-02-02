@@ -469,7 +469,6 @@ function addToLog(output) {
       logCount++;
     }
   } catch (error) {
-    console.debug(error)
     wrap.appendChild(div);
     logDiv.appendChild(wrap);
     logCount++;
