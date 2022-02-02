@@ -1,20 +1,3 @@
-=== demographics
-Gender:
-Age: XX years old
-Mother Tongue: ___
-English understanding: ◯ Elementary           ◯ Limited            ◯ Good
-What is your math grade? X / 6
-I play video games (console, desktop, or mobile).
-◯ Every day
-◯ Several times a week
-◯ Once a week
-◯ Once a month
-◯ Less
-◯ Never
-
-I have had a Computer Science course or experience in programming. y/n
-If you have any experience, have you worked with JavaScript before? y/n
-
 === attitude_games_chang,likert5
 I am good at playing computer games.
 Playing computer games is easy for me.

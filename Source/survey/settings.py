@@ -56,6 +56,24 @@ SESSION_CONFIGS = [
         app_sequence=['demographics'],
     ),
     dict(
+        name='learning',
+        display_name="learning",
+        num_demo_participants=1,
+        app_sequence=['learning'],
+    ),
+    dict(
+        name='learning_js',
+        display_name="learning_js",
+        num_demo_participants=1,
+        app_sequence=['learning_js'],
+    ),
+    dict(
+        name='survey',
+        display_name="survey",
+        num_demo_participants=1,
+        app_sequence=['survey'],
+    ),
+    dict(
         name='question_with_other_option',
         display_name="Menu with an 'other' option that lets you type in a valueInput manually",
         num_demo_participants=4,

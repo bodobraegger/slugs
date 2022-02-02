@@ -1,12 +1,13 @@
 from otree.api import *
 
+
 doc = """
 demographcis
 """
 
 
 class C(BaseConstants):
-    NAME_IN_URL = 'demographics'
+    NAME_IN_URL = 'learning_js'
     PLAYERS_PER_GROUP = None
     NUM_ROUNDS = 1
     

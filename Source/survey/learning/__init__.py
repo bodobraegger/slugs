@@ -1,12 +1,13 @@
 from otree.api import *
+from survey import Intro
 
 doc = """
-demographcis
+learning
 """
 
 
 class C(BaseConstants):
-    NAME_IN_URL = 'demographics'
+    NAME_IN_URL = 'learning'
     PLAYERS_PER_GROUP = None
     NUM_ROUNDS = 1
     
@@ -39,4 +40,4 @@ class MyPage(PageInherit):
     form_model = 'player'
     form_fields = ['gender', 'age', 'mother_tongue', 'english_understanding', 'math_grade', 'video_games', 'cs_experience', 'js_experience',]
 
-page_sequence = [MyPage]
+page_sequence = [Intro, MyPage]
