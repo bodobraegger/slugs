@@ -239,7 +239,7 @@ class Scene2 extends Phaser.Scene {
           
           let c = getRandomColorInCat();
           
-          // this.addFruit(20+c.color%(rand*10), c.color%(rand*10), 5*rand, c, 'flower');
+          // this.addFruit(20+c.color%(rand*10), c.color%(rand*10), 5*rand, c, 'round');
           let plant; 
           if(yesOrNo) {
             plant = new Plant(this, distx, disty, c, randSize, randFS, randFN, true)
@@ -367,7 +367,7 @@ class Scene2 extends Phaser.Scene {
       let visible = p.getVisible();
       if( !(visible.length) && p.circle && p.width < this.pb.torso.displayWidth*1.5) {
         try {
-          let f = this.addFruit(p.getFirstAlive().x, p.getFirstAlive().y, p.width*.5, p.color, 'flower');
+          let f = this.addFruit(p.getFirstAlive().x, p.getFirstAlive().y, p.width*.5, p.color, 'round');
           // console.info('replacing',p,'with',f)
           p.destroy(true, true);
         } catch(error) {
