@@ -5,7 +5,6 @@ function getColorCategory(color) {
       if(color.h - COLORCATS[i] >= 0) {
         cat1 = i;
       } 
-      // console.log(color.h - COLORCATS[i])
     }
     return (cat1==7? 0:cat1);
 }
@@ -23,8 +22,6 @@ function sameColorCategory(color1, color2) { // color blindness: https://coloror
     }
     let colorDiff = Math.min(Math.abs(color1.h - color2.h), Math.abs(COLORCATS[cat1] - color2.h), Math.abs(COLORCATS[cat2] - color1.h));
     let similarityBound = 0.2 * (color1.h + color2.h)/2
-    // console.log('color.h:', color1.h, color2.h,'| dff:', colorDiff, 'similarityBound:', similarityBound)
-    // console.log('cat:', COLORCATS_HR[cat1], COLORCATS_HR[cat2])
     */
     cat1 = getColorCategory(color1); 
     cat2 = getColorCategory(color2);
@@ -69,14 +66,10 @@ function getRandomColorInCat(cat) {
         hue = FloatBetween(rangeStart, rangeEnd)
       }
     }
-    // console.log(chosenCatIndex, COLORCATS_HR[chosenCatIndex])
     let r = new Phaser.Display.Color();
     r.setFromHSV(hue, FloatBetween(0.85, 0.95), FloatBetween(0.8, 0.9))
     // hack to make hue saved on it...
     r.setTo(r.red, r.green, r.blue, r.alpha, true);
     
-    // console.log(rangeEnd - rangeStart, chosenCatIndex == 0)
-    // console.log(rangeStart, rangeEnd, cat, r.h, getColorCategory(r), COLORCATS_HR[getColorCategory(r)])
-    // console.log(rangeStart, hue, rangeEnd, COLORCATS_HR[getColorClass(r)], r)
     return r;
 }

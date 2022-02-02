@@ -126,7 +126,6 @@ eventTypes.forEach(t => {
       let i = 1
       for( ; i < wordsOfInterest.length; i++) {
         if(!wordsAll.includes(wordsOfInterest[i])) {
-          // console.debug(wordsOfInterest[i], 'not in list of all words!')
           wordsOfInterest = wordsOfInterest.slice(0, i);
           current_word = wordsOfInterest[i-1];
           break
@@ -141,7 +140,6 @@ eventTypes.forEach(t => {
         // IF even number of words, then we have...
         // if xx is yy then zz ... 
         if(wordsAction.includes(current_word)) {
-          // console.debug('// if xx is yy then zz')
           return;
         }
         else if(current_word == 'intro') {
@@ -149,16 +147,13 @@ eventTypes.forEach(t => {
         }
         // if XX is YY..., 
         else if(current_word == notEqualWord) {
-          // console.debug('// if XX is not YY...,')
           wordsToCompare = wordsIfConditionRight;
         }
         else if(wordsIfConditionRight.includes(current_word) || wordsOfInterest.at(-2) == equalWord) {
-          // console.debug('// if XX is YY...,')
-          wordsToCompare = [thenWord];
+                    wordsToCompare = [thenWord];
         }
         // OR if XX ..., OR if XX is YY and ZZ ... 
         else if(wordsOfInterest.at(-2) == ifWord || wordsBoolean.includes(wordsOfInterest.at(-2))) {
-          // console.debug('// OR if XX ..., OR if XX is YY and ZZ ...')
           wordsToCompare = [equalWord]; 
           if(current_word == 'fruit') {
             wordsToCompare.push(notEqualWord)
@@ -174,7 +169,6 @@ eventTypes.forEach(t => {
         if(wordsBoolean.includes(current_word)) {
           // if XX is YY then ...,
           if(current_word == thenWord) {
-            // console.debug('// if XX is YY then ...,')
             wordsToCompare = ['eat'];
             if(wordsOfInterest.at(-4) == 'other_creature') {
               wordsToCompare = ['flee'];
@@ -182,7 +176,6 @@ eventTypes.forEach(t => {
           }
           // if XX is ..., 
           else if(current_word == equalWord || current_word == notEqualWord) {
-            // console.debug('// if XX is ...,')
             if(wordsOfInterest.includes('fruit')) {
               wordsToCompare = wordsIfConditionRight;
             } else if(wordsOfInterest.at(-2) == 'other_creature') {
@@ -191,9 +184,7 @@ eventTypes.forEach(t => {
           }
           // OR if XX is YY and ... 
           else if(wordsBoolean.includes(wordsOfInterest.at(-2))) {
-            // console.debug('// OR if XX is YY and ...')
             wordsToCompare = wordsIfConditionLeft;
-            // console.debug('juhui')
           }
         }
       }
@@ -282,9 +273,6 @@ eventTypes.forEach(t => {
         }
       }
     }
-    // console.debug(input, wordsOfInterest, current_word);
-    // console.debug(checkAgainst, wordsToCompare);
-    
     
     autocomplete.innerHTML = wrapCmd(input);
     let nextWord = '';
@@ -445,7 +433,6 @@ function addToLog(output) {
     wrap.classList.add('logSegment');
   }
 
-  // console.debug(getTotalChildrenHeights(terminal_container), 'vs', document.getElementById("phaser_container").clientHeight);
   let div = document.createElement('div');
   if(!(output instanceof HTMLDivElement) ) {
     // if output is already a stringified div, don't create a nested one.
@@ -490,7 +477,6 @@ function addToLog(output) {
 /*
   while(getTotalChildrenHeights(terminal_container) > getCanvasHeight() && logCount > 0 && terminal_container.children.length) {
     logDiv.firstChild.remove();
-    // console.debug('trimming log to make room! bigger than canvas currently')
     logCount--;
   }*/
   if(isOverflown(terminal_container)) {

@@ -1,5 +1,4 @@
 function velocityToTarget(from, to, speed = 1) {
-    // console.log(from.x, from.y, to.x, to.y)
     const direction = Math.atan((to.x - from.x) / (to.y - from.y));
     const speed2 = to.y >= from.y ? speed : -speed;
     

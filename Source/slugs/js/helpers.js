@@ -17,25 +17,22 @@ function randomElement(array = []) {
 }
 
 function changeStylesheetRule(stylesheet, selector, property, value) {
-	selector = selector.toLowerCase();
-	property = property.toLowerCase();
-	value = value.toLowerCase();
+    selector = selector.toLowerCase();
+    property = property.toLowerCase();
+    value = value.toLowerCase();
 
-	for(var i = 0; i < stylesheet.cssRules.length; i++) {
-		var rule = stylesheet.cssRules[i];
-		if(rule.selectorText === selector) {
-            // console.log('replacing css')
-			rule.style[property] = value;
-			return;
-		}
-	}
-    // console.log('creating css')
-	stylesheet.insertRule(selector + " { " + property + ": " + value + "; }", 0);
-    // console.log(stylesheet)
+    for(var i = 0; i < stylesheet.cssRules.length; i++) {
+        var rule = stylesheet.cssRules[i];
+        if(rule.selectorText === selector) {
+            rule.style[property] = value;
+            return;
+        }
+    }
+    stylesheet.insertRule(selector + " { " + property + ": " + value + "; }", 0);
 }
 
 function nearestPowerOf2(n=0) {
-	if(n<1) return 1;
-	else if(n>2147483647) return 1073741824;
-	return 1 << 31 - Math.clz32(n);
+    if(n<1) return 1;
+    else if(n>2147483647) return 1073741824;
+    return 1 << 31 - Math.clz32(n);
 }

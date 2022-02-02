@@ -104,8 +104,7 @@ class Scene2 extends Phaser.Scene {
     // this.load.on('complete', this.completeLoading, {newGraphics:this.newGraphics,loadingText:loadingText});
 
     this.mutationObserver = new MutationObserver(function(mutations) {
-      // console.log( Math.round((Date.now() - this.lastLogged) / 1000) )
-      this.lastLogged = Date.now();
+    this.lastLogged = Date.now();
     });
     this.mutationObserver.observe(terminal_log, {
       attributes: true,
@@ -229,11 +228,9 @@ class Scene2 extends Phaser.Scene {
                 let c = this.cameras.main;
                 let mp = c.midPoint;
                 let viewRec = new Phaser.Geom.Rectangle(mp.x-c.displayWidth*.5, mp.y-c.displayHeight*.5, c.displayWidth, c.displayHeight);
-                // console.log(viewRec)
                 let visible = Phaser.Geom.Rectangle.Overlaps(viewRec, new Phaser.Geom.Rectangle(distx-randSize*.5, disty-randSize*.5, randSize, randSize));
                 
                 tooClose = ( ( Math.abs(p.x-distx) < Math.max(randSize/tries, 250/tries) && Math.abs(p.y-disty) < Math.max(randSize/tries, 250/tries) ) || visible ) && tries<3;
-                // console.log(Math.abs(p.x-distx)+Math.abs(p.y-disty),randSize*3)
                 return tooClose;
               })
           } while(tooClose);
@@ -353,7 +350,6 @@ class Scene2 extends Phaser.Scene {
   update(time, delta) {
     //this.controls.update(delta)
     this.graphics.clear()
-    // console.log(constraints)
     BEINGS.getMatching('active', true).forEach(e => {
       // SHOW THE SKELETONS OF THE SLUGS
       if(e.someVisible()) {
@@ -939,7 +935,6 @@ class Scene2 extends Phaser.Scene {
     }
     others.forEach(b=>{
       being.heady.setOnCollideWith(b.torso, pair => {
-        // console.log('snake colliding with', limb, pair)
         if(being.eating && (b.hunter == this || b.torso.hunter == this)) {
           if(being.heady.displayWidth > b.torso.displayWidth) {
             // successfully ate
@@ -1025,19 +1020,14 @@ class Scene2 extends Phaser.Scene {
 function findClosest(A, B=[new Phaser.GameObjects.GameObject()]) {
   let distance = Infinity;
   let closest;
-  // console.log(A, B)
-  // console.log(A.x, A.y);
-  B.forEach(b=> {
-    // console.log(b.x, b.y)
-    // distance squared is faster
+      B.forEach(b=> {
+        // distance squared is faster
     currentDistance = Distance.Squared(A.x, A.y, b.x, b.y);
-    // console.log(A.x, A.y, b.x, b.y)
-    if(currentDistance < distance) {
+        if(currentDistance < distance) {
       distance = currentDistance;
       closest = b;
     }
-    // console.log(distance)
-  })
+      })
   return closest;
 }
 
@@ -1072,8 +1062,7 @@ class GroupDynVis extends GameObjects.Group {
       let c = this.scene.cameras.main;
       let mp = c.midPoint;
       let viewRec = new Phaser.Geom.Rectangle(mp.x-c.displayWidth*.5, mp.y-c.displayHeight*.5, c.displayWidth, c.displayHeight);
-      // console.log(viewRec)
-      if(Phaser.Geom.Rectangle.Overlaps(viewRec,f.getBounds())) {
+            if(Phaser.Geom.Rectangle.Overlaps(viewRec,f.getBounds())) {
         f.visible = true;
         this.visible = true;
         return this.visible;
@@ -1088,7 +1077,6 @@ class GroupDynVis extends GameObjects.Group {
       let c = this.scene.cameras.main;
       let mp = c.midPoint;
       let viewRec = new Phaser.Geom.Rectangle(mp.x-c.displayWidth*.5, mp.y-c.displayHeight*.5, c.displayWidth, c.displayHeight);
-      // console.log(viewRec)
       if(Phaser.Geom.Rectangle.Overlaps(viewRec,f.getBounds())) {
         f.visible = true;
         this.visible = true;
@@ -1161,7 +1149,6 @@ class Plant extends GroupDynVis {
             f0.joints.push(j); 
             f2.joints.push(j); 
           }
-          // console.log(f0.joints.length)
         }
 
       }
