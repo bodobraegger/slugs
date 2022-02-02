@@ -50,6 +50,12 @@ SESSION_CONFIG_DEFAULTS = dict(
 
 SESSION_CONFIGS = [
     dict(
+        name='demographics',
+        display_name="demographics",
+        num_demo_participants=1,
+        app_sequence=['demographics'],
+    ),
+    dict(
         name='question_with_other_option',
         display_name="Menu with an 'other' option that lets you type in a valueInput manually",
         num_demo_participants=4,
