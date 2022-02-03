@@ -1,0 +1,174 @@
+{{ block title }}
+    Section {{section_number}}
+{{ endblock }}
+{{ block content }}
+  
+<div class="mb-3 _formfield">
+    
+        <label class="col-form-label" for="id_js_ifelse">
+In the following JavaScript snippet, there is a line missing. Select the answers to fill in the
+missing line that would make it correct and let it log the following output to the console: <code>you
+need to practice debugging</code>.<br>
+JavaScript Snippet: <br>
+<div class="code"><pre style="margin: 0; line-height: 125%"><span style="color: #007020; font-weight: bold">let</span> goal <span style="color: #666666">=</span> <span style="color: #4070a0">'computational thinking'</span>
+<span style="color: #007020; font-weight: bold">let</span> activity <span style="color: #666666">=</span> <span style="color: #4070a0">'unsure'</span>
+<span style="color: #007020; font-weight: bold">if</span>(goal <span style="color: #666666">==</span> <span style="color: #4070a0">'fastest 100m sprint'</span>) 
+{
+activity <span style="color: #666666">=</span> <span style="color: #4070a0">'running'</span>
+} 
+<span style="color: #60a0b0; font-style: italic">// MISSING LINE</span>
+{
+activity <span style="color: #666666">=</span> <span style="color: #4070a0">'debugging'</span>
+}
+console.log(<span style="color: #4070a0">'you need to practice '</span> <span style="color: #666666">+</span> activity)
+</pre></div>
+</label>
+        <div class="controls" style="display:block">
+            
+            <div class="form-check form-check">
+                <input class="form-check-input" type="radio" id="id_js_ifelse-0" name="js_ifelse" value="if(goal == 'computational thinking')">
+                <label for="id_js_ifelse-0" class="form-check-label"><span style="color: #007020; font-weight: bold">if</span>(goal <span style="color: #666666">==</span> <span style="color: #4070a0">&#39;computational thinking&#39;</span>)</label>
+            </div>
+            
+            <div class="form-check form-check">
+                <input class="form-check-input" type="radio" id="id_js_ifelse-1" name="js_ifelse" value="else if(goal == 'fastest 100m sprint')">
+                <label for="id_js_ifelse-1" class="form-check-label"><span style="color: #007020; font-weight: bold">else</span> <span style="color: #007020; font-weight: bold">if</span>(goal <span style="color: #666666">==</span> <span style="color: #4070a0">&#39;fastest 100m sprint&#39;</span>)</label>
+            </div>
+            
+            <div class="form-check form-check">
+                <input class="form-check-input" type="radio" id="id_js_ifelse-2" name="js_ifelse" value="else">
+                <label for="id_js_ifelse-2" class="form-check-label"><span style="color: #007020; font-weight: bold">else</span></label>
+            </div>
+            
+            <div class="form-check form-check">
+                <input class="form-check-input" type="radio" id="id_js_ifelse-3" name="js_ifelse" value="if goal is computational thinking then">
+                <label for="id_js_ifelse-3" class="form-check-label">
+                    <span style="color: #007020; font-weight: bold">if</span> goal is computational thinking then</label>
+            </div>
+            
+        </div>
+
+        {{ formfield_errors 'js_ifelse' }}
+
+</div>
+        <br>
+
+    
+        
+<div class="mb-3 _formfield">
+    
+        <label class="col-form-label" for="id_js_while">In the following boxes are snippets of JavaScript code. Please select the snippets that produce the following output in the console: <br>
+<code>
+You are great!<br>
+You are nice!<br>
+You are clever!<br>
+</code>
+<br>
+            </label>
+        <div class="controls">
+            
+            <div class="form-check form-check">
+                <input class="form-check-input" type="radio" id="id_js_while-0" name="js_while" value="A">
+                <label for="id_js_while-0" class="form-check-label">
+<div class="code"><pre style="margin: 0; line-height: 125%"><span style="color: #007020; font-weight: bold">let</span> <span style="color: #666666">=</span> [<span style="color: #4070a0">&#39;great&#39;</span>, <span style="color: #4070a0">&#39;nice&#39;</span>]
+<span style="color: #007020; font-weight: bold">let</span> iteration <span style="color: #666666">=</span> <span style="color: #40a070">0</span>
+<span style="color: #007020; font-weight: bold">while</span>(iteration <span style="color: #666666"></span>< <span style="color: #40a070">2</span>) {
+  console.log(<span style="color: #4070a0">&#39;You are &#39;</span> <span style="color: #666666">+</span> c[iteration] <span style="color: #666666">+</span> <span style="color: #4070a0">&#39;!&#39;</span>)
+  iteration <span style="color: #666666">=</span> iteration <span style="color: #666666">+</span> <span style="color: #40a070">1</span>
+}
+</pre></div>
+    
+</label>
+            </div>
+            
+            <div class="form-check form-check">
+                <input class="form-check-input" type="radio" id="id_js_while-1" name="js_while" value="B">
+                <label for="id_js_while-1" class="form-check-label">
+<div class="code"><pre style="margin: 0; line-height: 125%"><span style="color: #007020; font-weight: bold">let</span> complimentsList <span style="color: #666666">=</span> [<span style="color: #4070a0">&#39;great&#39;</span>, <span style="color: #4070a0">&#39;nice&#39;</span>, <span style="color: #4070a0">&#39;clever&#39;</span>]
+<span style="color: #007020; font-weight: bold">let</span> iteration <span style="color: #666666">=</span> <span style="color: #40a070">0</span>
+<span style="color: #007020; font-weight: bold">while</span>(iteration <span style="color: #666666"></span>< <span style="color: #40a070">3</span>) {
+  console.log(<span style="color: #4070a0">&#39;You are &#39;</span> <span style="color: #666666">+</span> complimentsList[iteration] <span style="color: #666666">+</span> <span style="color: #4070a0">&#39;!&#39;</span>)
+  iteration <span style="color: #666666">=</span> iteration <span style="color: #666666">+</span> <span style="color: #40a070">1</span>
+}
+</pre></div>
+
+</label>
+            </div>
+            
+            <div class="form-check form-check">
+                <input class="form-check-input" type="radio" id="id_js_while-2" name="js_while" value="C">
+                <label for="id_js_while-2" class="form-check-label">
+<div class="code"><pre style="margin: 0; line-height: 125%"><span style="color: #007020; font-weight: bold">let</span> numberOfCompliments <span style="color: #666666">=</span> <span style="color: #40a070">3</span>;
+<span style="color: #007020; font-weight: bold">let</span> complimentsList <span style="color: #666666">=</span> [<span style="color: #4070a0">&#39;great&#39;</span>, <span style="color: #4070a0">&#39;nice&#39;</span>, <span style="color: #4070a0">&#39;clever&#39;</span>]
+<span style="color: #007020; font-weight: bold">let</span> iteration <span style="color: #666666">=</span> <span style="color: #40a070">0</span>
+<span style="color: #007020; font-weight: bold">while</span>(iteration <span style="color: #666666"></span>< numberOfCompliments) {
+  console.log(<span style="color: #4070a0">&#39;You are &#39;</span> <span style="color: #666666">+</span> complimentsList[iteration] <span style="color: #666666">+</span> <span style="color: #4070a0">&#39;!&#39;</span>)
+  iteration <span style="color: #666666">=</span> iteration <span style="color: #666666">+</span> <span style="color: #40a070">1</span>
+}
+</pre></div>
+
+</label>
+            </div>
+            
+            <div class="form-check form-check">
+                <input class="form-check-input" type="radio" id="id_js_while-3" name="js_while" value="D">
+                <label for="id_js_while-3" class="form-check-label"> 
+<div class="code"><pre style="margin: 0; line-height: 125%"><span style="color: #007020; font-weight: bold">let</span> numberOfCompliments <span style="color: #666666">=</span> <span style="color: #40a070">3</span>;
+<span style="color: #007020; font-weight: bold">let</span> complimentsList <span style="color: #666666">=</span> [<span style="color: #4070a0">&#39;great&#39;</span>, <span style="color: #4070a0">&#39;nice&#39;</span>, <span style="color: #4070a0">&#39;clever&#39;</span>]
+<span style="color: #007020; font-weight: bold">let</span> iteration <span style="color: #666666">=</span> <span style="color: #40a070">0</span>
+<span style="color: #007020; font-weight: bold">while</span>(iteration <span style="color: #666666"></span>< numberOfCompliments) {
+  console.log(<span style="color: #4070a0">&#39;You are &#39;</span> <span style="color: #666666">+</span> complimentsList[iteration] <span style="color: #666666">+</span> <span style="color: #4070a0">&#39;!&#39;</span>)
+  iteration <span style="color: #666666">=</span> iteration <span style="color: #666666">+</span> <span style="color: #40a070">2</span>
+}
+</pre></div>
+
+</label>
+            </div>
+            
+        </div>
+    {{ formfield_errors 'js_while' }}
+
+</div>
+        <br>
+
+    
+        
+<div class="mb-3 _formfield">
+    
+        <label class="col-form-label" for="id_js_fizzbuzz">
+            Please write a JavaScript function that, for a given input number n, returns the sum of all
+            whole numbers divisible by 3 multiplied with the sum of all numbers not divisible by 3, which
+            are smaller than n. As a reminder, to test if a number is divisible by another, you can use the
+            <code>%</code> operator to get the remainder of a division, for example: <code>4 % 3 = 1</code>, <code>4 % 4 = 0</code>. If the result
+            is zero, then the first number is divisible by the second one.<br>
+            Here is an outline for a function containing the structure of a <code>while</code> loop.<br>
+<div class="code"><pre style="margin: 0; line-height: 125%"><span style="color: #007020; font-weight: bold">function</span> bigSum(n) {
+<span style="color: #007020; font-weight: bold">while</span>( )
+  {
+  <span style="color: #60a0b0; font-style: italic">// fill in the function</span>
+  }
+}
+</pre></div>
+<br></label>
+        <div class="controls">
+            <textarea class="form-control" id="id_js_fizzbuzz" name="js_fizzbuzz" value=""></textarea>
+        </div>
+
+    {{ formfield_errors 'js_fizzbuzz' }}
+</div>
+
+{{ next_button }}
+
+{{ endblock }}
+
+
+{% block styles %}
+<style>
+    img {
+        max-width: 80%;
+    }
+    .code {
+        padding: 10px; border-radius: 15px; border: solid 1px #101010;
+    }
+</style>
+{% endblock %}
