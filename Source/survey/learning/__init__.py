@@ -1,4 +1,5 @@
 from random import choices
+import string
 from tempfile import template
 from otree.api import *
 from survey import Intro
@@ -22,32 +23,34 @@ class Group(BaseGroup):
 
 
     
-def generateLabelDivs(choices): 
+def generate_label_div(choices): 
     r = '<div style="display: flex">'
     for x in choices:
         r+=f'''<div style="flex: 1; text-align: center">
                 {x}
                 <br>
-                <span style="text-align: center">{x}</span>
+                {generate_img_tag(x)}
             </div>'''
-    return r+ '</div>' + f'For example: {choices[0]}, {choices[1]}, {choices[2]}; round'
+    return r+ '</div>'
+def generate_img_tag(filename):
+    return f"<img src='/static/{filename}.png'>"
 class Player(BasePlayer):
     # section 1
-    fruit_not_fit = models.StringField(widget=widgets.RadioSelectHorizontal, choices=['B', 'C', 'D', 'E', 'H'], blank=True, label='Please select the fruit that does not fit into the below Set.')
-    fruit_combine = models.LongStringField(blank=True, label='Please combine the following fruit into sets, by writing the corresponding letters of a combination a line. Always include all the fruits involved in a combination. Add a one word description next to the set that explains why the fruit belong together.<br>' + generateLabelDivs(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']))
+    fruit_not_fit = models.StringField(widget=widgets.RadioSelectHorizontal, choices=['B', 'C', 'D', 'E', 'H'], blank=True, label='Please select the fruit that does not fit into the below Set.' + generate_label_div(['B', 'C', 'D', 'E', 'H']))
+    fruit_combine = models.LongStringField(blank=True, label='Please combine the following fruit into sets, by writing the corresponding letters of a combination a line. Always include all the fruits involved in a combination. Add a one word description next to the set that explains why the fruit belong together.<br>' + generate_label_div(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']) + f"Incomplete example: B, C; red")
     fruit_instruction_change = models.StringField(blank=True, 
-        label='''The selection below was created using this instruction: “Select the green fruit.”<br>
-            A D E G<br>
+        label=f'''The selection below was created using this instruction: “Select the green fruit.”<br>
+            {generate_label_div(['A', 'D', 'E', 'G'])}<br>
             How should the instruction be changed in order to generate the selection below?<br>
-            A E F G''')
-    leaf_combine = models.LongStringField(blank=True, label='Please combine the following leaves into sets, by writing the corresponding letters of a combination a line. Always include all the leaves involved in a combination. Add a one word description next to the set that explains why the leaves belong together.<br>' + generateLabelDivs(['I', 'J', 'K', 'L', 'M', 'N', 'O', 'P']))
-    leaf_correct_instructions_1 = models.StringField(blank=True, label='Please select the correct instructions to help someone produce the selection I, J from the leaves:', choices=['1. Select all leaves that are spiky.', '2. Select all leaves that are round and smooth.', '3. Select all leaves that have 7 segments.', '4. Select all leaves that are darker.',])
-    leaf_correct_instructions_2 = models.StringField(blank=True, label='Please select the correct instructions to help someone produce the selection O, N, L, K from the leaves:', choices=['1. Select all leaves that are spiky.', '2. Select all leaves that are round and smooth.', '3. Select all leaves that have 7 segments.', '4. Select all leaves that are lighter.',])
+            {generate_label_div(['A', 'E', 'F', 'G'])}''')
+    leaf_combine = models.LongStringField(blank=True, label='Please combine the following leaves into sets, by writing the corresponding letters of a combination a line. Always include all the leaves involved in a combination. Add a one word description next to the set that explains why the leaves belong together.<br>' + generate_label_div(['I', 'J', 'K', 'L', 'M', 'N', 'O', 'P']))
+    leaf_correct_instructions_1 = models.StringField(blank=True, label=f'Please select the correct instructions to help someone produce the selection  {generate_label_div(["I", "J"])} from the leaves: {generate_label_div(list(string.ascii_uppercase)[8:16])}', choices=['1. Select all leaves that are spiky.', '2. Select all leaves that are round and smooth.', '3. Select all leaves that have 7 segments.', '4. Select all leaves that are darker.',])
+    leaf_correct_instructions_2 = models.StringField(blank=True, label=f'Please select the correct instructions to help someone produce the selection {generate_label_div(["O", "N", "L", "K"])} from the leaves: {generate_label_div(list(string.ascii_uppercase)[8:16])}', choices=['1. Select all leaves that are spiky.', '2. Select all leaves that are round and smooth.', '3. Select all leaves that have 7 segments.', '4. Select all leaves that are lighter.',])
     leaf_instruction_change = models.StringField(blank=True, 
-        label='''The selection below was created using this instruction: “Select all leaves with 7 segments.”<br>
-            M, P<br>
+        label=f'''The selection below was created using this instruction: “Select all leaves with 7 segments.”<br>
+            {generate_label_div(['M', 'P'])}<br>
             How should the instruction be changed in order to generate the selection below?<br>
-            K, L, M, N, O, P''')
+            {generate_label_div(['K', 'L', 'M', 'N', 'O', 'P'])}''')
     # section 2
     shampoo = models.StringField(blank=True, 
         label='''Zorg, an alien from a planet where everything is understood literally, is visiting earth. Zorg
