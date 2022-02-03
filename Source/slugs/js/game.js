@@ -92,9 +92,6 @@ const config = {
         velocityIterations: 0.5,
         constraintIterations: 0.25,
         enableSleeping: true,
-        plugins: {
-          attractors: true,
-        }
       }
     },
     parent: 'phaser_container',
