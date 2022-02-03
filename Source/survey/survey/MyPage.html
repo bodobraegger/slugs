@@ -1,14 +1,14 @@
 {{ block title }}
-    Page {{subsession.round_number}} / {{C.NUM_ROUNDS}}
+    Question {{subsession.round_number}} / {{C.NUM_ROUNDS}}
 {{ endblock }}
 {{ block content }}
 
     {% for field in form %}
         <!--
-        {{field}}
+        {% formfield field %}
         -->    
 
-        <p><i>Labels under radio buttons</i></p>
+        <p>{{field.label}}</p>
         <div style="display: flex">
                 {{ for choice in field }}
                 <div style="flex: 1; text-align: center">

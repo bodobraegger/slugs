@@ -1,0 +1,26 @@
+{{ block title }}
+    Section {{section_number}}
+{{ endblock }}
+{{ block content }}
+
+    {% for field in form %}
+        <!--
+        {% formfield field %}
+        -->    
+        {% formfield field %}
+        <br>
+
+  {% endfor %}
+  
+  {{ next_button }}
+
+{{ endblock }}
+
+
+{% block styles %}
+<style>
+    img {
+        max-width: 80%;
+    }
+</style>
+{% endblock %}

@@ -56,16 +56,18 @@ SESSION_CONFIGS = [
         app_sequence=['demographics'],
     ),
     dict(
-        name='learning',
-        display_name="learning",
+        name='learning_pre',
+        display_name="learning_pre",
         num_demo_participants=1,
         app_sequence=['learning'],
+        include_js_test=False
     ),
     dict(
-        name='learning_js',
-        display_name="learning_js",
+        name='learning_post',
+        display_name="learning_post",
         num_demo_participants=1,
-        app_sequence=['learning_js'],
+        app_sequence=['learning'],
+        include_js_test=True
     ),
     dict(
         name='survey',
