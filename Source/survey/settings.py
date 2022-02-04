@@ -50,6 +50,41 @@ SESSION_CONFIG_DEFAULTS = dict(
 
 SESSION_CONFIGS = [
     dict(
+        name='questionnaires_part_1',
+        display_name="questionnaires_part_1",
+        num_demo_participants=1,
+        app_sequence=['demographics', 'survey', 'break'],
+        questionnaire = 'questions_pre.csv'
+    ),
+    dict(
+        name='questionnaires_part_2',
+        display_name="questionnaires_part_2",
+        num_demo_participants=1,
+        app_sequence=['learning', 'break'],
+        include_js_test=False
+    ),
+    dict(
+        name='questionnaires_part_3',
+        display_name="questionnaires_part_3",
+        num_demo_participants=1,
+        app_sequence=['survey', 'break'],
+        questionnaire = 'questions_mid.csv'
+    ),
+    dict(
+        name='questionnaires_part_4',
+        display_name="questionnaires_part_4",
+        num_demo_participants=1,
+        app_sequence=['survey', 'break'],
+        questionnaire = 'questions_post.csv'
+    ),
+    dict(
+        name='questionnaires_part_5',
+        display_name="questionnaires_part_5",
+        num_demo_participants=1,
+        app_sequence=['learning', 'break'],
+        questionnaire = 'questions_post.csv'
+    ),
+    dict(
         name='demographics',
         display_name="demographics",
         num_demo_participants=1,
@@ -60,7 +95,7 @@ SESSION_CONFIGS = [
         display_name="learning_pre",
         num_demo_participants=1,
         app_sequence=['learning'],
-        include_js_test=False
+        include_js_test=True
     ),
     dict(
         name='learning_post',
@@ -82,48 +117,6 @@ SESSION_CONFIGS = [
         num_demo_participants=1,
         app_sequence=['survey'],
         questionnaire = 'questions.csv',
-    ),
-    dict(
-        name='question_with_other_option',
-        display_name="Menu with an 'other' option that lets you type in a valueInput manually",
-        num_demo_participants=4,
-        app_sequence=['question_with_other_option'],
-    ),
-    dict(
-        name='multi_select',
-        display_name="Multi-select widget (a.k.a. multiple choice / multiple answer)",
-        num_demo_participants=1,
-        app_sequence=['multi_select'],
-    ),
-    dict(
-        name='multi_select_complex',
-        display_name="Multi-select widget (flexible version with custom labels & 'select at least N')",
-        num_demo_participants=1,
-        app_sequence=['multi_select_complex'],
-    ),
-    dict(
-        name='questions_from_csv_simple',
-        display_name='Quiz questions loaded from CSV spreadsheet (simple version)',
-        num_demo_participants=2,
-        app_sequence=['questions_from_csv_simple'],
-    ),
-    dict(
-        name='questions_from_csv',
-        display_name='Quiz questions loaded from CSV spreadsheet (complex version)',
-        num_demo_participants=2,
-        app_sequence=['questions_from_csv_complex'],
-    ),
-    dict(
-        name='radio_switching_point',
-        display_name='Radio button table with single switching point (strategy method)',
-        num_demo_participants=1,
-        app_sequence=['radio_switching_point'],
-    ),
-    dict(
-        name='radio',
-        display_name="Radio buttons in various layouts, looping over radio choices",
-        app_sequence=['radio'],
-        num_demo_participants=1,
     ),
 ]
 

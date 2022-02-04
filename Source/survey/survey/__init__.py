@@ -29,7 +29,7 @@ def creating_session(subsession):
         if r.get('scale') == '':
             subsession.session.vars['empty_row_indices'] += [i]
     
-    subsession.session.vars['empty_row_indices'] += [len(subsession.session.vars['questionnaire_rows'])]
+    # subsession.session.vars['empty_row_indices'] += [len(subsession.session.vars['questionnaire_rows'])]
 
 class Subsession(BaseSubsession):
     pass

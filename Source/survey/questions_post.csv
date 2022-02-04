@@ -1,21 +1,4 @@
 questionnaire,scale,question
-attitude_games_chang,likert5,I am good at playing computer games.
-attitude_games_chang,likert5,Playing computer games is easy for me.
-attitude_games_chang,likert5,I understand and play computer games well.
-attitude_games_chang,likert5,I am skilled at playing computer games.
-attitude_games_chang,likert5,I like taking courses that use computers.
-attitude_games_chang,likert5,Using computer games in school is a good way to learn.
-attitude_games_chang,likert5,Playing computer games improves my eye and hand coordination.
-attitude_games_chang,likert5,Playing computer games enhances my imagination.
-attitude_games_chang,likert5,I like it when people talk about computer games.
-attitude_games_chang,likert5,I feel comfortable while playing computer games.
-attitude_games_chang,likert5,I am very interested in solving quests/questions/missions in computer games.
-attitude_games_chang,likert5,I always try to solve the current quest/question/mission in the computer game.
-attitude_games_chang,likert5,Playing computer games makes me happy.
-attitude_games_chang,likert5,Playing computer games is part of my life.
-attitude_games_chang,likert5,"When I have free time, I talk about computer games with my friends."
-attitude_games_chang,likert5,I am not alone in a computer game as I can make friends there.
-,,
 attitude_cs_haynie,likert4,I have self-confidence when it comes to computer science.
 attitude_cs_haynie,likert4,I am confident that I can solve problems by using computing.
 attitude_cs_haynie,likert4,I can learn computer science without a teacher to explain it. 
@@ -58,15 +41,4 @@ attitude_cs_weston,likert4b,Important people in my life think it is good for me 
 attitude_cs_weston,likert4b,I believe people like me can do well learning technology.
 attitude_cs_weston,likert4b,My family likes me to learn about technology.
 attitude_cs_weston,likert4b,Other students generally think it is cool that I learn about technology.
-,,
-sus_brooke,likert5,I think that I would like to use this system frequently.
-sus_brooke,likert5,I found the system unnecessarily complex.
-sus_brooke,likert5,I thought the system was easy to use.
-sus_brooke,likert5,I think that I would need the support of a technical person to be able to use this system.
-sus_brooke,likert5,I found the various functions in this system were well integrated.
-sus_brooke,likert5,I thought there was too much inconsistency in this system.
-sus_brooke,likert5,I would imagine that most people would learn to use this system very quickly.
-sus_brooke,likert5,I found the system very cumbersome to use.
-sus_brooke,likert5,I felt very confident using the system.
-sus_brooke,likert5,I needed to learn a lot of things before I could get going with this system.
 ,,
