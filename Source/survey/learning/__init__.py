@@ -90,7 +90,7 @@ class Player(BasePlayer):
             <p>Suggest a way of making this process easier for the people on the farm.</p>
             ''')
     # section 3
-    js_ifelse = models.StringField(blank=True, widget=widgets.RadioSelect,
+    js_ifelse = models.StringField(blank=True,
         label='''
 In the following JavaScript snippet, there is a line missing. Select the answers to fill in the
 missing line that would make it correct and let it log the following output to the console: <code>you
@@ -109,10 +109,10 @@ activity <span style="color: #666666">=</span> <span style="color: #4070a0">&#39
 console.log(<span style="color: #4070a0">&#39;you need to practice &#39;</span> <span style="color: #666666">+</span> activity)
 </pre></div>
 ''' # + generate_pres_div(["if(goal == 'computational thinking')", "else if(goal == 'fastest 100m sprint')", "else", "if goal is computational thinking then"])
-, choices=["if(goal == 'computational thinking')", "else if(goal == 'fastest 100m sprint')", "else", "if goal is computational thinking then"])
+)
 
 
-    js_while = models.StringField(blank=True, widget=widgets.RadioSelect,
+    js_while = models.StringField(blank=True,
         label='''In the following boxes are snippets of JavaScript pre. Please select the snippets that produce the following output in the console: <br>
 <code>
 You are great!<br>
@@ -120,8 +120,7 @@ You are nice!<br>
 You are clever!<br>
 </code>
 <br>
-            ''', 
-choices=['A', 'B', 'C', 'D'])
+            ''')
     js_fizzbuzz = models.LongStringField(blank=True, 
         label='''
             Please write a JavaScript function that, for a given input number n, returns the sum of all

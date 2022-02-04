@@ -25,27 +25,28 @@ console.log(<span style="color: #4070a0">'you need to practice '</span> <span st
 </label>
         <div class="controls" style="display:block">
             
-            <div class="form-check form-check">
-                <input class="form-check-input" type="radio" id="id_js_ifelse-0" name="js_ifelse" value="if(goal == 'computational thinking')">
+            <div class="form-check form-check" onchange="write_multiple(this)">
+                <input class="form-check-input" type="checkbox" id="id_js_ifelse-0" value="A">
                 <label for="id_js_ifelse-0" class="form-check-label"><span style="color: #007020; font-weight: bold">if</span>(goal <span style="color: #666666">==</span> <span style="color: #4070a0">&#39;computational thinking&#39;</span>)</label>
             </div>
             
-            <div class="form-check form-check">
-                <input class="form-check-input" type="radio" id="id_js_ifelse-1" name="js_ifelse" value="else if(goal == 'fastest 100m sprint')">
+            <div class="form-check form-check" onchange="write_multiple(this)">
+                <input class="form-check-input" type="checkbox" id="id_js_ifelse-1" value="B">
                 <label for="id_js_ifelse-1" class="form-check-label"><span style="color: #007020; font-weight: bold">else</span> <span style="color: #007020; font-weight: bold">if</span>(goal <span style="color: #666666">==</span> <span style="color: #4070a0">&#39;fastest 100m sprint&#39;</span>)</label>
             </div>
             
-            <div class="form-check form-check">
-                <input class="form-check-input" type="radio" id="id_js_ifelse-2" name="js_ifelse" value="else">
+            <div class="form-check form-check" onchange="write_multiple(this)">
+                <input class="form-check-input" type="checkbox" id="id_js_ifelse-2" value="C">
                 <label for="id_js_ifelse-2" class="form-check-label"><span style="color: #007020; font-weight: bold">else</span></label>
             </div>
             
-            <div class="form-check form-check">
-                <input class="form-check-input" type="radio" id="id_js_ifelse-3" name="js_ifelse" value="if goal is computational thinking then">
+            <div class="form-check form-check" onchange="write_multiple(this)">
+                <input class="form-check-input" type="checkbox" id="id_js_ifelse-3" value="D">
                 <label for="id_js_ifelse-3" class="form-check-label">
                     <span style="color: #007020; font-weight: bold">if</span> goal is computational thinking then</label>
             </div>
             
+            <input type="hidden" name="js_ifelse" id="js_ifelse">
         </div>
 
         {{ formfield_errors 'js_ifelse' }}
@@ -58,17 +59,17 @@ console.log(<span style="color: #4070a0">'you need to practice '</span> <span st
 <div class="mb-3 _formfield">
     
         <label class="col-form-label" for="id_js_while">In the following boxes are snippets of JavaScript code. Please select the snippets that produce the following output in the console: <br>
-<code>
-You are great!<br>
-You are nice!<br>
-You are clever!<br>
-</code>
+<pre>
+You are great!
+You are nice!
+You are clever!
+</pre>
 <br>
             </label>
         <div class="controls">
             
-            <div class="form-check form-check">
-                <input class="form-check-input" type="radio" id="id_js_while-0" name="js_while" value="A">
+            <div class="form-check form-check" onchange='write_multiple(this)'>
+                <input class="form-check-input" type="checkbox" id="id_js_while-0" value="A">
                 <label for="id_js_while-0" class="form-check-label">
 <div class="code"><pre style="margin: 0; line-height: 125%"><span style="color: #007020; font-weight: bold">let</span> <span style="color: #666666">=</span> [<span style="color: #4070a0">&#39;great&#39;</span>, <span style="color: #4070a0">&#39;nice&#39;</span>]
 <span style="color: #007020; font-weight: bold">let</span> iteration <span style="color: #666666">=</span> <span style="color: #40a070">0</span>
@@ -81,8 +82,8 @@ You are clever!<br>
 </label>
             </div>
             
-            <div class="form-check form-check">
-                <input class="form-check-input" type="radio" id="id_js_while-1" name="js_while" value="B">
+            <div class="form-check form-check" onchange='write_multiple(this)'>
+                <input class="form-check-input" type="checkbox" id="id_js_while-1" value="B">
                 <label for="id_js_while-1" class="form-check-label">
 <div class="code"><pre style="margin: 0; line-height: 125%"><span style="color: #007020; font-weight: bold">let</span> complimentsList <span style="color: #666666">=</span> [<span style="color: #4070a0">&#39;great&#39;</span>, <span style="color: #4070a0">&#39;nice&#39;</span>, <span style="color: #4070a0">&#39;clever&#39;</span>]
 <span style="color: #007020; font-weight: bold">let</span> iteration <span style="color: #666666">=</span> <span style="color: #40a070">0</span>
@@ -95,8 +96,8 @@ You are clever!<br>
 </label>
             </div>
             
-            <div class="form-check form-check">
-                <input class="form-check-input" type="radio" id="id_js_while-2" name="js_while" value="C">
+            <div class="form-check form-check" onchange='write_multiple(this)'>
+                <input class="form-check-input" type="checkbox" id="id_js_while-2" value="C">
                 <label for="id_js_while-2" class="form-check-label">
 <div class="code"><pre style="margin: 0; line-height: 125%"><span style="color: #007020; font-weight: bold">let</span> numberOfCompliments <span style="color: #666666">=</span> <span style="color: #40a070">3</span>;
 <span style="color: #007020; font-weight: bold">let</span> complimentsList <span style="color: #666666">=</span> [<span style="color: #4070a0">&#39;great&#39;</span>, <span style="color: #4070a0">&#39;nice&#39;</span>, <span style="color: #4070a0">&#39;clever&#39;</span>]
@@ -110,8 +111,8 @@ You are clever!<br>
 </label>
             </div>
             
-            <div class="form-check form-check">
-                <input class="form-check-input" type="radio" id="id_js_while-3" name="js_while" value="D">
+            <div class="form-check form-check onchange='write_multiple(this)'">
+                <input class="form-check-input" type="checkbox" id="id_js_while-3" value="D">
                 <label for="id_js_while-3" class="form-check-label"> 
 <div class="code"><pre style="margin: 0; line-height: 125%"><span style="color: #007020; font-weight: bold">let</span> numberOfCompliments <span style="color: #666666">=</span> <span style="color: #40a070">3</span>;
 <span style="color: #007020; font-weight: bold">let</span> complimentsList <span style="color: #666666">=</span> [<span style="color: #4070a0">&#39;great&#39;</span>, <span style="color: #4070a0">&#39;nice&#39;</span>, <span style="color: #4070a0">&#39;clever&#39;</span>]
@@ -120,7 +121,9 @@ You are clever!<br>
   console.log(<span style="color: #4070a0">&#39;You are &#39;</span> <span style="color: #666666">+</span> complimentsList[iteration] <span style="color: #666666">+</span> <span style="color: #4070a0">&#39;!&#39;</span>)
   iteration <span style="color: #666666">=</span> iteration <span style="color: #666666">+</span> <span style="color: #40a070">2</span>
 }
-</pre></div>
+</pre>
+<input type="hidden" name="js_while" id="js_while" value=''>
+</div>
 
 </label>
             </div>
@@ -160,6 +163,25 @@ You are clever!<br>
 {{ next_button }}
 
 {{ endblock }}
+
+
+{% block scripts %}
+<script>
+function write_multiple(e) {
+    let p = e.parentElement.parentElement;
+    let inputs = p.getElementsByTagName('input');
+    let combined_value = ''
+    let i = [...inputs]
+    i.forEach(c=>{
+        if(c.checked) {
+            combined_value += c.value+ ' ';
+        }
+    })
+    console.log(i.at(-1).name, combined_value)
+    i.at(-1).value = combined_value.trim();
+}
+</script>
+{% endblock %}
 
 
 {% block styles %}
