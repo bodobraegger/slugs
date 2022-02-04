@@ -1,36 +1,33 @@
 {{ block title }}
-    Question {{subsession.round_number}} / {{C.NUM_ROUNDS}}
+    Question {{cur_question}} / {{num_questions}}
 {{ endblock }}
 {{ block content }}
 
-    {% for field in form %}
-        <!--
-        {% formfield field %}
-        -->    
+    <p>{{group.question}}</p>
 
-        <p>{{field.label}}</p>
-        <div style="display: flex">
-                {{ for choice in field }}
-                <div style="flex: 1; text-align: center">
-                    {{ choice }}
-                    <br>
-                    <span style="text-align: center">{{ choice.label }}</span>
-                </div>
-                {{ endfor }}
-        </div>
+    <div style="display: flex">
         
-        {% if form.errors %}
-            <div class="otree-form-errors alert alert-danger">
-              {% if form.non_field_error %}
-                {{ form.non_field_error }}
-              {% else %}
-                {{ "Please fix the errors."|gettext }}
-              {% endif %}
-            </div>
-        {% endif %}{% if is_defined('js_vars') and js_vars %}<script>var js_vars = {{ js_vars }};</script>{% endif %}
-
-        <br>
-    {% endfor %}
+        {% for choice in session.vars.scale %}
+        <div style="flex: 1; text-align: center">
+            <input class="form-check-input" type="radio" id="id_answer-{{ forloop.counter0 }}" name="answer" value="{{ forloop.counter0 }}">
+            <br>
+            <span style="text-align: center">{{ choice }}</span>
+        </div>
+        {% endfor %}
+      
+      
+      {% if form.errors %}
+      <div class="otree-form-errors alert alert-danger">
+        {% if form.non_field_error %}
+        {{ form.non_field_error }}
+        {% else %}
+        {{ "Please fix the errors."|gettext }}
+        {% endif %}
+      </div>
+      {% endif %}{% if is_defined('js_vars') and js_vars %}<script>var js_vars = {{ js_vars }};</script>{% endif %}
+    </div>
+      
+    <br>
     {{ next_button }}
 
 {{ endblock }}

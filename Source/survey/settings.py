@@ -70,10 +70,18 @@ SESSION_CONFIGS = [
         include_js_test=True
     ),
     dict(
+        name='pre_test_with_questionnaires',
+        display_name="learning_both",
+        num_demo_participants=1,
+        app_sequence=['demographics', 'survey'],
+        include_js_test=False
+    ),
+    dict(
         name='survey',
         display_name="survey",
         num_demo_participants=1,
         app_sequence=['survey'],
+        questionnaire = 'questions.csv',
     ),
     dict(
         name='question_with_other_option',
