@@ -82,7 +82,8 @@ SESSION_CONFIGS = [
         display_name="questionnaires_part_5",
         num_demo_participants=1,
         app_sequence=['learning', 'break'],
-        questionnaire = 'questions_post.csv'
+        questionnaire = 'questions_post.csv',
+        include_js_test=True
     ),
     dict(
         name='demographics',
@@ -120,3 +121,4 @@ SESSION_CONFIGS = [
     ),
 ]
 
+INSTALLED_APPS=['otree']
