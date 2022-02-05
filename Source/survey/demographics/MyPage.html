@@ -1,5 +1,5 @@
 {{ block title }}
-    Questionniare 1: Page {{subsession.round_number}} / {{C.NUM_ROUNDS}}
+    Preliminary Questionnaire
 {{ endblock }}
 {{ block content }}
 
@@ -7,3 +7,14 @@
     {{ next_button }}
 
 {{ endblock }}
+
+{% block scripts %}
+<script>
+document.addEventListener('keydown', function(ev) {
+  if (ev.key === "Enter" && !(ev.target.tagName.toLowerCase() == 'textarea')) {
+    ev.preventDefault();
+    console.log(ev.target,ev.target.tagName.toLowerCase(),"ENTER-KEY PREVENTED ON NON-TEXTAREA ELEMENTS");
+  }
+});
+</script>
+{% endblock %}

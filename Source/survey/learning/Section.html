@@ -1,5 +1,5 @@
 {{ block title }}
-    Section {{section_number}}
+    Questionnaire 2: Section {{section_number}}
 {{ endblock }}
 {{ block content }}
 
@@ -16,6 +16,17 @@
 
 {{ endblock }}
 
+
+{% block scripts %}
+<script>
+document.addEventListener('keydown', function(ev) {
+  if (ev.key === "Enter" && !(ev.target.tagName.toLowerCase() == 'textarea')) {
+    ev.preventDefault();
+    console.log(ev.target,ev.target.tagName.toLowerCase(),"ENTER-KEY PREVENTED ON NON-TEXTAREA ELEMENTS");
+  }
+});
+</script>
+{% endblock %}
 
 {% block styles %}
 <style>

@@ -1,5 +1,5 @@
 {{ block title }}
-    Section {{section_number}}
+    Questionnaire 2: Section {{section_number}}
 {{ endblock }}
 {{ block content }}
   
@@ -180,6 +180,14 @@ function write_multiple(e) {
     console.log(i.at(-1).name, combined_value)
     i.at(-1).value = combined_value.trim();
 }
+</script>
+<script>
+document.addEventListener('keydown', function(ev) {
+  if (ev.key === "Enter" && !(ev.target.tagName.toLowerCase() == 'textarea')) {
+    ev.preventDefault();
+    console.log(ev.target,ev.target.tagName.toLowerCase(),"ENTER-KEY PREVENTED ON NON-TEXTAREA ELEMENTS");
+  }
+});
 </script>
 {% endblock %}
 

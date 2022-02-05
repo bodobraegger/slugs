@@ -50,40 +50,22 @@ SESSION_CONFIG_DEFAULTS = dict(
 
 SESSION_CONFIGS = [
     dict(
-        name='questionnaires_part_1',
-        display_name="questionnaires_part_1",
+        name='questionnaires_home',
+        display_name="questionnaires_home",
         num_demo_participants=1,
-        app_sequence=['demographics', 'survey', 'break'],
-        questionnaire = 'questions_pre.csv'
+        app_sequence=['hello', 'demographics', 'survey', 'learning', 'goodbye'],
+        questionnaire = 'questions_pre.csv',
+        include_js_test=False,
+        at_home=True
     ),
     dict(
-        name='questionnaires_part_2',
-        display_name="questionnaires_part_2",
+        name='questionnaires_post',
+        display_name="questionnaires_post",
         num_demo_participants=1,
-        app_sequence=['learning', 'break'],
-        include_js_test=False
-    ),
-    dict(
-        name='questionnaires_part_3',
-        display_name="questionnaires_part_3",
-        num_demo_participants=1,
-        app_sequence=['survey', 'break'],
-        questionnaire = 'questions_mid.csv'
-    ),
-    dict(
-        name='questionnaires_part_4',
-        display_name="questionnaires_part_4",
-        num_demo_participants=1,
-        app_sequence=['survey', 'break'],
-        questionnaire = 'questions_post.csv'
-    ),
-    dict(
-        name='questionnaires_part_5',
-        display_name="questionnaires_part_5",
-        num_demo_participants=1,
-        app_sequence=['learning', 'break'],
+        app_sequence=['hello', 'survey', 'learning', 'goodbye'],
         questionnaire = 'questions_post.csv',
-        include_js_test=True
+        include_js_test=True,
+        at_home=False
     ),
     dict(
         name='demographics',

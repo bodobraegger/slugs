@@ -63,7 +63,7 @@ class Player(BasePlayer):
         label='''Zorg, an alien from a planet where everything is understood literally, is visiting earth. Zorg
             bought a shampoo at the supermarket so she can wash her antennae. As she tries it in the
             shower, she can’t seem to finish showering at all because she follows the instructions on the
-            bottle exactly. The instructions read:<br>
+            bottle exactly. The instructions read:<br><br>
             <pre>
             Wash<br>
             Rinse<br>

@@ -1,12 +1,12 @@
 from otree.api import *
 
 doc = """
-break
+intro
 """
 
 
 class C(BaseConstants):
-    NAME_IN_URL = 'break'
+    NAME_IN_URL = 'hello'
     PLAYERS_PER_GROUP = None
     NUM_ROUNDS = 1
     
@@ -23,8 +23,9 @@ class Group(BaseGroup):
 class Player(BasePlayer):
     pass
 
+
 # PAGES
-class MyPage(Page):
+class Intro(Page):
     pass
 
-page_sequence = [MyPage]
+page_sequence = [Intro]

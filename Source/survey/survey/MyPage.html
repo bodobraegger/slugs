@@ -1,5 +1,6 @@
 {{ block title }}
-    Question {{cur_question}} / {{num_questions}}
+     Questionnaire 1: Part {{cur_survey}} / {{num_surveys}}<hr> 
+     Question {{cur_question}} / {{num_questions}}
 {{ endblock }}
 {{ block content }}
 
@@ -31,3 +32,15 @@
     {{ next_button }}
 
 {{ endblock }}
+
+{% block scripts %}
+<script>
+<script>
+document.addEventListener('keydown', function(ev) {
+  if (ev.key === "Enter" && !(ev.target.tagName.toLowerCase() == 'textarea')) {
+    ev.preventDefault();
+    console.log(ev.target,ev.target.tagName.toLowerCase(),"ENTER-KEY PREVENTED ON NON-TEXTAREA ELEMENTS");
+  }
+});
+</script>
+{% endblock %}

@@ -65,7 +65,7 @@ class MyPage(PageInherit):
         else:
             cur_question = player.round_number-1-player.session.vars['empty_row_indices'][cur_ind]
             num_questions = num_questions-1 - player.session.vars['empty_row_indices'][cur_ind]
-        return {'cur_question':cur_question,'num_questions': num_questions}
+        return {'cur_survey': cur_ind+2, 'num_surveys': len(player.session.vars['empty_row_indices']),'cur_question':cur_question,'num_questions': num_questions}
 
     def is_displayed(player):
         if(player.round_number-1) < len(player.session.vars['questionnaire_rows']):
