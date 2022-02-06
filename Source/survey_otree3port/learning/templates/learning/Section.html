@@ -10,9 +10,14 @@
     {% for field in form %}
         <!--
         {% formfield field %}
-        -->    
-        {% formfield field %}
+        -->  
+        <div class='form-group'>
+        {{ field.label | safe }}  
+        {{ field }}
+        {% if field.errors %}{{ field.errors.0 }}{% endif %}
         <br>
+        <br>
+        </div>
 
   {% endfor %}
   
