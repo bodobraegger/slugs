@@ -1,0 +1,49 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+     Questionnaire 1: Part {{cur_survey}} / {{num_surveys}}<hr> 
+     Question {{cur_question}} / {{num_questions}}
+{% endblock %}
+{% block content %}
+
+    <p>{{group.question}}</p>
+
+    <div style="display: flex">
+        
+        {% for choice in session.vars.scale %}
+        <div style="flex: 1; text-align: center">
+            <input class="form-check-input" type="radio" id="id_answer-{{ forloop.counter0 }}" name="answer" value="{{ forloop.counter0 }}">
+            <br>
+            <span style="text-align: center">{{ choice }}</span>
+        </div>
+        {% endfor %}
+      
+      
+      {% if form.errors %}
+      <div class="otree-form-errors alert alert-danger">
+        {% if form.non_field_error %}
+        {{ form.non_field_error }}
+        {% else %}
+        {{ "Please fix the errors." }}
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+      
+    <br>
+    {% next_button %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+<script>
+document.addEventListener('keydown', function(ev) {
+  if (ev.key === "Enter" && !(ev.target.tagName.toLowerCase() == 'textarea')) {
+    ev.preventDefault();
+    console.log(ev.target,ev.target.tagName.toLowerCase(),"ENTER-KEY PREVENTED ON NON-TEXTAREA ELEMENTS");
+  }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+
+{% block title %}
+    Welcome
+{% endblock %}
+{% block content %}
+
+    <p>Hello! Thank you for taking part in this study. On the following pages, there will be a sequence of questionnaires for you to fill out.</p>
+    <p>Please answer each question on your own without talking to your friends or parents. There are no right or wrong answers and we really care for your personal opinions :). They will help us evaluate and improve our educational format!</p>
+
+    <p>Important: Please complete all questionnaires in one sitting, and do not close this browser window / move away from this webpage! In case you accidentally do, you can use the following link to resume where you left off (so you don't have to start over): <a href='' id='thisUrl'></a></p>
+
+    {% next_button %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById("thisUrl").innerHTML = window.location.href;
+    document.getElementById("thisUrl").href = window.location.href;
+</script>
+{% endblock %}

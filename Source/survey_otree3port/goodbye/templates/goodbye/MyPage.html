@@ -1,0 +1,13 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+
+{% block title %}
+    Finished!
+{% endblock %}
+{% block content %}
+
+Thank you for your participation! Your anonymous participant code is <code>{{player.participant.code}}</code>. Please write it down. You can use it to request deletion of your data.
+
+
+{% endblock %}

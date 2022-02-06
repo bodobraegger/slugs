@@ -1,0 +1,18 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+    Finished with this questionnaire block!
+{% endblock %}
+{% block content %}
+
+    <p>Thank you for completing this questionnaire. Your answers help us shape the future of education! </p>
+
+    <p><b>Important: Please do not close this browser tab / window! </b> </p>
+
+    {% if session.config.at_home %}
+    
+    <p>Please rest for a minute, then continue with the next one :). </p>
+        {%next_button%}
+    {% endif %}
+{% endblock %}

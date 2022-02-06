@@ -1,0 +1,55 @@
+questionnaire,scale,question
+sus_brooke,likert5,I think that I would like to use this system frequently.
+sus_brooke,likert5,I found the system unnecessarily complex.
+sus_brooke,likert5,I thought the system was easy to use.
+sus_brooke,likert5,I think that I would need the support of a technical person to be able to use this system.
+sus_brooke,likert5,I found the various functions in this system were well integrated.
+sus_brooke,likert5,I thought there was too much inconsistency in this system.
+sus_brooke,likert5,I would imagine that most people would learn to use this system very quickly.
+sus_brooke,likert5,I found the system very cumbersome to use.
+sus_brooke,likert5,I felt very confident using the system.
+sus_brooke,likert5,I needed to learn a lot of things before I could get going with this system.
+,,
+attitude_cs_haynie,likert4,I have self-confidence when it comes to computer science.
+attitude_cs_haynie,likert4,I am confident that I can solve problems by using computing.
+attitude_cs_haynie,likert4,I can learn computer science without a teacher to explain it. 
+attitude_cs_haynie,likert4,I am sure I could do advanced work in computer science. 
+attitude_cs_haynie,likert4,I think I will do well in computer science.
+attitude_cs_haynie,likert4,I would take additional computer science courses if I were given the opportunity.
+attitude_cs_haynie,likert4,I hope that my future career will require the use of computer science.
+attitude_cs_haynie,likert4,I like to use computer science to solve problems.
+attitude_cs_haynie,likert4,The challenge of solving problems using computer science appeals to me.
+attitude_cs_haynie,likert4,I like writing computer programs. 
+attitude_cs_haynie,likert4,I feel comfortable in computer science.
+attitude_cs_haynie,likert4,I feel I belong in computer science.
+attitude_cs_haynie,likert4,I feel accepted by my peers in computer science.
+attitude_cs_haynie,likert4,I know someone like me who uses computer science in their work.
+attitude_cs_haynie,likert4,I know a lot of students like me who are interested in computer science.
+attitude_cs_haynie,likert4,Knowledge of computer science will help me earn a living.
+attitude_cs_haynie,likert4,Learning to use computing skills will help me achieve my career goals.
+attitude_cs_haynie,likert4,Computing skills used to understand computer science material can be helpful to me in understanding things in everyday life. 
+attitude_cs_haynie,likert4,I'll need a mastery of computer science for my future work.
+attitude_cs_haynie,likert4,Computer science is a worthwhile and necessary subject.
+attitude_cs_haynie,likert4,A friend or peer has encouraged me to study computer science.
+attitude_cs_haynie,likert4,Someone I know has given me the desire to study computer science.
+attitude_cs_haynie,likert4,Someone I know has praised my work in computer science.
+attitude_cs_haynie,likert4,Someone I know has discussed with me the computer science field.
+attitude_cs_haynie,likert4,Someone in my family has encouraged me to study computer science.
+,,
+attitude_cs_weston,likert4b,How interested are you in solving software problems?
+attitude_cs_weston,likert4b,How interested are you in programming computers or other technologies (in other words writing code)?
+attitude_cs_weston,likert4b,How much do you want to learn how to program computers or other technologies?
+attitude_cs_weston,likert4b,How much do you want to learn computer science?
+attitude_cs_weston,likert4b,How interested are you in playing computer games?
+attitude_cs_weston,likert4b,How interested are you in designing computer games?
+attitude_cs_weston,likert4b,How much do you want to learn about computer game design?
+attitude_cs_weston,likert4b,How confident are you in your ability to design computer games?
+attitude_cs_weston,likert4b,How confident are you in your ability to think of new technology inventions?
+attitude_cs_weston,likert4b,How confident are you in your ability to actually create new technology inventions?
+attitude_cs_weston,likert4b,How interested are you in actually creating new technology inventions?
+attitude_cs_weston,likert4b,How much do you want to learn how to create new technology inventions?
+attitude_cs_weston,likert4b,Important people in my life think it is good for me to learn about technology.
+attitude_cs_weston,likert4b,I believe people like me can do well learning technology.
+attitude_cs_weston,likert4b,My family likes me to learn about technology.
+attitude_cs_weston,likert4b,Other students generally think it is cool that I learn about technology.
+,,
