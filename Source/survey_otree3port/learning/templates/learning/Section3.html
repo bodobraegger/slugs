@@ -1,10 +1,10 @@
 {% extends "global/Page.html" %}
 {% load otree static %}
 
-{{ block title }}
+{% block title %}
     Questionnaire 2: Section {{section_number}}
-{{ endblock }}
-{{ block content }}
+{% endblock %}
+{% block content %}
   
 <div class="mb-3 _formfield">
     
@@ -52,7 +52,7 @@ console.log(<span style="color: #4070a0">'you need to practice '</span> <span st
             <input type="hidden" name="js_ifelse" id="js_ifelse">
         </div>
 
-        {{ formfield_errors 'js_ifelse' }}
+        {% if form.js_ifelse.errors %}{{ form.js_ifelse.errors.0 }}{% endif %}
 
 </div>
         <br>
@@ -132,7 +132,7 @@ You are clever!
             </div>
             
         </div>
-    {{ formfield_errors 'js_while' }}
+        {% if form.js_while.errors %}{{ form.js_while.errors.0 }}{% endif %}
 
 </div>
         <br>
@@ -160,12 +160,12 @@ You are clever!
             <textarea class="form-control" id="id_js_fizzbuzz" name="js_fizzbuzz" value=""></textarea>
         </div>
 
-    {{ formfield_errors 'js_fizzbuzz' }}
+        {% if form.js_fizzbuzz.errors %}{{ form.js_fizzbuzz.errors.0 }}{% endif %}
 </div>
 
-{{ next_button }}
+{% next_button %}
 
-{{ endblock }}
+{% endblock %}
 
 
 {% block scripts %}
