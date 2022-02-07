@@ -115,7 +115,7 @@
 }
 
 #autocomplete_parent > * > span.cmd {
-    margin: 0 -4px;
+    margin: 0 -3px;
 }
 
 #autocomplete_suggestions {
@@ -175,12 +175,20 @@
     animation-iteration-count: 1;
 }
 
+
+.cmd-wrap {
+    background-color: rgba(255, 255, 255, 0.1);
+    white-space:pre-line;
+    padding: 0 2px;
+    margin: 0 -2px;
+}
 .cmd {
     font-weight: bold;
     /* mix-blend-mode: darken; */ 
     background-color: rgb(90, 90, 90);
     color: white;
-    padding: 0 4px;
+    padding: 0 3px;
+    margin: 0 -3px;
 }
 
 .wordsAction {

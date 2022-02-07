@@ -91,7 +91,7 @@ class Slug extends Phaser.GameObjects.Container {
           if(c < 10) {
             if(player) {
               startNewLogSegment();
-              logInput(`your being roams around... maybe you could tell it what to do? try seeing how by typing ${wrapCmd('help')}!`)
+              logInput(`your being roams around... maybe you could tell it what to do? try seeing how by typing ${wrapCmd('help')}! don't forget to press enter when you're done typing :)`)
               this.roam();
             } 
           } else if(c < 15) {
@@ -333,9 +333,9 @@ class Slug extends Phaser.GameObjects.Container {
             }
           })
           if( !this.food_matching.getMatching('active', true).length) {
-            let output = `your being is done with the food it saw.`
+            let output = `your being is done with the food it saw. you can tell it to ${wrapCmd('eat')} again to get it to grow more :).`
             if(playersBeing.plantLoop && this.chosenFood.group) {
-              output += `<br>it tried all fruits off the plant which matched its rules!`
+              output += `<br>it tried all fruits off the plant which matched its rules! you can tell it to ${wrapCmd('eat')} again to get it to grow more :).`
             }
             if(this == this.scene.pb) {
               logOutput(output);
@@ -497,7 +497,7 @@ class Slug extends Phaser.GameObjects.Container {
       let output = ``;
       this.rotationDirection = 0;  
       this.timer = 0;
-      this.fleeing = 0;
+      this.fleeing = false;
       let enemyHeadys = []
       let enemyHeadyPointers = [];
       if(!(this.rulesParsed.filter(e => e.action == 'flee').length)) {
@@ -543,7 +543,7 @@ class Slug extends Phaser.GameObjects.Container {
             }
             let inverse = this.color.clone().setTo(255-this.color.r, 255-this.color.g, 255-this.color.b).color
             drawVec(vecFromEnemy, this.hunterHeady,inverse, Math.min(this.heady.displayWidth, (this.heady.displayWidth+this.hunter.torso.displayWidth)*30/dist + this.heady.displayWidth/4))
-            this.moveTo(vecFromEnemy, 3);
+            this.moveTo(vecFromEnemy, 4);
           }
           else {
             let output = `it thinks it far enough from the creature it tried to flee from now, so it stops fleeing ...`

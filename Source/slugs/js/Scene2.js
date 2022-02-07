@@ -164,7 +164,7 @@ class Scene2 extends Phaser.Scene {
     
     // let s1 = new Slug(this, slug_x-280, slug_y-5, 10);
     this.cameras.main.startFollow(this.pb.torso, false, 0.03, 0.03)
-    this.zoomAndPanToPlayersBeing(10, 4000, 'Cubic')
+    this.zoomAndPanToPlayersBeing(10, 2000, 'Cubic')
     
     this.stage = 1;
     this.slugs = [this.pb];
@@ -268,6 +268,7 @@ class Scene2 extends Phaser.Scene {
     }
 
     this.updateEdible = function() {
+        if(!(this.started)) { return; }
         let healthyFood = [];
         FRUIT.getMatching('active', true).forEach( f => {
           if(sameColorCategory(this.pb.color, f.color) && this.pb.heady.displayWidth > f.displayWidth && this.pb.shape == f.shape && this.pb.txtr == f.txtr) {
@@ -438,7 +439,7 @@ class Scene2 extends Phaser.Scene {
   start() {
     NARRATION.startNarration();
     if(!(this.started)) {
-      this.zoomAndPanToPlayersBeing(1, 4000, 'Cubic')
+      this.zoomAndPanToPlayersBeing(1, 2000, 'Cubic')
     }
     this.started = true;
   }
@@ -484,7 +485,7 @@ class Scene2 extends Phaser.Scene {
     
     switch (cmd[0]) {
       case ifWord: {
-        const ifError = `uh oh, an if rule needs to be of the form ${wrapCmd('if <i>condition</i> then <i>action</i>')}, for example: ${wrapCmd(ifExample)}!`
+        const ifError = `uh oh, an if rule needs to be of the form ${wrapCmd('if <i>condition</i> then <i>action</i>')}, for example: <br>${wrapCmd(ifExample)}!`
         if(cmd.length < 6 || !(wordsIfConditionRight.concat('hunting').includes(cmd.at(-3))) || !(cmd.at(-2) == thenWord) || !(wordsAction.includes(cmd.at(-1))) || !(cmd.includes(ENTITY_TYPES[0])||cmd.includes(ENTITY_TYPES.at(-1))) || cmd.length != new Set(cmd).size) { 
           logInput(output);
           logError(ifError);
@@ -508,7 +509,7 @@ class Scene2 extends Phaser.Scene {
       }
       case loopWord: {
         if(cmd.length < 6 || !(wordsAction.includes(cmd.at(-1))) || cmd.includes('other_creature') || cmd.join(' ') != 'while fruit is on plant eat') {
-          let error = `uh oh, a routine needs to be of the form ${wrapCmd(loopWord + ' <i>condition</i> <i>action</i>')}, for example: ${wrapCmd(loopExample)}!`
+          let error = `uh oh, a routine needs to be of the form ${wrapCmd(loopWord + ' <i>condition</i> <i>action</i>')}, for example: <br>${wrapCmd(loopExample)}!`
           if(cmd.includes('other_creature')) error += `<br>the being does not understand routines about ${wrapCmd('other_creature')}s.`
           logOutput(error);
           return;
@@ -584,7 +585,7 @@ class Scene2 extends Phaser.Scene {
                   })
                   logOutput(output)
                 } else {
-                  logOutput(`your being does not know any ${wrapCmd(e)} yet. try giving it one by typing ${wrapCmd(RULESorROUTINES == RULES ? ifExample:loopExample)}!<br>`);
+                  logOutput(`your being does not know any ${wrapCmd(e)} yet. try giving it one by typing <br>${wrapCmd(RULESorROUTINES == RULES ? ifExample:loopExample)}!<br>`);
                 }
               } else if(e=='color') {
                 logOutput(`your being tells you its ${wrapCmd(e)} is ${wrapCmd(COLORCATS_HR[getColorCategory(this.pb.color)])}.`); 
@@ -683,10 +684,10 @@ class Scene2 extends Phaser.Scene {
               output += `you can use the ${wrapCmd('flee')} command to tell your being to flee from an ${wrapCmd('other_creature')}. if you give it rules using the ${wrapCmd(ifWord)} about the creatures it should flee from, then it won't just flee from anything.`
               break;
             case ifWord:
-              output += `with the ${wrapCmd(ifWord)} keyword you can give rules to your being! your being will use these rules to figure out what to ${wrapCmd('eat')} and from what to ${wrapCmd('flee')} :). An if rule needs to be of the form ${wrapCmd('if <i>condition</i> then <i>action</i>')}, for example: ${wrapCmd(ifExample)}! the food the being chooses has to fit all the rules you give it!! you have to make sure that your rules don't make it impossible for your being to choose food :).`;
+              output += `with the ${wrapCmd(ifWord)} keyword you can give rules to your being! your being will use these rules to figure out what to ${wrapCmd('eat')} and from what to ${wrapCmd('flee')} :). An if rule needs to be of the form <br>${wrapCmd('if <i>condition</i> then <i>action</i>')}, for example: <br>${wrapCmd(ifExample)}! the food the being chooses has to fit all the rules you give it!! you have to make sure that your rules don't make it impossible for your being to choose food :).`;
               break;
             case loopWord:
-              output += `to make your being more efficient in eating, you can give it a ${wrapCmd('routine')} to follow so it can do things automatically. for example: ${wrapCmd(loopExample)}.`
+              output += `to make your being more efficient in eating, you can give it a ${wrapCmd('routine')} to follow so it can do things automatically. for example: <br>${wrapCmd(loopExample)}.`
               break;
             case stopWord:
               output += `${wrapCmd(stopWord)} will ${wrapCmd(stopWord)} your being from doing the last action you told it to do, probably ${wrapCmd('eat')}ing!`
@@ -844,12 +845,16 @@ class Scene2 extends Phaser.Scene {
     beings.forEach(s=> {
       o.setOnCollideWith(s.heady, pair => {
         try { 
-        let characteristics = `size: ${o.displayWidth<=s.heady.displayWidth?'smaller_than_head':'bigger_than_head'}; color: ${COLORCATS_HR[getColorCategory(o.color)]}; texture: ${o.txtr};  shape: ${o.shape};`
+        let characteristics = `
+          <br>- ${wrapCmd('size')}:    ${wrapCmd(o.displayWidth<=s.heady.displayWidth?'smaller_than_head':'bigger_than_head')};
+          <br>- ${wrapCmd('color')}:   ${wrapCmd(COLORCATS_HR[getColorCategory(o.color)])};
+          <br>- ${wrapCmd('texture')}: ${wrapCmd(o.txtr)};
+          <br>- ${wrapCmd('shape')}:   ${wrapCmd(o.shape)};`
         if(o == s.chosenFood && s.eating) {
           if(o.displayWidth <= s.heady.displayWidth) {
             let output = ``
             if(sameColorCategory(o.color, s.color) && o.txtr == s.txtr && o.shape == s.shape) {
-              output += `the being enjoyed this snack😋.<br>the snack's characteristics are: ${wrapCmd(characteristics)}<br>`
+              output += `the being enjoyed this snack😋.<br>the snack's characteristics were: ${characteristics}<br>`
               if(s.alpha < 1) {
                 s.saturate(1)
                 s.setAlpha(1);
@@ -871,7 +876,7 @@ class Scene2 extends Phaser.Scene {
               }
             } else {
               //console.log(sameColorCategory(o.color, s.color), o.txtr == s.txtr, o.shape == s.shape)
-              output = `oh no, the being did not like what it ate 🤢! it has turned ${wrapCmd('see-through', ['beingscolor'])}<br>the snack's characteristics are: ${wrapCmd(characteristics)}<br>`
+              output = `oh no, the being did not like what it ate 🤢! it has turned ${wrapCmd('see-through', ['beingscolor'])}<br>the snack's characteristics were: ${characteristics}<br>`
               s.setAlpha(0.5);
               if(!sameColorCategory(o.color, s.color)) {
                 output += `<br>perhaps it did not like its color 🍎🍈🍊`
@@ -911,7 +916,7 @@ class Scene2 extends Phaser.Scene {
               logOutput(output)
             }
           } else {
-            let output = `the being can't eat anything bigger than its head :0.<br>the snack's characteristics are: ${wrapCmd(characteristics)}<br>`
+            let output = `the being can't eat anything bigger than its head :0.<br> the characteristics of the snack it just tried to eat are: ${characteristics}<br>`
             if(s.plantLoop && o.group) {
               let oGroupMatchTemp = new Phaser.GameObjects.Group(this, this.pb.food_matching.getMatching('group', o.group));
               if(oGroupMatchTemp.getChildren('active', true).length) {
@@ -931,7 +936,7 @@ class Scene2 extends Phaser.Scene {
         }
         }
         catch(error) {
-          warn(error, 'error in setOnCollidesWithFruit')
+          console.warn(error, 'error in setOnCollidesWithFruit')
         }
       })
     })

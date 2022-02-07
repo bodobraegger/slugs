@@ -532,7 +532,7 @@ function wrapCmd(cmd, classesToAdd = []) {
   }
   let cmdArr = cmd.split(' ')
   if(cmdArr.length > 1) {
-    let r = ''
+    let r = '<span class="cmd-wrap">'
     cmdArr.forEach(e => {
       let wrapped;
       let delims = [':', ';', '-', ',']
@@ -541,7 +541,7 @@ function wrapCmd(cmd, classesToAdd = []) {
       else wrapped = wrapCmd(e, classesToAdd);
       r += `${wrapped} `;
     });
-    return r.trimEnd();
+    return r.trimEnd()+'</span>';
   }
   let i = 0;
   let classList = `cmd ${cmd} `
