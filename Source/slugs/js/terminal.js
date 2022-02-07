@@ -535,7 +535,7 @@ function wrapCmd(cmd, classesToAdd = []) {
     let r = ''
     cmdArr.forEach(e => {
       let wrapped;
-      let delims = [':', ';', '-']
+      let delims = [':', ';', '-', ',']
       if(delims.includes(e)) wrapped = e;
       else if(e.length>1 && delims.includes(e.at(-1)) ) wrapped = wrapCmd(e.slice(0,-1), classesToAdd)+e.at(-1)
       else wrapped = wrapCmd(e, classesToAdd);
