@@ -163,10 +163,9 @@ class Scene2 extends Phaser.Scene {
     this.rulesLength = 0;
     
     // let s1 = new Slug(this, slug_x-280, slug_y-5, 10);
-    this.cameras.main.startFollow(this.pb.torso, false, 0.03, 0.03);
-    this.cameras.main.setZoom(1000);
-    this.cameras.main.zoomTo(10, 4000, 'Cubic');
-
+    this.cameras.main.startFollow(this.pb.torso, false, 0.03, 0.03)
+    this.zoomAndPanToPlayersBeing(10, 4000, 'Cubic')
+    
     this.stage = 1;
     this.slugs = [this.pb];
     
@@ -388,7 +387,7 @@ class Scene2 extends Phaser.Scene {
     
     if(this.pb.scale > this.stage+1) {
       this.stage++;
-      this.cameras.main.zoomTo(1/this.stage, 2000, 'Sine.easeInOut');
+      this.zoomAndPanToPlayersBeing(1/this.stage, 2000, 'Sine.easeInOut');
       NARRATION.loopNudged = false;
     }
     if(this.stage >= 2 && !(this.pb.plantLoop) && !(NARRATION.loopNudged)) {
@@ -439,7 +438,7 @@ class Scene2 extends Phaser.Scene {
   start() {
     NARRATION.startNarration();
     if(!(this.started)) {
-      this.cameras.main.zoomTo(1, 4000, 'Cubic');
+      this.zoomAndPanToPlayersBeing(1, 4000, 'Cubic')
     }
     this.started = true;
   }
@@ -457,15 +456,15 @@ class Scene2 extends Phaser.Scene {
     terminal_container.style.background = 'radial-gradient(circle at right top, rgb(0, 61, 152), rgba(0, 0, 0, 0)), radial-gradient(circle at 20% 80%, rgb(166, 208, 228), rgba(0, 0, 0, 0))'
     addToLog = ()=>{}
     this.cameras.main.setZoom(1/this.stage);
-    this.cameras.main.zoomTo(0.0001, 3000, 'Sine.easeInOut');
+    this.zoomAndPanToPlayersBeing(0.0001, 3000, 'Sine.easeInOut');
     this.time.delayedCall(1000, () => {
-      this.cameras.main.zoomTo(0.0001, 3000, 'Sine.easeInOut');
+      this.zoomAndPanToPlayersBeing(0.0001, 3000, 'Sine.easeInOut');
     })
     this.time.delayedCall(2000, () => {
-      this.cameras.main.zoomTo(0.0001, 3000, 'Sine.easeInOut');
+      this.zoomAndPanToPlayersBeing(0.0001, 3000, 'Sine.easeInOut');
     })
     this.time.delayedCall(3000, () => {
-      this.cameras.main.zoomTo(0.0001, 3000, 'Sine.easeInOut');
+      this.zoomAndPanToPlayersBeing(0.0001, 3000, 'Sine.easeInOut');
     })
     this.stage = 99;
   }
@@ -476,11 +475,13 @@ class Scene2 extends Phaser.Scene {
     if(cmd.length < 1 || cmd[0] == '') { return; }
 
     // logInput(output);
-    
-    // TODO: IMPLEMENT SOME SORT OF WAY TO RECOGNIZE CONNECTED OUTPUT BUBBLES FOR COLORING CURRENT OUTPUT
-    // startOutput();
-    if(newSegment) { startNewLogSegment(); }
+        if(newSegment) { startNewLogSegment(); }
 
+    if(!(this.started) && cmd[0] != 'intro' && cmd[0] != 'start') {
+      logError(`it seems like you did not input ${wrapCmd('start')} yet! you really need to do this before being able to play the game, and you should really try to read these messages closely in order to receive guidance :).`)
+      return;
+    }
+    
     switch (cmd[0]) {
       case ifWord: {
         const ifError = `uh oh, an if rule needs to be of the form ${wrapCmd('if <i>condition</i> then <i>action</i>')}, for example: ${wrapCmd(ifExample)}!`
@@ -761,6 +762,13 @@ class Scene2 extends Phaser.Scene {
     }
     logOutput(output)
   }
+  
+  zoomAndPanToPlayersBeing = (zoomLevel, time, easing = "Sine.easeInOut", whenFinished = undefined, args = []) => {
+    let camera = this.cameras.main;
+    let spriteToFollow = this.pb.torso;
+    let x = spriteToFollow.x, y = spriteToFollow.y;
+    zoomAndPanTo(camera, zoomLevel, x, y, time, spriteToFollow, easing, whenFinished, args);
+  };
 
   addGameCircle(x, y, radius, color) {
     let circle = this.add.circle(x, y, radius, color.color);
@@ -923,86 +931,6 @@ class Scene2 extends Phaser.Scene {
         }
         }
         catch(error) {
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
           warn(error, 'error in setOnCollidesWithFruit')
         }
       })
@@ -1233,9 +1161,35 @@ class Plant extends GroupDynVis {
 
       }
     scene.add.existing(this);
-  }
+  }  
   destroy(clearChildren = false, destroyChildren=false) {
     this.scene.matter.world.removeConstraint(this.joints, true);
     super.destroy(clearChildren, destroyChildren);
   }
 }
+
+const zoomAndPanTo = (camera, zoomLevel, x, y, time, spriteToFollow = null, easing = "Sine.easeInOut", whenFinished = undefined, args = []) => {
+  camera.pan(
+    x,
+    y,
+    time,
+    easing,
+    true,
+    //The camera pan callback
+    //https://photonstorm.github.io/phaser3-docs/Phaser.Types.Cameras.Scene2D.html#.CameraPanCallback
+    (progress) => {
+      //Update the pan effect's destination x/y to the player's position
+      //https://phaser.discourse.group/t/dynamic-camera-pan-values/8365
+      //If the camera's destination target is moving, like the player,
+      //update the `desitnation` values
+      if (spriteToFollow) {
+        camera.panEffect.destination.x = spriteToFollow.x;
+        camera.panEffect.destination.y = spriteToFollow.y;
+      } 
+      if (progress === 1 && whenFinished) {
+        whenFinished.call(args);
+      }
+    }
+  );
+  camera.zoomTo(zoomLevel, time, easing);
+};
