@@ -381,6 +381,7 @@ class Slug extends Phaser.GameObjects.Container {
     evaluateFoodRules(logging = true) {
       let foodSelected = FRUIT.getMatching('active', true);
       let rulesFoodPositive = this.rulesParsed.filter(e => e.action == 'eat');
+      let rulesOutput = ''
       if(rulesFoodPositive.length) {
         if(logging) logOutput(`it remembers the following food ${wrapCmd('rules')} about things it should eat:`)
         
@@ -389,7 +390,7 @@ class Slug extends Phaser.GameObjects.Container {
           let r = rulesFoodPositive[i]; 
           let booleanExpr = r.booleanExpr;
           let booleanString = booleanExpr.join(' '); // .splice(1, 0, '(').push(')')
-          if(logging) logOutput(`${i+1}. ${wrapCmd(booleanString.replaceAll("'", ""))} ${i<rulesFoodPositive.length-1 ? 'and' : ''}`)
+          rulesOutput += `${i+1}. ${wrapCmd(booleanString.replaceAll("'", ""))} ${i<rulesFoodPositive.length-1 ? 'and<br>' : ''}`
           booleanString = booleanString.replaceAll(notEqualWord, '!=').replaceAll(equalWord, '==').replaceAll(andWord, '&&').replaceAll(` ${orWord}`, ` ||`);
           if(booleanString.includes("beings ")) {
             ATTRIBUTES.forEach( (e,i) => {
@@ -437,8 +438,12 @@ class Slug extends Phaser.GameObjects.Container {
         }
         // add to foodmatching outside of condition
       } 
-      if(this == this.scene.pb && !(rulesFoodPositive.length)) {
-        if(logging) logOutput(`none of the ${wrapCmd('rules')} tell your being what to ${wrapCmd('eat')}, so it will try to ${wrapCmd('eat')} anything! perhaps you should try to give it a rule to make sure it eats good food. try using the ${wrapCmd('help if')} commands :)`)
+      if(logging) {
+        if(this == this.scene.pb && !(rulesFoodPositive.length)) {
+          logOutput(`none of the ${wrapCmd('rules')} tell your being what to ${wrapCmd('eat')}, so it will try to ${wrapCmd('eat')} anything! perhaps you should try to give it a rule to make sure it eats good food. try using the ${wrapCmd('help if')} commands :)`)
+        } else if(rulesOutput.length) {
+          logOutput(rulesOutput);
+        }
       }
       return foodSelected;
     }

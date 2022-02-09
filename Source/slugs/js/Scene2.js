@@ -437,11 +437,17 @@ class Scene2 extends Phaser.Scene {
 
   }
   start() {
-    NARRATION.startNarration();
     if(!(this.started)) {
+      NARRATION.startNarration();
       this.zoomAndPanToPlayersBeing(1, 2000, 'Cubic')
+      this.time.delayedCall(1000, () => {
+        this.zoomAndPanToPlayersBeing(1, 2000, 'Cubic');
+      })
+      this.time.delayedCall(2000, () => {
+        this.zoomAndPanToPlayersBeing(1, 2000, 'Cubic');
+      })
+      this.started = true;
     }
-    this.started = true;
   }
   shutdown() {
     this.started = false;
@@ -452,8 +458,27 @@ class Scene2 extends Phaser.Scene {
     terminal_input.value = 'thanks for playing!'
     terminal_input.parentNode.removeChild(autocomplete);
     terminal_input.parentNode.removeChild(terminal_input);
-    startNewLogSegment();
-    logOutput(`THANK YOU FOR PLAYING! you reached the end of the game :).`);
+    startNewLogSegment(); 
+    let output = `GREAT JOB, you reached the end of the game. you managed to get your being to grow to 20 times it's initial size!<br>`
+    logOutput(output);
+    if(this.pb.rulesParsed.filter(e=>e.action=='eat').length) {
+      output = `you taught your being how to ${wrapCmd('eat')} properly :) you gave it rules that told it to look for... <br>`
+      this.pb.rulesParsed.filter(e=>e.action=='eat').forEach((e,i) => {
+        output += `${i+1}. ${wrapCmd(e.booleanExpr.join(' ').replaceAll("'", ""))} ${i<this.pb.rulesParsed.filter(e=>e.action=='eat').length-1 ? 'and<br>' : '<br>'}`
+      })
+      logOutput(output);
+    }
+    if(this.pb.plantLoop) {
+      if(!(this.pb.rulesParsed.length)) output =`you taught your being how to eat properly :) <br>`
+      else output = ''
+      output += `you taught it to keep eating all the fruits off a plant in a routine: <br>${wrapCmd('while fruit is on plant eat')} <br>`
+      logOutput(output);
+    }
+    if(this.pb.rulesParsed.filter(e=>e.action=='flee').length) {
+      output = `you helped it learn to only free from other creatures that are actually hunting it: <br>${wrapCmd(this.pb.rulesParsed.filter(e=>e.action=='flee')[0].booleanExpr.join(' ').replaceAll("'", ""))}<br>`
+      logOutput(output);
+    }
+    logOutput(`thank you for playing, i hope you enjoyed the game :)`)
     terminal_container.style.background = 'radial-gradient(circle at right top, rgb(0, 61, 152), rgba(0, 0, 0, 0)), radial-gradient(circle at 20% 80%, rgb(166, 208, 228), rgba(0, 0, 0, 0))'
     addToLog = ()=>{}
     this.cameras.main.setZoom(1/this.stage);
