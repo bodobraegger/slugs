@@ -14,10 +14,17 @@ SESSION_CONFIGS = [
         name='questionnaires_post',
         display_name="questionnaires_post",
         num_demo_participants=1,
-        app_sequence=['hello', 'questionnaire', 'learning', 'goodbye'],
+        app_sequence=['hello', 'questionnaire', 'learning', 'demographics', 'goodbye'],
         questionnaire = 'questions_post.csv',
         include_js_test=True,
         at_home=False
+    ),
+]
+
+ROOMS = [
+    dict(
+        name='post_questionnaire',
+        display_name='Classroom: Post Questionnaire'
     ),
 ]
 

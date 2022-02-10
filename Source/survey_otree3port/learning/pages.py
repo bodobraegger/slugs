@@ -23,6 +23,11 @@ class Section3(PageInherit):
         return player.subsession.session.config.get('include_js_test') == True
     def vars_for_template(player):
         return {'section_number': 3}
+    def app_after_this_page(self, upcoming_apps):
+        if self.participant.vars.get('show_demographics'):
+            return upcoming_apps[0]
+        else:
+            return upcoming_apps[-1]
 
 class Intro(Page):
     def is_displayed(player):

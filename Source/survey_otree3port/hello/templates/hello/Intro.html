@@ -12,6 +12,13 @@
 
     <p>Important: Please complete all questionnaires in one sitting, and do not close this browser window / move away from this webpage! In case you accidentally do, you can use the following link to resume where you left off (so you don't have to start over): <a href='' id='thisUrl'></a></p>
 
+    <p>
+    <label for="id_questionnaire_pre_code">Please copy and paste the <code>anonymous participant code</code> (mix of 8 letters and numbers) here that you received on the last page of the questionnaire you have completed at home. <br>
+        If you did not write the code down (and you can't find the link in your browser history or need help), or did not complete the home questionniare, please raise your hand.</label>
+    <input type="text" name="questionnaire_pre_code" maxlength="17" required="" id="id_questionnaire_pre_code" class="form-control">
+    </p>
+    <br>
+
     {% next_button %}
 
 {% endblock %}
