@@ -45,7 +45,6 @@ def plot_hist(all,a,b,title,label_a, label_b):
 
     plt.legend(loc='upper left')
     ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
-    plt.show()
 
 def merge(): 
     """ used to merge pre and post test data that has since been discarded """
@@ -307,6 +306,7 @@ def plot(input):
 
     d = 'POST.sus_brooke'
     df_gamers, df_nongamers = df[(mask:=df.video_games > 1)], df[~mask]
+
     _, p_f = stats.shapiro(df_gamers[d])
     _, p_m = stats.shapiro(df_nongamers[d])
         
@@ -322,11 +322,18 @@ def plot(input):
 
     cohens_d = (mean(df_gamers[c]) - mean(df_nongamers[c])) / (sqrt((stdev(df_gamers[c]) ** 2 + stdev(df_nongamers[c]) ** 2) / 2))
     print(f'{out}, {cohens_d= :.3f}')
-    plot_hist(df[d], df_gamers[d], df_nongamers[d], d, 'Gamers', 'Non-Gamers (1/Month or less)')
+
+    df_flinta_gamers, df_flinta_nongamers = df_flinta[(mask:=df.video_games > 1)], df_flinta[~mask]
+    df_male_gamers, df_male_nongamers = df_male[(mask:=df.video_games > 1)], df_male[~mask]
+    print(f'{len(df_flinta_gamers)=}, {len(df_flinta_nongamers)=}, {len(df_male_gamers)=},{len(df_male_nongamers)=}')
 
 
+    plot_hist(df[d], df_gamers[d], df_nongamers[d], d, 'Gamers', 'Non-Gamers (1/month or less)')
     for d in headers_relevant:
         plot_hist(df[d], df_flinta[d], df_male[d], d, 'FLINTA*', 'Male')
+    
+
+    plt.show()
 
 
 
