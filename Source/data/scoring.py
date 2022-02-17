@@ -259,10 +259,11 @@ def plot(input):
     # df_male.hist()
     # df_flinta.hist()
     plt.style.use('tableau-colorblind10')
-    for d in headers_questionnaires:
+    for d in [h for h in headers_questionnaires if 'sus_brooke' in h] + headers_delta:
         colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
         fig, ax = plt.subplots(1,1)
-        plt.hist([df_flinta[d], df_male[d]], label = [f'FLINTA*: {d}', f'Male: {d}'], rwidth=1)
+        plt.title(d)
+        plt.hist([df_flinta[d], df_male[d]], label = [f'FLINTA*', f'Male'], rwidth=1)
         
         plt.axvline(df_flinta[d].mean(), linestyle='dashed', linewidth=1, color=colors[0])
         min_ylim, max_ylim = plt.ylim()
@@ -271,10 +272,6 @@ def plot(input):
         plt.axvline(df_male[d].mean(), linestyle='dashed', linewidth=1, color=colors[1])
         min_ylim, max_ylim = plt.ylim()
         plt.text(df_male[d].mean()+.1, max_ylim*0.7, 'Mean - Male: {:.2f}'.format(df_male[d].mean()))
-
-        plt.axvline(df_flinta[d].mean(), linestyle='dashed', linewidth=1, color=colors[0])
-        min_ylim, max_ylim = plt.ylim()
-        plt.text(df_flinta[d].mean()+.1, max_ylim*0.9, 'Mean - FLINTA*: {:.2f}'.format(df_flinta[d].mean()))
 
         plt.axvline(df[d].mean()+.1, linestyle='dashed', linewidth=1, color=colors[2])
         min_ylim, max_ylim = plt.ylim()
@@ -287,5 +284,5 @@ def plot(input):
 
 
 
-score_and_clean(incompletion_cutoff=3, output = 'scored.csv')
-# plot('scored_without_tests.csv')
+
+plot('scored.csv')
