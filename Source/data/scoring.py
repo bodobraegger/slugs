@@ -1,9 +1,13 @@
 from copy import copy
 import csv
+from scipy import stats
+from pingouin import ancova
 from math import floor
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
+from statistics import mean, stdev
+from math import sqrt
 from pprint import pprint
 
 import pandas as pd
@@ -47,6 +51,7 @@ def score_and_clean(input='merged.csv', tests_input = 'test_scores.csv', output=
 
         # attitude_cs_weston: sum each + 1
         # sus_brooke: odd question v directly, even question 4-v
+
     with open(input) as f:
         r = csv.DictReader(f)
         answers = dict()
@@ -57,6 +62,8 @@ def score_and_clean(input='merged.csv', tests_input = 'test_scores.csv', output=
         questionnaire_headers['POST.attitude_cs_haynie'] = []
         questionnaire_headers['POST.attitude_cs_weston'] = []
         questionnaire_headers['POST.sus_brooke'] = []
+        game_choices = ["Every day", "Several times a week", "Once a week", "Once a month", "Less"]
+        game_choices.reverse()
 
 
         for i, participant_row in enumerate(r):
@@ -80,9 +87,11 @@ def score_and_clean(input='merged.csv', tests_input = 'test_scores.csv', output=
                     for h in questionnaire_headers[q]:
                         
                         answers[q][code]['gender']=participant_row[f'PRE.demographics.1.player.gender']
+                        if(participant_row[f'PRE.demographics.1.player.gender'] ==''):
+                            answers[q][code]['gender']=participant_row['POST.demographics.1.player.gender']
                         answers[q][code]['cs_exp']=participant_row[f'PRE.demographics.1.player.cs_experience']
                         answers[q][code]['js_exp']=participant_row[f'PRE.demographics.1.player.js_experience']
-                        answers[q][code]['video_games']=participant_row[f'PRE.demographics.1.player.video_games']
+                        answers[q][code]['video_games']=game_choices.index(participant_row[f'PRE.demographics.1.player.video_games'])
                         answers[q][code]['age']=participant_row[f'PRE.demographics.1.player.age']
                         answers[q][code]['native_tongue']=participant_row[f'PRE.demographics.1.player.mother_tongue']
                         answers[q][code]['english']=participant_row[f'PRE.demographics.1.player.english_understanding']
@@ -121,28 +130,6 @@ def score_and_clean(input='merged.csv', tests_input = 'test_scores.csv', output=
                                 qs_count+=1
                             elif(participant_row[f'{h}.group.questionnaire'] == 'sus_brooke'):
                                 answers[q][code]['score'] += 2 # LIKERT 5, 0-4
-
-
-
-
-
-
-            
-            # for h in attitude_games_chang_headers:
-            #     answers[participant_row['PRE.participant.code']]= participant_row[f'{h}.player.answer']
-            # print(answers)
-
-            # 
-            #  
-            # analysis: 
-            # visualize
-            # compare boys vs girls from before intervention, then after intervention, and overall from before to after
-            # for attitudes: you only check deltas
-            # test normality: shapiro wilk, if normal: normal T test
-                # if not: non-parametric T test
-            # null-hypo: no effect, e.g. no difference between girls and boys
-            # p value: probability that we observe null-hypo to be true, we want it to be < 0.05
-            # ancova to control for differences present before intervention
 
         # pprint(answers, sort_dicts=False)
         incomplete = dict()
@@ -218,8 +205,8 @@ def score_and_clean(input='merged.csv', tests_input = 'test_scores.csv', output=
                                 participant_answers[p][h]=answers_complete[q][p][c]['score']
                     if 'DELTA.' in h:
                         participant_answers[p][h] = participant_answers[p][h.replace('DELTA.', 'POST.')] - participant_answers[p][h.replace('DELTA.', 'PRE.')]
-                    print(answers_complete[q][p].get('q1'), answers_complete[q][p])
-                    if answers_complete[q][p].get('q1') is not None:
+
+                    if h=='POST.sus_brooke' and answers_complete[q][p].get('q1') is not None:
                         participant_answers[p][f'{h}.q1'] = answers_complete[q][p].get('q1')
         # pprint(answers_complete, sort_dicts=False)
         # pprint(participant_answers, sort_dicts=False)
@@ -229,7 +216,6 @@ def score_and_clean(input='merged.csv', tests_input = 'test_scores.csv', output=
         # df.hist(columns=gender_participants.keys(), bins=len(gender_participants))
         for g in gender_participants:
             print(g, len(gender_participants[g]))
-        
         
         data = [participant_answers[p].values() for p in participant_answers]
         
@@ -245,8 +231,8 @@ def score_and_clean(input='merged.csv', tests_input = 'test_scores.csv', output=
             with open(output_raw_filtered, 'w') as o:
                 w = csv.writer(o)
                 for i, participant_row in enumerate(r):
-                    print(participant_row)
                     if(i==0):
+                        print(participant_row)
                         w.writerow(participant_row.keys())
                     if(participant_row['PRE.participant.code'] in participant_answers):
                         w.writerow(participant_row.values())
@@ -259,7 +245,45 @@ def plot(input):
     # df_male.hist()
     # df_flinta.hist()
     plt.style.use('tableau-colorblind10')
-    for d in [h for h in headers_questionnaires if 'sus_brooke' in h] + headers_delta:
+
+    headers_relevant = [h for h in headers_questionnaires if 'attitude' not in h] + headers_delta
+
+    # analysis: 
+    # visualize
+    # compare boys vs girls from before intervention, then after intervention, and overall from before to after
+    # for attitudes: you only check deltas
+    # test normality: shapiro wilk, if normal: normal T test
+        # if not: non-parametric T test
+    # null-hypo: no effect, e.g. no difference between girls and boys
+    # p value: probability that we observe null-hypo to be true, we want it to be < 0.05
+    # ancova to control for differences present before intervention
+
+    for c in headers_relevant:
+        stat, p = stats.shapiro(df_flinta[c])
+        print(f'shapiro-wilk (flinta*): {c : <38} : {stat= :.3f}, {p= :.3f}')
+        stat, p = stats.shapiro(df_male[c])
+        print(f'shapiro-wilk (male)   : {c : <38} : {stat= :.3f}, {p= :.3f}')
+
+    for c in headers_relevant:
+        _, p_f = stats.shapiro(df_flinta[c])
+        _, p_m = stats.shapiro(df_male[c])
+        
+        stat, p, out = None, None, None
+
+        if(p_f > 0.05 and p_m > 0.05):
+            stat, p = stats.ttest_ind(df_flinta[c], df_male[c])
+            out = f't-test (ind.): {c : <38} : {stat= :.3f}, {p= :.3f}'
+        else:
+            stat, p = stats.ttest_ind(df_flinta[c], df_male[c], trim=0.2)
+            out = f't-test (yuen): {c : <38} : {stat= :.3f}, {p= :.3f}'
+
+        cohens_d = (mean(df_flinta[c]) - mean(df_male[c])) / (sqrt((stdev(df_flinta[c]) ** 2 + stdev(df_male[c]) ** 2) / 2))
+        print(f'{out}, {cohens_d= :.3f}')
+
+
+    print(ancova(data=df, dv='POST.test', covar='POST.test.js', between='gender', ))
+    
+    for d in headers_relevant:
         colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
         fig, ax = plt.subplots(1,1)
         plt.title(d)
@@ -284,5 +308,5 @@ def plot(input):
 
 
 
-
+# score_and_clean(output='scored.csv', incompletion_cutoff=3)
 plot('scored.csv')
