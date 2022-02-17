@@ -25,6 +25,27 @@ headers_questionnaires = ['PRE.test', 'PRE.attitude_games_chang', 'PRE.attitude_
 headers_delta = ['DELTA.test', 'DELTA.attitude_cs_weston'] + [f'DELTA.{h}' for h in headers_haynie]
 headers = headers_demo + headers_questionnaires + headers_delta
 
+def plot_hist(all,a,b,title,label_a, label_b):
+    colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+    fig, ax = plt.subplots(1,1)
+    plt.title(title)
+    plt.hist([a, b], label = [f'{label_a}', f'{label_b}'], rwidth=1)
+    
+    plt.axvline(a.mean(), linestyle='dashed', linewidth=1, color=colors[0])
+    min_ylim, max_ylim = plt.ylim()
+    plt.text(a.mean()+.1, max_ylim*0.9, f'Mean - {label_a}: {a.mean() :.2f}')
+
+    plt.axvline(b.mean(), linestyle='dashed', linewidth=1, color=colors[1])
+    min_ylim, max_ylim = plt.ylim()
+    plt.text(b.mean()+.1, max_ylim*0.7, f'Mean - {label_b}: {b.mean() :.2f}')
+
+    plt.axvline(all.mean()+.1, linestyle='dashed', linewidth=1, color=colors[2])
+    min_ylim, max_ylim = plt.ylim()
+    plt.text(all.mean(), max_ylim*0.8, f'Mean - All: {all.mean() :.2f}')
+
+    plt.legend(loc='upper left')
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
+    plt.show()
 
 def merge(): 
     """ used to merge pre and post test data that has since been discarded """
@@ -270,7 +291,7 @@ def plot(input):
         
         stat, p, out = None, None, None
 
-        if(p_f > 0.05 and p_m > 0.05):
+        if(p_f <= 0.05 and p_m <= 0.05):
             stat, p = stats.ttest_ind(df_flinta[c], df_male[c])
             out = f't-test (ind.): {c : <38} : {stat= :.3f}, {p= :.3f}'
         else:
@@ -281,32 +302,35 @@ def plot(input):
         print(f'{out}, {cohens_d= :.3f}')
 
 
-    print(ancova(data=df, dv='POST.test', covar='POST.test.js', between='gender', ))
-    
-    for d in headers_relevant:
-        colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
-        fig, ax = plt.subplots(1,1)
-        plt.title(d)
-        plt.hist([df_flinta[d], df_male[d]], label = [f'FLINTA*', f'Male'], rwidth=1)
+    # print(ancova(data=df, dv='POST.test', covar='POST.test.js', between='gender', ))
+
+
+    d = 'POST.sus_brooke'
+    df_gamers, df_nongamers = df[(mask:=df.video_games > 1)], df[~mask]
+    _, p_f = stats.shapiro(df_gamers[d])
+    _, p_m = stats.shapiro(df_nongamers[d])
         
-        plt.axvline(df_flinta[d].mean(), linestyle='dashed', linewidth=1, color=colors[0])
-        min_ylim, max_ylim = plt.ylim()
-        plt.text(df_flinta[d].mean()+.1, max_ylim*0.9, 'Mean - FLINTA*: {:.2f}'.format(df_flinta[d].mean()))
+    stat, p, out = None, None, None
+    if(p_f <= 0.05 and p_m <= 0.05):
+        stat, p = stats.ttest_ind(df_gamers[d], df_nongamers[d])
+        t = d+' gamers-nongamers'
+        out = f't-test (ind.): {t : <38} : {stat= :.3f}, {p= :.3f}'
+    else:
+        t = d+' gamers-nongamers'
+        stat, p = stats.ttest_ind(df_gamers[d], df_nongamers[d], trim=0.2)
+        out = f't-test (yuen): {t : <38} : {stat= :.3f}, {p= :.3f}'
 
-        plt.axvline(df_male[d].mean(), linestyle='dashed', linewidth=1, color=colors[1])
-        min_ylim, max_ylim = plt.ylim()
-        plt.text(df_male[d].mean()+.1, max_ylim*0.7, 'Mean - Male: {:.2f}'.format(df_male[d].mean()))
+    cohens_d = (mean(df_gamers[c]) - mean(df_nongamers[c])) / (sqrt((stdev(df_gamers[c]) ** 2 + stdev(df_nongamers[c]) ** 2) / 2))
+    print(f'{out}, {cohens_d= :.3f}')
+    plot_hist(df[d], df_gamers[d], df_nongamers[d], d, 'Gamers', 'Non-Gamers (1/Month or less)')
 
-        plt.axvline(df[d].mean()+.1, linestyle='dashed', linewidth=1, color=colors[2])
-        min_ylim, max_ylim = plt.ylim()
-        plt.text(df[d].mean(), max_ylim*0.8, 'Mean - All: {:.2f}'.format(df[d].mean()))
 
-        plt.legend(loc='upper left')
-        ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
-        plt.show()
+    for d in headers_relevant:
+        plot_hist(df[d], df_flinta[d], df_male[d], d, 'FLINTA*', 'Male')
 
 
 
 
 # score_and_clean(output='scored.csv', incompletion_cutoff=3)
 plot('scored.csv')
+
