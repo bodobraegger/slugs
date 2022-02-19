@@ -25,26 +25,88 @@ headers_questionnaires = ['PRE.test', 'PRE.attitude_games_chang', 'PRE.attitude_
 headers_delta = ['DELTA.test', 'DELTA.attitude_cs_weston'] + [f'DELTA.{h}' for h in headers_haynie]
 headers = headers_demo + headers_questionnaires + headers_delta
 
-def plot_hist(all,a,b,title,label_a, label_b):
-    colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+
+colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+labels_colors = {'FLINTA*': '#77F', 'Male':colors[1], 'Gamers':colors[6], 'Non-Gamers (1/month or less)':colors[9], 'all': colors[7]}
+
+def get_complementary(color):
+    # strip the # from the beginning
+    color = color[1:]
+ 
+    # convert the string into hex
+    color = int(color, 16)
+ 
+    # invert the three bytes
+    # as good as substracting each of RGB component by 255(FF)
+    comp_color = 0xFFFFFF ^ color
+ 
+    # convert the color back to hex by prefixing a #
+    comp_color = "#%06X" % comp_color
+ 
+    # return the result
+    return comp_color
+
+
+def plot_hist(all,a,b,title,label_a, label_b, include_experienced=True, save=True):
     fig, ax = plt.subplots(1,1)
+    fig.set_size_inches(7, 7)
+    # plt.tight_layout()
+    plt.subplots_adjust(left=0.08, right=0.92, top=0.925, bottom=0.075)
     plt.title(title)
-    plt.hist([a, b], label = [f'{label_a}', f'{label_b}'], rwidth=1)
-    
-    plt.axvline(a.mean(), linestyle='dashed', linewidth=1, color=colors[0])
-    min_ylim, max_ylim = plt.ylim()
-    plt.text(a.mean()+.1, max_ylim*0.9, f'Mean - {label_a}: {a.mean() :.2f}')
+    plt.xlabel('Score')
+    plt.ylabel(f'Nr. of Participants, total:{len(all)}')
 
-    plt.axvline(b.mean(), linestyle='dashed', linewidth=1, color=colors[1])
-    min_ylim, max_ylim = plt.ylim()
-    plt.text(b.mean()+.1, max_ylim*0.7, f'Mean - {label_b}: {b.mean() :.2f}')
-
-    plt.axvline(all.mean()+.1, linestyle='dashed', linewidth=1, color=colors[2])
-    min_ylim, max_ylim = plt.ylim()
-    plt.text(all.mean(), max_ylim*0.8, f'Mean - All: {all.mean() :.2f}')
-
+    counts, bins, patches = plt.hist([a, b], 
+        label = [f'{label_a}, total:{len(a)}', f'{label_b}, total:{len(b)}'], 
+        rwidth=.99, 
+        # stacked=True,
+        bins=np.floor(np.arange(all.min(), all.max()+1, (all.max()-all.min())/3)),
+        color=[labels_colors[label_a], labels_colors[label_b]],
+        )
+    # print(bins, all.max(), all.min())
     plt.legend(loc='upper left')
-    ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
+    
+    # Set the ticks to be at the edges of the bins.
+    ax.set_xticks(bins)
+    # Set the xaxis's tick labels to be formatted with 1 decimal place...
+    # ax.xaxis.set_major_formatter(FormatStrFormatter('%0.1f'))
+    # Label the raw counts and the percentages below the x-axis...
+    bin_centers = 0.5 * np.diff(bins) + bins[:-1]
+    for count, x in zip(counts[0], bin_centers):
+        # Label the raw counts
+        ax.annotate(str(count), xy=(x-.25*(bin_centers[1]-bin_centers[0]), 0), xycoords=('data', 'axes fraction'),
+            xytext=(0, 10), textcoords='offset points', va='top', ha='center', color='white')
+    for count, x in zip(counts[1], bin_centers):
+        # Label the raw counts
+        ax.annotate(str(count), xy=(x+.25*(bin_centers[1]-bin_centers[0]), 0), xycoords=('data', 'axes fraction'),
+            xytext=(0, 10), textcoords='offset points', va='top', ha='center', color='white')
+
+        # Label the percentages
+        # percent = '%0.0f%%' % (100 * float(count) / counts.sum())
+        # ax.annotate(percent, xy=(x, 0), xycoords=('data', 'axes fraction'), xytext=(0, -32), textcoords='offset points', va='top', ha='center')
+
+    
+    plt.axvline(a.mean(), linestyle='solid', linewidth=1, color=get_complementary(labels_colors[label_a]))
+    plt.axvline(a.mean(), linestyle='dashed', linewidth=2, color=labels_colors[label_a])
+    min_ylim, max_ylim = plt.ylim()
+    plt.text(a.mean(), max_ylim*0.85, f'Mean\n{label_a}\n{a.mean() :.2f}', ha='center', color='white',bbox=dict(facecolor=labels_colors[label_a],boxstyle='square',edgecolor='white',pad=1,  alpha=0.7))
+
+    plt.axvline(b.mean(), linestyle='solid', linewidth=1, color=get_complementary(labels_colors[label_b]))
+    plt.axvline(b.mean(), linestyle='dashed', linewidth=2, color=labels_colors[label_b])
+    min_ylim, max_ylim = plt.ylim()
+    plt.text(b.mean(), max_ylim*0.55, f'Mean\n{label_b}\n{b.mean() :.2f}', ha='center', color='white',bbox=dict(facecolor=labels_colors[label_b],boxstyle='square',edgecolor='white',pad=1,  alpha=0.7))
+
+    plt.axvline(all.mean(), linestyle='solid', linewidth=1, color=get_complementary(labels_colors['all']))
+    plt.axvline(all.mean(), linestyle='dashed', linewidth=2, color=labels_colors['all'])
+    min_ylim, max_ylim = plt.ylim()
+    plt.text(all.mean(), max_ylim*0.7, f'Mean\nAll\n{all.mean() :.2f}', ha='center', color='white',bbox=dict(facecolor=labels_colors['all'],boxstyle='square',edgecolor='white',pad=1,  alpha=0.7))
+
+    # ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
+    if(save):
+        path = 'figures/'
+        if not include_experienced:
+            path += 'no_js_exp/'
+        plt.savefig(f'{path}{title}-{label_a.split(" ")[0]}_{label_b.split(" ")[0]}.png')
 
 def merge(): 
     """ used to merge pre and post test data that has since been discarded """
@@ -258,9 +320,10 @@ def score_and_clean(input='merged.csv', tests_input = 'test_scores.csv', output=
                         w.writerow(participant_row.values())
                 
 
-def plot(input):
+def plot(input, include_experienced=True, save=True, show=False):
     df = pd.read_csv(input)
-    print(df)
+    if not include_experienced:
+        df = df[(mask:=df.js_exp == False)]
     df_male, df_flinta = df[(mask:=df.gender == 'Male')], df[~mask]
     # df_male.hist()
     # df_flinta.hist()
@@ -328,12 +391,12 @@ def plot(input):
     print(f'{len(df_flinta_gamers)=}, {len(df_flinta_nongamers)=}, {len(df_male_gamers)=},{len(df_male_nongamers)=}')
 
 
-    plot_hist(df[d], df_gamers[d], df_nongamers[d], d, 'Gamers', 'Non-Gamers (1/month or less)')
+    plot_hist(df[d], df_gamers[d], df_nongamers[d], d, 'Gamers', 'Non-Gamers (1/month or less)', include_experienced, save)
     for d in headers_relevant:
-        plot_hist(df[d], df_flinta[d], df_male[d], d, 'FLINTA*', 'Male')
+        plot_hist(df[d], df_flinta[d], df_male[d], d, 'FLINTA*', 'Male', include_experienced, save)
     
-
-    plt.show()
+    if(show):
+        plt.show()
 
 
 
