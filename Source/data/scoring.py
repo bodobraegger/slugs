@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
 from statistics import mean, stdev
-from math import sqrt
+from math import sqrt, floor, ceil
 from pprint import pprint
 
 import pandas as pd
@@ -27,7 +27,7 @@ headers = headers_demo + headers_questionnaires + headers_delta
 
 
 colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
-labels_colors = {'FLINTA*': '#77F', 'Male':colors[1], 'Gamers':colors[6], 'Non-Gamers (1/month or less)':colors[9], 'all': colors[7]}
+labels_colors = {'FLINTA*': '#77F', 'Male':colors[1], 'Gamers':colors[6], 'Non-Gamers\n(1/month or less)':colors[9], 'all': colors[7]}
 
 def get_complementary(color):
     # strip the # from the beginning
@@ -47,7 +47,7 @@ def get_complementary(color):
     return comp_color
 
 
-def plot_hist(all,a,b,title,label_a, label_b, include_experienced=True, save=True):
+def plot_hist(min_bins, all,a,b,title,label_a, label_b, include_experienced=True, save=True):
     fig, ax = plt.subplots(1,1)
     fig.set_size_inches(7, 7)
     # plt.tight_layout()
@@ -56,16 +56,21 @@ def plot_hist(all,a,b,title,label_a, label_b, include_experienced=True, save=Tru
     plt.xlabel('Score')
     plt.ylabel(f'Nr. of Participants, total:{len(all)}')
 
+    bins=np.arange(all.min(), all.max()+1, round((all.max()-all.min())/min_bins))
+    if len(bins) <= min_bins: bins=np.arange(all.min(), all.max()+1, round((all.max()-all.min())/(min_bins+1)))
+    bins=np.ceil(bins)
     counts, bins, patches = plt.hist([a, b], 
         label = [f'{label_a}, total:{len(a)}', f'{label_b}, total:{len(b)}'], 
         rwidth=.99, 
         # stacked=True,
-        bins=np.floor(np.arange(all.min(), all.max()+1, (all.max()-all.min())/3)),
+        bins=bins,
         color=[labels_colors[label_a], labels_colors[label_b]],
         )
     # print(bins, all.max(), all.min())
     plt.legend(loc='upper left')
     
+    # print(bins)
+
     # Set the ticks to be at the edges of the bins.
     ax.set_xticks(bins)
     # Set the xaxis's tick labels to be formatted with 1 decimal place...
@@ -89,24 +94,26 @@ def plot_hist(all,a,b,title,label_a, label_b, include_experienced=True, save=Tru
     plt.axvline(a.mean(), linestyle='solid', linewidth=1, color=get_complementary(labels_colors[label_a]))
     plt.axvline(a.mean(), linestyle='dashed', linewidth=2, color=labels_colors[label_a])
     min_ylim, max_ylim = plt.ylim()
-    plt.text(a.mean(), max_ylim*0.85, f'Mean\n{label_a}\n{a.mean() :.2f}', ha='center', color='white',bbox=dict(facecolor=labels_colors[label_a],boxstyle='square',edgecolor='white',pad=1,  alpha=0.7))
+    plt.text(a.mean(), max_ylim*0.85, f'Mean\n{label_a}\n{a.mean() :.2f}', ha='center', color='white',bbox=dict(facecolor=labels_colors[label_a],boxstyle='square',edgecolor='white',pad=.5,  alpha=0.7))
 
     plt.axvline(b.mean(), linestyle='solid', linewidth=1, color=get_complementary(labels_colors[label_b]))
     plt.axvline(b.mean(), linestyle='dashed', linewidth=2, color=labels_colors[label_b])
     min_ylim, max_ylim = plt.ylim()
-    plt.text(b.mean(), max_ylim*0.55, f'Mean\n{label_b}\n{b.mean() :.2f}', ha='center', color='white',bbox=dict(facecolor=labels_colors[label_b],boxstyle='square',edgecolor='white',pad=1,  alpha=0.7))
+    plt.text(b.mean(), max_ylim*0.55, f'Mean\n{label_b}\n{b.mean() :.2f}', ha='center', color='white',bbox=dict(facecolor=labels_colors[label_b],boxstyle='square',edgecolor='white',pad=.5,  alpha=0.7))
 
     plt.axvline(all.mean(), linestyle='solid', linewidth=1, color=get_complementary(labels_colors['all']))
     plt.axvline(all.mean(), linestyle='dashed', linewidth=2, color=labels_colors['all'])
     min_ylim, max_ylim = plt.ylim()
-    plt.text(all.mean(), max_ylim*0.7, f'Mean\nAll\n{all.mean() :.2f}', ha='center', color='white',bbox=dict(facecolor=labels_colors['all'],boxstyle='square',edgecolor='white',pad=1,  alpha=0.7))
+    plt.text(all.mean(), max_ylim*0.7, f'Mean\nAll\n{all.mean() :.2f}', ha='center', color='white',bbox=dict(facecolor=labels_colors['all'],boxstyle='square',edgecolor='white',pad=.5,  alpha=0.7))
 
     # ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
     if(save):
         path = 'figures/'
         if not include_experienced:
             path += 'no_js_exp/'
-        plt.savefig(f'{path}{title}-{label_a.split(" ")[0]}_{label_b.split(" ")[0]}.png')
+        name1 = label_a.replace("\n", " ").replace("*", "").split(" ")[0]
+        name2 = label_b.replace("\n", " ").replace("*", "").split(" ")[0]
+        plt.savefig(f'{path}{title}-{name1}_{name2}.png')
 
 def merge(): 
     """ used to merge pre and post test data that has since been discarded """
@@ -391,9 +398,9 @@ def plot(input, include_experienced=True, save=True, show=False):
     print(f'{len(df_flinta_gamers)=}, {len(df_flinta_nongamers)=}, {len(df_male_gamers)=},{len(df_male_nongamers)=}')
 
 
-    plot_hist(df[d], df_gamers[d], df_nongamers[d], d, 'Gamers', 'Non-Gamers (1/month or less)', include_experienced, save)
+    plot_hist(4, df[d], df_gamers[d], df_nongamers[d], d, 'Gamers', 'Non-Gamers\n(1/month or less)', include_experienced, save)
     for d in headers_relevant:
-        plot_hist(df[d], df_flinta[d], df_male[d], d, 'FLINTA*', 'Male', include_experienced, save)
+        plot_hist(4, df[d], df_flinta[d], df_male[d], d, 'FLINTA*', 'Male', include_experienced, save)
     
     if(show):
         plt.show()
