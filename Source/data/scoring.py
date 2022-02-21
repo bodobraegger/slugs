@@ -79,11 +79,11 @@ def plot_hist(min_bins, all,a,b,title,label_a, label_b, include_experienced=True
     bin_centers = 0.5 * np.diff(bins) + bins[:-1]
     for count, x in zip(counts[0], bin_centers):
         # Label the raw counts
-        ax.annotate(str(count), xy=(x-.25*(bin_centers[1]-bin_centers[0]), 0), xycoords=('data', 'axes fraction'),
+        ax.annotate(str(round(count)), xy=(x-.25*(bin_centers[1]-bin_centers[0]), 0), xycoords=('data', 'axes fraction'),
             xytext=(0, 10), textcoords='offset points', va='top', ha='center', color='white')
     for count, x in zip(counts[1], bin_centers):
         # Label the raw counts
-        ax.annotate(str(count), xy=(x+.25*(bin_centers[1]-bin_centers[0]), 0), xycoords=('data', 'axes fraction'),
+        ax.annotate(str(round(count)), xy=(x+.25*(bin_centers[1]-bin_centers[0]), 0), xycoords=('data', 'axes fraction'),
             xytext=(0, 10), textcoords='offset points', va='top', ha='center', color='white')
 
         # Label the percentages
