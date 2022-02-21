@@ -18,3 +18,25 @@ The repository is structured as follows:
 - The code for the online survey is written in the [oTree](https://www.otree.org/) python framework, and included in the folders `Source/survey/` (otree 5+), and `Source/survey_otree3port/` (otree 3.3.11). I included both because the oTree servers at ETH were not up to date and I realized this too late. To run this, please reference the online oTree documentation.
 - The LaTeX code for the report pdf is in the `Documents/Report/latex` folder
 - In general, all PDF files are in the Documents folder. 
+
+---
+Handy git commit code for automatic deploying and versioning for Github Pages (after setting up a deploy branch on the respective github repo)
+`.git/hooks/pre-commit`
+```bash
+#!/bin/sh
+f="./me.html" # the below line automatically increases a ?v=X counter, to force browsers to reload the JS files even when cached
+sed -r 's/(.*)(\?v=)([0-9]+)(.*)/echo "\1\2$((\3+1))\4"/ge' -i.bak "$f"
+# rm "$f.bak"
+git add $f
+```
+
+`.git/hooks/post-commit`:
+```bash
+#!/bin/sh
+cd /home/bodie/projects/thesis
+git push github master:deploy
+```
+
+Note: This clashes with git LFS support and the hooks would need to be merged manually.
+
+ 
